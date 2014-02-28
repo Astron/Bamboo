@@ -1,10 +1,8 @@
 // Filename: Field.cpp
-#include "util/HashGenerator.h"
-#include "value/default.h"
+#include "Field.h"
 #include "module/Module.h"
 #include "module/Struct.h"
-
-#include "Field.h"
+#include "traits/default.h"
 namespace bamboo { // open namespace
 
 // constructor
@@ -68,14 +66,6 @@ void Field::set_id(unsigned int id) {
 // set_struct sets a pointer to the struct containing the field.
 void Field::set_struct(Struct *strct) {
     m_struct = strct;
-}
-
-// generate_hash accumulates the properties of this field into the hash.
-void Field::generate_hash(HashGenerator& hashgen) const {
-    hashgen.add_int(m_id);
-    hashgen.add_string(m_name);
-    m_type->generate_hash(hashgen);
-    KeywordList::generate_hash(hashgen);
 }
 
 

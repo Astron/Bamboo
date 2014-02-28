@@ -43,7 +43,7 @@ if(BISON_FOUND)
   add_custom_command(
     SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
     COMMAND ${BISON_EXECUTABLE}
-    ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser.h
+    ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser-defs.h
          -o ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
          ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
     COMMENT "Generating dcfile/parser.cpp"
@@ -80,17 +80,14 @@ set(DCFILE_SOURCES
   src/dcfile/parser.cpp
   src/dcfile/lexer.cpp
   src/dcfile/write.cpp
-  src/dcfile/read.cpp)
+  src/dcfile/format.cpp)
 
-set(NETWORK_SOURCES
-  src/value/format.cpp
-  src/value/parse.cpp
-  src/value/default.cpp)
-
-set(UTIL_SOURCES
-  src/util/PrimeNumberGenerator.cpp
-  src/util/HashGenerator.cpp
-  src/util/hash_legacy.cpp)
+set(TRAITS_SOURCES
+  src/traits/default.cpp
+  src/traits/hashLegacy.cpp
+  src/traits/HashGenerator.cpp
+  src/traits/primes.cpp
+  src/traits/sizetag.cpp)
 
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")

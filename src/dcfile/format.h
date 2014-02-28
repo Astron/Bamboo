@@ -2,7 +2,7 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Forward declarations
@@ -10,10 +10,10 @@ class DistributedType;
 
 // format_value steps through packed data and unpacks it as a .dc file parameter value.
 //     An DistributedType represents any type with defined structure (Class, Field, method, etc...)
-std::string format_value(const DistributedType *, const std::vector<uint8_t>& packed);
-std::string format_value(const DistributedType *, const std::string& packed);
-void format_value(const DistributedType *, const std::vector<uint8_t>& packed, std::ostream& out);
-void format_value(const DistributedType *, const std::string& packed, std::ostream& out);
+std::string format_dcvalue(const DistributedType *, const std::vector<uint8_t>& packed);
+std::string format_dcvalue(const DistributedType *, const std::string& packed);
+void format_dcvalue(const DistributedType *, const std::vector<uint8_t>& packed, std::ostream& out);
+void format_dcvalue(const DistributedType *, const std::string& packed, std::ostream& out);
 
 // format_hex outputs <str> as a hexidecimal constant enclosed in angle-brackets (<>)
 std::string format_hex(const std::string& str);
@@ -26,4 +26,4 @@ std::string format_quoted(char quote_mark, const std::string& str);
 void format_quoted(char quote_mark, const std::string& str, std::ostream& out);
 
 
-} // close namespace dclass
+} // close namespace bamboo

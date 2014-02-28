@@ -30,9 +30,6 @@ class MolecularField : public Field, public Struct {
     //     For a molecular field, this always returns false (molecular defaults are implict).
     virtual bool set_default_value(const std::string& default_value);
 
-    // generate_hash accumulates the properties of this field into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   protected:
     using Field::set_id;
 };

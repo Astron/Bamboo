@@ -1,8 +1,6 @@
 // Filename: Method.cpp
-#include "util/HashGenerator.h"
-#include "module/Parameter.h"
-
 #include "Method.h"
+#include "module/Parameter.h"
 using namespace std;
 namespace bamboo { // open namespace
 
@@ -59,15 +57,6 @@ bool Method::add_parameter(Parameter *param) {
     }
 
     return true;
-}
-
-// generate_hash accumulates the properties of this method into the hash
-void Method::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
-    hashgen.add_int(m_parameters.size());
-    for(auto it = m_parameters.begin(); it != m_parameters.end(); ++it) {
-        (*it)->generate_hash(hashgen);
-    }
 }
 
 

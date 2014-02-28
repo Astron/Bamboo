@@ -1,7 +1,7 @@
 // Filename: Class.h
 #pragma once
-#include "Struct.h"
-#include <unordered_map> // std::unordered_map
+#include <unordered_map>
+#include "module/Struct.h"
 namespace bamboo { // open namespace
 
 
@@ -48,9 +48,6 @@ class Class : public Struct {
 
     // add_field adds a new Field to the class.
     virtual bool add_field(Field *field);
-
-    // generate_hash accumulates the properties of this type into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
 
   private:
     // add_child marks a class as a child of this class.

@@ -1,10 +1,4 @@
 // Filename: HashGenerator.h
-// Created by: drose (22 Mar, 2001)
-//
-// Copyright (c) Carnegie Mellon University.  All rights reserved.
-// All use of this software is subject to the terms of the revised BSD license.
-//
-
 #pragma once
 #include <stdint.h> // for fixed-with integers
 #include <string>   // for std::string

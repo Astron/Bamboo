@@ -49,9 +49,6 @@ class Field : public KeywordList {
     //     Returns false if the value is invalid for the field's type.
     virtual bool set_default_value(const std::string& default_value);
 
-    // generate_hash accumulates the properties of this field into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   protected:
     // set_id sets the unique index number associated with the field.
     void set_id(unsigned int id);

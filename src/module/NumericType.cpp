@@ -1,14 +1,11 @@
 // Filename: NumericType.cpp
+#include "NumericType.h"
 
 // This must be defined for inttypes.h to define the fixed with integer macros
 #if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
 #define __STDC_LIMIT_MACROS
 #endif
-
 #include <inttypes.h> // fixed-width integer limits
-#include "util/HashGenerator.h"
-
-#include "NumericType.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -189,19 +186,6 @@ bool NumericType::set_range(const NumericRange& range) {
     }
 
     return true;
-}
-
-// generate_hash accumulates the properties of this type into the hash.
-void NumericType::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
-    hashgen.add_int(m_divisor);
-    if(has_modulus()) {
-        hashgen.add_int(m_modulus.integer);
-    }
-    if(has_range()) {
-        hashgen.add_int(m_range.min.integer);
-        hashgen.add_int(m_range.max.integer);
-    }
 }
 
 

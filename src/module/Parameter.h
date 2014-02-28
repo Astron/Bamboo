@@ -41,9 +41,6 @@ class Parameter {
     //     Returns false if the value is invalid for the parameter's type.
     bool set_default_value(const std::string& default_value);
 
-    // generate_hash accumulates the properties of this type into the hash.
-    void generate_hash(HashGenerator& hashgen) const;
-
   private:
     // set_method sets a pointer to the method containing the parameter.
     void set_method(Method *method);

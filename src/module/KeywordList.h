@@ -36,9 +36,6 @@ class KeywordList {
     //     Returns true if it is added, false if it was already there.
     bool add_keyword(const std::string& keyword);
 
-    // generate_hash accumulates the properties of these keywords into the hash.
-    void generate_hash(HashGenerator& hashgen) const;
-
   private:
     std::vector<std::string> m_keywords; // the actual list of keywords
     std::unordered_set<std::string> m_keywords_by_name; // a map of name to keywords in list

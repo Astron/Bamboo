@@ -1,9 +1,8 @@
 // Filename: ArrayType.h
 #pragma once
-#include <stddef.h> // size_t
+#include <stddef.h> // for size_t
+#include "module/DistributedType.h"
 #include "module/NumericRange.h"
-
-#include "DistributedType.h"
 namespace bamboo { // open namespace
 
 
@@ -32,9 +31,6 @@ class ArrayType : public DistributedType {
     inline bool has_range() const;
     // get_range returns the range of sizes that the array may have.
     inline NumericRange get_range() const;
-
-    // generate_hash accumulates the properties of this type into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
 
   private:
     DistributedType *m_element_type; // type of the elements contained in the array

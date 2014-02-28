@@ -1,8 +1,6 @@
 // Filename: MolecularField.cpp
-#include "util/HashGenerator.h"
-#include "module/Class.h"
-
 #include "MolecularField.h"
+#include "module/Class.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -71,17 +69,6 @@ bool MolecularField::set_default_value(const std::string&) {
     // MolecularField default values are implict from their
     // atomic components and cannot be defined manually.
     return false;
-}
-
-// generate_hash accumulates the properties of this field into the hash.
-void MolecularField::generate_hash(HashGenerator& hashgen) const {
-    hashgen.add_int(Field::m_id);
-    hashgen.add_string(Field::m_name);
-    // We aren't the owner of the fields so we only use their id in the hash
-    hashgen.add_int(m_fields.size());
-    for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
-        hashgen.add_int((*it)->get_id());
-    }
 }
 
 

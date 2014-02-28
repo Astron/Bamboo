@@ -1,6 +1,7 @@
 // Filename: NumericRange.h
 #pragma once
 #include <math.h> // INFINITY
+#include <stdint.h>
 namespace bamboo { // open namespace bamboo
 
 

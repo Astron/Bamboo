@@ -10,7 +10,7 @@
 
 #include "format.h"
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 // A Formatter steps through packed data and unpacks it as a .dc file parameter format.
 //     This is created and called by format() to handle formatting.
@@ -456,21 +456,21 @@ struct Formatter {
 
 // format unpacks the packed data into a string formatted for a .dc file.
 //     This is used to produce default values when outputting a distributed class to a file.
-string format_value(const DistributedType *dtype, const vector<uint8_t>& packed) {
+string format_dcvalue(const DistributedType *dtype, const vector<uint8_t>& packed) {
     ostringstream ss;
-    format_value(dtype, packed, ss);
+    format_dcvalue(dtype, packed, ss);
     return ss.str();
 }
-string format_value(const DistributedType *dtype, const string& packed) {
+string format_dcvalue(const DistributedType *dtype, const string& packed) {
     ostringstream ss;
-    format_value(dtype, packed, ss);
+    format_dcvalue(dtype, packed, ss);
     return ss.str();
 }
-void format_value(const DistributedType *dtype, const vector<uint8_t>& packed, ostream& out) {
+void format_dcvalue(const DistributedType *dtype, const vector<uint8_t>& packed, ostream& out) {
     Formatter formatter(packed, out);
     formatter.format(dtype);
 }
-void format_value(const DistributedType *dtype, const string& packed, ostream& out) {
+void format_dcvalue(const DistributedType *dtype, const string& packed, ostream& out) {
     Formatter formatter(packed, out);
     formatter.format(dtype);
 }
@@ -520,4 +520,4 @@ string format_quoted(char quote_mark, const string& str) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

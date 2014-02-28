@@ -41,9 +41,6 @@ class NumericType : public DistributedType {
     //     Returns false if the range is not valid for this type.
     bool set_range(const NumericRange& range);
 
-    // generate_hash accumulates the properties of this type into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   private:
     unsigned int m_divisor;
 

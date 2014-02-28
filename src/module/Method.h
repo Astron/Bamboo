@@ -3,7 +3,6 @@
 #include <stddef.h>      // size_t
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
-
 #include "DistributedType.h"
 namespace bamboo { // open namespace
 
@@ -32,9 +31,6 @@ class Method : public DistributedType {
     // add_parameter adds a new parameter to the method.
     //     Returns false if the parameter could not be added to the method.
     bool add_parameter(Parameter *param);
-
-    // generate_hash accumulates the properties of this field into the hash
-    virtual void generate_hash(HashGenerator& hashgen) const;
 
   private:
     std::vector<Parameter *> m_parameters; // the "arguments" or parameters of the method

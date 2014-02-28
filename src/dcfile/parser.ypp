@@ -2,11 +2,19 @@
 //
 
 %{
-	#include "dcfile/lexerDefs.h"
-	#include "dcfile/parserDefs.h"
-	#include "dcfile/parser.h"
-	#include "dcfile/write.h" // format_type(Type);
+	#include "lex.h"
+	#include "parse.h"
 
+	#include <unistd.h>
+	#include <stdint.h> // for fixed-width integer limits
+	#include <math.h>   // for float-macro INFINITY
+	#include <stack>    // std::stack
+	#include <fstream>  // std::ifstream
+	#include <sstream>  // std::stringstream
+
+	#include "dcfile/token.h"
+	#include "dcfile/parser-defs.h"
+	#include "dcfile/write.h"           // format_type(Type);
 	#include "module/Module.h"
 	#include "module/DistributedType.h"
 	#include "module/NumericRange.h"
@@ -19,22 +27,17 @@
 	#include "module/Parameter.h"
 	#include "module/MolecularField.h"
 
-	#include <unistd.h>
-	#include <stdint.h> // Fixed width integer limits
-	#include <math.h>   // Float INFINITY
-	#include <stack>    // std::stack
-
-	#define yyparse run_parser
-	#define yylex run_lexer
-	#define yyerror parser_error
-	#define yywarning parser_warning
+	#define yylex dclex
+	#define yyparse dcparse
+	#define yyerror dcerror
+	#define yywarning dcwarning
 	#define yychar dcyychar
 	#define yydebug dcyydebug
 	#define yynerrs dcyynerrs
 
 	// Because our token type contains objects of type string, which
 	// require correct copy construction (and not simply memcpying), we
-	// cannot use bison's built-in auto-stack-grow feature.  As an easy
+	// cannot use bison's built-in autTo-stack-grow feature.  As an easy
 	// solution, we ensure here that we have enough yacc stack to start
 	// with, and that it doesn't ever try to grow.
 	#define YYINITDEPTH 1000
@@ -80,22 +83,22 @@
 // Defining the interface to the parser.
 ////////////////////////////////////////////////////////////////////
 
-	void init_file_parser(istream& in, const string& filename, Module& module)
+	static void dcparser_file(istream& in, const string& filename, Module& module)
 	{
 		parsed_module = &module;
-		init_file_lexer(in, filename);
+		dclexer_init(in, filename, START_DC_FILE);
 	}
 
-	void init_value_parser(istream& in, const string& source,
-	                       const DistributedType* type, string& output)
+	static void dcparser_value(istream& in, const string& source,
+	                           const DistributedType* type, string& output)
 	{
 		parsed_value = &output;
 		current_depth = 0;
 		type_stack.push(TypeAndDepth(type, 0));
-		init_value_lexer(in, source);
+		dclexer_init(in, source, START_DC_VALUE);
 	}
 
-	void cleanup_parser()
+	static void dcparser_cleanup()
 	{
 		current_depth = 0;
 		type_stack = stack<TypeAndDepth>();
@@ -103,23 +106,6 @@
 		parsed_value = (string*)NULL;
 	}
 
-	int parser_error_count()
-	{
-		return lexer_error_count();
-	}
-	int parser_warning_count()
-	{
-		return lexer_warning_count();
-	}
-
-	void parser_error(const string &msg)
-	{
-		lexer_error(msg);
-	}
-	void parser_warning(const string &msg)
-	{
-		lexer_warning(msg);
-	}
 %}
 
 // Use verbose errors
@@ -127,8 +113,8 @@
 %debug
 
 /* Value tokens */
-%token <u.uint64> UNSIGNED_INTEGER
-%token <u.real> REAL
+%token <uint64> UNSIGNED_INTEGER
+%token <real> REAL
 %token <str> STRING HEX_STRING IDENTIFIER CHAR
 
 /* Initial Tokens */
@@ -163,30 +149,30 @@
 
 
 /* Abstract Nonterminals */
-%type <u.dfield> named_field
-%type <u.dfield> unnamed_field
-%type <u.dparam> parameter
-%type <u.dmethod> method
-%type <u.dmolecule> molecular
+%type <dfield> named_field
+%type <dfield> unnamed_field
+%type <dparam> parameter
+%type <dmethod> method
+%type <dmolecule> molecular
 %type <strings> import_symbols
 %type <str> import_module
 %type <nametype> typedef
 
 /* Simple Nonterminals */
-%type <u.dfield> class_field
-%type <u.dfield> struct_field
-%type <u.dfield> defined_field
-%type <u.dclass> defined_class
-%type <u.dtype> defined_type
-%type <u.dtype> builtin_array_type
-%type <u.dnumeric> numeric_type
-%type <u.type> array_type_token
-%type <u.type> numeric_type_token
-%type <u.int64> signed_integer
-%type <u.uint32> small_unsigned_integer
-%type <u.uint32> char_or_uint
-%type <u.real> char_or_number
-%type <u.real> number
+%type <dfield> class_field
+%type <dfield> struct_field
+%type <dfield> defined_field
+%type <dclass> defined_class
+%type <dtype> defined_type
+%type <dtype> builtin_array_type
+%type <dnumeric> numeric_type
+%type <type> array_type_token
+%type <type> numeric_type_token
+%type <int64> signed_integer
+%type <uint32> small_unsigned_integer
+%type <uint32> char_or_uint
+%type <real> char_or_number
+%type <real> number
 %type <range> numeric_range
 %type <range> array_range
 %type <strings> keyword_list
@@ -206,21 +192,21 @@
 // These nonterminals are not-quite-obvious/kinda-hacky, but were made to statisfy a LALR-grammar.
 %type <nametype> typedef_type
 %type <nametype> nonmethod_type_with_name
-%type <u.dfield> field_with_name
-%type <u.dfield> field_with_name_as_array
-%type <u.dfield> field_with_name_and_default
-%type <u.dfield> method_as_field
-%type <u.dtype> nonmethod_type
-%type <u.dtype> nonmethod_type_no_array
-%type <u.dtype> type_with_array
-%type <u.dnumeric> numeric_token_only
-%type <u.dnumeric> numeric_with_range
-%type <u.dnumeric> numeric_with_modulus
-%type <u.dnumeric> numeric_with_divisor
-%type <u.dmethod> method_body
-%type <u.dparam> param_with_name
-%type <u.dparam> param_with_name_as_array
-%type <u.dparam> param_with_name_and_default
+%type <dfield> field_with_name
+%type <dfield> field_with_name_as_array
+%type <dfield> field_with_name_and_default
+%type <dfield> method_as_field
+%type <dtype> nonmethod_type
+%type <dtype> nonmethod_type_no_array
+%type <dtype> type_with_array
+%type <dnumeric> numeric_token_only
+%type <dnumeric> numeric_with_range
+%type <dnumeric> numeric_with_modulus
+%type <dnumeric> numeric_with_divisor
+%type <dmethod> method_body
+%type <dparam> param_with_name
+%type <dparam> param_with_name_as_array
+%type <dparam> param_with_name_and_default
 
 %%
 
@@ -329,26 +315,26 @@ typedef
 			DistributedType* dtype = parsed_module->get_type_by_name($1.name);
 			if(dtype == (DistributedType*)NULL)
 			{
-				parser_error("Unknown error adding typedef to module.");
+				dcerror("Unknown error adding typedef to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
 			if(dstruct == (Struct*)NULL)
 			{
-				parser_error("Cannot add 'typedef " + $1.name
+				dcerror("Cannot add 'typedef " + $1.name
 				             + "' to module because a typedef was already declared with that name.");
 				break;
 			}
 
 			if(dstruct->as_class())
 			{
-				parser_error("Cannot add 'typedef " + $1.name
+				dcerror("Cannot add 'typedef " + $1.name
 				             + "' to module because a class was already declared with that name.");
 			}
 			else
 			{
-				parser_error("Cannot add 'typedef " + $1.name
+				dcerror("Cannot add 'typedef " + $1.name
 				             + "' to module because a struct was already declared with that name.");
 			}
 		}
@@ -370,7 +356,7 @@ typedef_type
 nonmethod_type_with_name
 	: nonmethod_type IDENTIFIER
 	{
-		TokenType::NameType nt;
+		DCToken::NameType nt;
 		nt.type = $1;
 		nt.name = $2;
 		$$ = nt;
@@ -383,7 +369,7 @@ defined_type
 		DistributedType* dtype = parsed_module->get_type_by_name($1);
 		if(dtype == (DistributedType*)NULL)
 		{
-			parser_error("Type '" + string($1) + "' has not been declared.");
+			dcerror("Type '" + string($1) + "' has not been declared.");
 			$$ = NULL;
 			break;
 		}
@@ -418,26 +404,26 @@ dclass
 			DistributedType* dtype = parsed_module->get_type_by_name(current_class->get_name());
 			if(dtype == (DistributedType*)NULL)
 			{
-				parser_error("Unknown error adding class to module.");
+				dcerror("Unknown error adding class to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
 			if(dstruct == (Struct*)NULL)
 			{
-				parser_error("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->get_name()
 				             + "' to module because a typedef was already declared with that name.");
 				break;
 			}
 
 			if(dstruct->as_class())
 			{
-				parser_error("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->get_name()
 				             + "' to module because a class was already declared with that name.");
 			}
 			else
 			{
-				parser_error("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->get_name()
 				             + "' to module because a struct was already declared with that name.");
 			}
 		}
@@ -472,7 +458,7 @@ defined_class
 		DistributedType* dtype = parsed_module->get_type_by_name($1);
 		if(dtype == (DistributedType*)NULL)
 		{
-			parser_error("'dclass " + string($1) + "' has not been declared.");
+			dcerror("'dclass " + string($1) + "' has not been declared.");
 			$$ = NULL;
 			break;
 		}
@@ -480,7 +466,7 @@ defined_class
 		Struct* dstruct = dtype->as_struct();
 		if(dstruct == (Struct*)NULL)
 		{
-			parser_error("class cannot inherit from non-class type '" + string($1) + "'.");
+			dcerror("class cannot inherit from non-class type '" + string($1) + "'.");
 			$$ = NULL;
 			break;
 		}
@@ -488,7 +474,7 @@ defined_class
 		Class* dclass = dstruct->as_class();
 		if(dclass == (Class*)NULL)
 		{
-			parser_error("class cannot inherit from struct type '" + string($1) + "'.");
+			dcerror("class cannot inherit from struct type '" + string($1) + "'.");
 			$$ = NULL;
 			break;
 		}
@@ -514,7 +500,7 @@ class_fields
 			// Lets be really descriptive about why this failed
 			if(current_class->get_field_by_name($2->get_name()))
 			{
-				parser_error("Cannot add field '" + $2->get_name()
+				dcerror("Cannot add field '" + $2->get_name()
 				             + "', a field with that name already exists in 'dclass "
 				             + current_class->get_name() + "'.");
 			}
@@ -522,16 +508,16 @@ class_fields
 			{
 				if($2->as_molecular())
 				{
-					parser_error("Cannot use a molecular field as a constructor.");
+					dcerror("Cannot use a molecular field as a constructor.");
 				}
 				else
 				{
-					parser_error("The constructor must be the first field in the class.");
+					dcerror("The constructor must be the first field in the class.");
 				}
 			}
 			else
 			{
-				parser_error("Unknown error adding field to class.");
+				dcerror("Unknown error adding field to class.");
 			}
 		}
 	}
@@ -549,7 +535,7 @@ class_field
 
 		if($1->get_name().empty())
 		{
-			parser_error("An unnamed field can't be defined in a class.");
+			dcerror("An unnamed field can't be defined in a class.");
 			$$ = NULL;
 			break;
 		}
@@ -582,26 +568,26 @@ dstruct
 			DistributedType* dtype = parsed_module->get_type_by_name(current_struct->get_name());
 			if(dtype == (DistributedType*)NULL)
 			{
-				parser_error("Unknown error adding struct to module.");
+				dcerror("Unknown error adding struct to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
 			if(dstruct == (Struct*)NULL)
 			{
-				parser_error("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->get_name()
 				             + "' to module because a typedef was already declared with that name.");
 				break;
 			}
 
 			if(dstruct->as_class())
 			{
-				parser_error("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->get_name()
 				             + "' to module because a class was already declared with that name.");
 			}
 			else
 			{
-				parser_error("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->get_name()
 				             + "' to module because a struct was already declared with that name.");
 			}
 		}
@@ -624,21 +610,21 @@ struct_fields
 			// Lets be really descriptive about why this failed
 			if(current_struct->get_field_by_name($2->get_name()))
 			{
-				parser_error("Cannot add field '" + $2->get_name()
+				dcerror("Cannot add field '" + $2->get_name()
 				             + "', a field with that name already exists in 'struct "
 				             + current_struct->get_name() + "'.");
 			}
 			else if(current_struct->get_name() == $2->get_name())
 			{
-				parser_error("A constructor can't be defined in a struct.");
+				dcerror("A constructor can't be defined in a struct.");
 			}
 			else if($2->get_type()->as_method())
 			{
-				parser_error("A method can't be defined in a struct.");
+				dcerror("A method can't be defined in a struct.");
 			}
 			else
 			{
-				parser_error("Unknown error adding field to struct.");
+				dcerror("Unknown error adding field to struct.");
 			}
 		}
 	}
@@ -755,7 +741,7 @@ nonmethod_type_no_array
 
 		if($1->get_type() == T_METHOD)
 		{
-			parser_error("Cannot use a method type here.");
+			dcerror("Cannot use a method type here.");
 			$$ = NULL;
 			break;
 		}
@@ -804,11 +790,11 @@ molecular
 		{
 			if($3->as_molecular())
 			{
-				parser_error("Cannot add molecular '" + $3->get_name() + "' to a molecular field.");
+				dcerror("Cannot add molecular '" + $3->get_name() + "' to a molecular field.");
 			}
 			else
 			{
-				parser_error("Unkown error adding field " + $3->get_name() + " to molecular '"
+				dcerror("Unkown error adding field " + $3->get_name() + " to molecular '"
 				             + $1 + "'.");
 			}
 		}
@@ -829,16 +815,16 @@ molecular
 		{
 			if($3->as_molecular())
 			{
-				parser_error("Cannot add molecular '" + $3->get_name() + "' to a molecular field.");
+				dcerror("Cannot add molecular '" + $3->get_name() + "' to a molecular field.");
 			}
 			else if(!$1->has_matching_keywords(*$3))
 			{
-				parser_error("Mismatched keywords in molecular between " +
+				dcerror("Mismatched keywords in molecular between " +
 					$1->get_field(0)->get_name() + " and " + $3->get_name() + ".");
 			}
 			else
 			{
-				parser_error("Unkown error adding field " + $3->get_name() + " to molecular '"
+				dcerror("Unkown error adding field " + $3->get_name() + " to molecular '"
 				             + $1->get_name() + "'.");
 			}
 		}
@@ -851,7 +837,7 @@ defined_field
 	{
 		if(!current_class)
 		{
-			parser_error("Field '" + $1 + "' not defined in current class.");
+			dcerror("Field '" + $1 + "' not defined in current class.");
 			$$ = NULL;
 			break;
 		}
@@ -859,7 +845,7 @@ defined_field
 		Field *field = current_class->get_field_by_name($1);
 		if(field == (Field*)NULL)
 		{
-			parser_error("Field '" + $1 + "' not defined in current class.");
+			dcerror("Field '" + $1 + "' not defined in current class.");
 			$$ = NULL;
 			break;
 		}
@@ -893,7 +879,7 @@ builtin_array_type
 		}
 		else
 		{
-			parser_error("Found builtin ArrayType not handled by parser.");
+			dcerror("Found builtin ArrayType not handled by parser.");
 			$$ = NULL;
 		}
 	}
@@ -913,7 +899,7 @@ builtin_array_type
 		}
 		else
 		{
-			parser_error("Found builtin ArrayType not handled by parser.");
+			dcerror("Found builtin ArrayType not handled by parser.");
 			$$ = NULL;
 		}
 	}
@@ -935,7 +921,7 @@ numeric_with_range
 	{
 		if(!$1->set_range($3))
 		{
-			parser_error("Invalid range for type.");
+			dcerror("Invalid range for type.");
 		}
 
 		$$ = $1;
@@ -944,7 +930,7 @@ numeric_with_range
 	{
 		if(!$1->set_range($3))
 		{
-			parser_error("Invalid range for type.");
+			dcerror("Invalid range for type.");
 		}
 
 		$$ = $1;
@@ -953,7 +939,7 @@ numeric_with_range
 	{
 		if(!$1->set_range($3))
 		{
-			parser_error("Invalid range for type.");
+			dcerror("Invalid range for type.");
 		}
 
 		$$ = $1;
@@ -965,7 +951,7 @@ numeric_with_modulus
 	{
 		if(!$1->set_modulus($3))
 		{
-			parser_error("Invalid modulus for type.");
+			dcerror("Invalid modulus for type.");
 		}
 
 		$$ = $1;
@@ -977,14 +963,14 @@ numeric_with_divisor
 	{
 		if(!$1->set_divisor($3))
 		{
-			parser_error("Invalid divisor for type.");
+			dcerror("Invalid divisor for type.");
 		}
 	}
 	| numeric_with_modulus '/' small_unsigned_integer
 	{
 		if(!$1->set_divisor($3))
 		{
-			parser_error("Invalid divisor for type.");
+			dcerror("Invalid divisor for type.");
 		}
 	}
 	;
@@ -1007,7 +993,7 @@ method_body
 		bool param_added = fn->add_parameter($2);
 		if(!param_added)
 		{
-			parser_error("Unknown error adding parameter to method.");
+			dcerror("Unknown error adding parameter to method.");
 		}
 		$$ = fn;
 	}
@@ -1016,7 +1002,7 @@ method_body
 		bool param_added = $1->add_parameter($3);
 		if(!param_added)
 		{
-			parser_error("Cannot add parameter '" + $3->get_name()
+			dcerror("Cannot add parameter '" + $3->get_name()
 			             + "', a parameter with that name is already used in this method.");
 		}
 		$$ = $1;
@@ -1106,7 +1092,7 @@ char_or_uint
 	{
 		if($1.length() != 1)
 		{
-			parser_error("Single character required.");
+			dcerror("Single character required.");
 			$$ = 0;
 		}
 		else
@@ -1123,7 +1109,7 @@ small_unsigned_integer
 		unsigned int num = (unsigned int)$1;
 		if(num != $1)
 		{
-			parser_error("Number out of range.");
+			dcerror("Number out of range.");
 			$$ = 1;
 		}
 		$$ = num;
@@ -1141,7 +1127,7 @@ char_or_number
 	{
 		if($1.length() != 1)
 		{
-			parser_error("Single character required.");
+			dcerror("Single character required.");
 			$$ = 0;
 		}
 		else
@@ -1215,7 +1201,7 @@ type_value
 		{
 			if($1.length() != dtype->get_size())
 			{
-				parser_error("Value for fixed-length string has incorrect length.");
+				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
 			$$ = $1;
@@ -1229,7 +1215,7 @@ type_value
 		}
 		else
 		{
-			parser_error("Cannot use string value for non-string type '"
+			dcerror("Cannot use string value for non-string type '"
 			             + format_type(dtype->get_type()) + "'.");
 			$$ = $1;
 		}
@@ -1251,7 +1237,7 @@ type_value
 		{
 			if($1.length() != dtype->get_size())
 			{
-				parser_error("Value for fixed-length blob has incorrect length.");
+				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
 			$$ = $1;
@@ -1263,7 +1249,7 @@ type_value
 		}
 		else
 		{
-			parser_error("Cannot use hex value for non-blob type '"
+			dcerror("Cannot use hex value for non-blob type '"
 			             + format_type(dtype->get_type()) + "'.");
 			$$ = $1;
 		}
@@ -1299,7 +1285,7 @@ method_value
 		}
 		else
 		{
-			parser_error("Cannot use method-value for non-method type '"
+			dcerror("Cannot use method-value for non-method type '"
 			             + format_type(dtype->get_type()) + "'.");
 		}
 	}
@@ -1349,7 +1335,7 @@ struct_value
 		}
 		else
 		{
-			parser_error("Cannot use struct-composition for non-struct type '"
+			dcerror("Cannot use struct-composition for non-struct type '"
 			             + format_type(dtype->get_type()) + "'.");
 		}
 	}
@@ -1392,7 +1378,7 @@ array_value
 		type_stack.pop();
 		if(!dtype->as_array())
 		{
-			parser_error("Cannot use array-composition for non-array type '"
+			dcerror("Cannot use array-composition for non-array type '"
 			             + format_type(dtype->get_type()) + "'.");
 			$$ = "";
 			break;
@@ -1404,7 +1390,7 @@ array_value
 		if(array->get_array_size() > 0)
 		{
 			// For fixed size arrays, an empty array is an error
-			parser_error("Fixed-sized array of size "
+			dcerror("Fixed-sized array of size "
 			             + to_string(array->get_array_size())
 			             + " can't have 0 elements.");
 		}
@@ -1413,7 +1399,7 @@ array_value
 			// If we have a range, 0 elements must be valid in the range
 			if(0 < array->get_range().min.uinteger)
 			{
-				parser_error("Too few elements in array value, minimum "
+				dcerror("Too few elements in array value, minimum "
 				             + to_string(array->get_range().min.uinteger) + ".");
 			}
 		}
@@ -1445,7 +1431,7 @@ array_value
 		}
 		else
 		{
-			parser_error("Cannot use array-composition for non-array type '"
+			dcerror("Cannot use array-composition for non-array type '"
 			             + format_type(dtype->get_type()) + "'.");
 		}
 	}
@@ -1468,12 +1454,12 @@ array_value
 			{
 				if(actual_size > array->get_range().max.uinteger)
 				{
-					parser_error("Too many elements in array value, maximum "
+					dcerror("Too many elements in array value, maximum "
 					             + to_string(array->get_range().max.uinteger) + ".");
 				}
 				else if(actual_size < array->get_range().min.uinteger)
 				{
-					parser_error("Too few elements in array value, minimum "
+					dcerror("Too few elements in array value, minimum "
 					             + to_string(array->get_range().min.uinteger) + ".");
 				}
 			}
@@ -1604,7 +1590,7 @@ array_expansion
 		{
 			if($1.length() != dtype->get_size())
 			{
-				parser_error("Value for fixed-length string has incorrect length.");
+				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
 			string val;
@@ -1632,7 +1618,7 @@ array_expansion
 		}
 		else
 		{
-			parser_error("Cannot use string value for non-string type '"
+			dcerror("Cannot use string value for non-string type '"
 			             + format_type(dtype->get_type()) + "'.");
 
 			string val;
@@ -1660,7 +1646,7 @@ array_expansion
 		{
 			if($1.length() != dtype->get_size())
 			{
-				parser_error("Value for fixed-length blob has incorrect length.");
+				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
 			string val;
@@ -1689,7 +1675,7 @@ array_expansion
 		}
 		else
 		{
-			parser_error("Cannot use hex value for non-blob type '"
+			dcerror("Cannot use hex value for non-blob type '"
 			             + format_type(dtype->get_type()) + "'.");
 
 			string val;
@@ -1736,7 +1722,7 @@ keyword_list
 	{
 		if(!parsed_module->has_keyword($2))
 		{
-			parser_error("Keyword '" + $2 + "' has not been declared.");
+			dcerror("Keyword '" + $2 + "' has not been declared.");
 			break;
 		}
 
@@ -1752,6 +1738,65 @@ empty
 %% /* Start helper function section */
 
 
+Module *read_dcfile(istream& in, const string& filename) {
+    Module *m = new Module();
+    bool ok = parse_dcfile(m, in, filename);
+    if(ok) {
+        return m;
+    }
+
+    return NULL;
+}
+Module *read_dcfile(const string& filename) {
+    Module *m = new Module();
+    bool ok = parse_dcfile(m, filename);
+    if(ok) {
+        return m;
+    }
+
+    return NULL;
+}
+bool parse_dcfile(Module *m, istream& in, const string& filename) {
+    dcparser_file(in, filename, *m);
+    dcparse();
+    dcparser_cleanup();
+    return (dc_errors() == 0);
+}
+bool parse_dcfile(Module *m, const string& filename) {
+    ifstream in;
+    in.open(filename.c_str());
+    if(!in) {
+        cerr << "Cannot open " << filename << " for reading.\n";
+        return false;
+    }
+    return parse_dcfile(m, in, filename);
+}
+string parse_dcvalue(const DistributedType *dtype, const string& formatted, bool& err) {
+    istringstream strm(formatted);
+    return parse_dcvalue(dtype, strm, err);
+
+}
+string parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
+    string value;
+    try {
+        dcparser_value(in, "parse_value()", dtype, value);
+        dcparse();
+        dcparser_cleanup();
+    } catch(const exception& e) {
+        err = true;
+        return string("parse_value() error: ") + e.what();
+    }
+
+    if(dc_errors() > 0) {
+        err = true;
+        return string("parse value(): unknown error");
+    }
+
+    err = false;
+    return value;
+}
+
+
 bool check_depth()
 {
 	return (!type_stack.empty() && current_depth == type_stack.top().depth);
@@ -1761,11 +1806,11 @@ void depth_error(string what)
 {
 	if(type_stack.empty() || current_depth < type_stack.top().depth)
 	{
-		parser_error("Too many nested values while parsing value for " + what + ".");
+		dcerror("Too many nested values while parsing value for " + what + ".");
 	}
 	else
 	{
-		parser_error("Too few nested values while parsing value for " + what + ".");	
+		dcerror("Too few nested values while parsing value for " + what + ".");	
 	}
 }
 
@@ -1773,11 +1818,11 @@ void depth_error(int depth, string what)
 {
 	if(current_depth > depth)
 	{
-		parser_error("Too few nested values before this " + what + " value.");
+		dcerror("Too few nested values before this " + what + " value.");
 	}
 	else
 	{
-		parser_error("Too many nested values before this " + what + " value.");
+		dcerror("Too many nested values before this " + what + " value.");
 	}
 }
 
@@ -1790,7 +1835,7 @@ string number_value(Type type, double &number)
 			float v = number;
 			if(v == INFINITY || v == -INFINITY)
 			{
-				parser_error("Value is out of range for type 'float32'.");
+				dcerror("Value is out of range for type 'float32'.");
 			}
 
 			return string((char*)&v, sizeof(float));
@@ -1809,12 +1854,12 @@ string number_value(Type type, double &number)
 		case T_UINT32:
 		case T_UINT64:
 		{
-			parser_error("Cannot use floating-point value for integer datatype.");
+			dcerror("Cannot use floating-point value for integer datatype.");
 			return string();
 		}
 		default:
 		{
-			parser_error("Cannot use floating-point value for non-numeric datatype.");
+			dcerror("Cannot use floating-point value for non-numeric datatype.");
 			return string();
 		}
 	}
@@ -1828,7 +1873,7 @@ string number_value(Type type, int64_t &number)
 		{
 			if(INT8_MIN > number || number > INT8_MAX)
 			{
-				parser_error("Signed integer out of range for type 'int8'.");
+				dcerror("Signed integer out of range for type 'int8'.");
 			}
 
 			int8_t v = number;
@@ -1838,7 +1883,7 @@ string number_value(Type type, int64_t &number)
 		{
 			if(INT16_MIN > number || number > INT16_MAX)
 			{
-				parser_error("Signed integer out of range for type 'int16'.");
+				dcerror("Signed integer out of range for type 'int16'.");
 			}
 
 			uint16_t v = number;
@@ -1848,7 +1893,7 @@ string number_value(Type type, int64_t &number)
 		{
 			if(INT32_MIN > number || number > INT32_MAX)
 			{
-				parser_error("Signed integer out of range for type 'int32'.");
+				dcerror("Signed integer out of range for type 'int32'.");
 			}
 
 			int32_t v = number;
@@ -1866,7 +1911,7 @@ string number_value(Type type, int64_t &number)
 		{
 			if(number < 0)
 			{
-				parser_error("Can't use negative value for unsigned integer datatype.");
+				dcerror("Can't use negative value for unsigned integer datatype.");
 			}
 			uint64_t v = number;
 			return number_value(type, v);
@@ -1880,7 +1925,7 @@ string number_value(Type type, int64_t &number)
 		}
 		default:
 		{
-			parser_error("Cannot use signed integer value for non-numeric datatype.");
+			dcerror("Cannot use signed integer value for non-numeric datatype.");
 			return string();
 		}
 	}
@@ -1895,7 +1940,7 @@ string number_value(Type type, uint64_t &number)
 		{
 			if(number > UINT8_MAX)
 			{
-				parser_error("Unsigned integer out of range for type 'uint8'.");
+				dcerror("Unsigned integer out of range for type 'uint8'.");
 			}
 
 			uint8_t v = number;
@@ -1905,7 +1950,7 @@ string number_value(Type type, uint64_t &number)
 		{
 			if(number > UINT16_MAX)
 			{
-				parser_error("Unsigned integer out of range for type 'uint16'.");
+				dcerror("Unsigned integer out of range for type 'uint16'.");
 			}
 
 			uint16_t v = number;
@@ -1915,7 +1960,7 @@ string number_value(Type type, uint64_t &number)
 		{
 			if(number > UINT32_MAX)
 			{
-				parser_error("Unsigned integer out of range for type 'uint32'.");
+				dcerror("Unsigned integer out of range for type 'uint32'.");
 			}
 
 			uint32_t v = number;
@@ -1932,7 +1977,7 @@ string number_value(Type type, uint64_t &number)
 		{
 			if(number > INT64_MAX)
 			{
-				parser_error("Unsigned integer out of range for signed integer datatype.");
+				dcerror("Unsigned integer out of range for signed integer datatype.");
 			}
 			int64_t v = number;
 			return number_value(type, v);
@@ -1946,7 +1991,7 @@ string number_value(Type type, uint64_t &number)
 		}
 		default:
 		{
-			parser_error("Cannot use unsigned integer value for non-numeric datatype.");
+			dcerror("Cannot use unsigned integer value for non-numeric datatype.");
 			return string();
 		}
 	}

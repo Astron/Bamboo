@@ -1,6 +1,6 @@
 // Filename: default.h
 #include <string> // std::string
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Forward declarations
@@ -14,4 +14,4 @@ std::string create_default_value(const DistributedType *dtype);
 std::string create_default_value(const DistributedType *dtype, bool& is_implicit);
 
 
-} // close namespace dclass
+} // close namespace bamboo

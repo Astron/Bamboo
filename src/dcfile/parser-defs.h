@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_H_INCLUDED
-# define YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_H_INCLUDED
+#ifndef YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
+# define YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
@@ -43,7 +43,8 @@ extern int yydebug;
 /* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-enum yytokentype {
+  enum yytokentype
+  {
     UNSIGNED_INTEGER = 258,
     REAL = 259,
     STRING = 260,
@@ -71,7 +72,7 @@ enum yytokentype {
     KW_STRING = 282,
     KW_BLOB = 283,
     KW_CHAR = 284
-};
+  };
 #endif
 
 /* Value type.  */
@@ -79,6 +80,6 @@ enum yytokentype {
 
 extern YYSTYPE yylval;
 
-int yyparse(void);
+int yyparse (void);
 
-#endif /* !YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_HOME_KESTRED_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED  */

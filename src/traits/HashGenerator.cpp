@@ -1,12 +1,6 @@
 // Filename: HashGenerator.cpp
-// Created by: drose (22 Mar, 2001)
-//
-// Copyright (c) Carnegie Mellon University.  All rights reserved.
-// All use of this software is subject to the terms of the revised BSD license.
-//
-
 #include "HashGenerator.h"
-#include "PrimeNumberGenerator.h"
+#include "primes.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -20,15 +14,13 @@ namespace bamboo { // open namespace bamboo
 // the result to the low-order 32 bits.
 
 #define MAX_PRIME_NUMBERS 10000
-#define PRIMES PrimeNumberGenerator::singleton
 
 // constructor
-HashGenerator::HashGenerator() : m_hash(0), m_index(0) {
-}
+HashGenerator::HashGenerator() : m_hash(0), m_index(0) {}
 
 // add_int adds another integer to the hash so far.
 void HashGenerator::add_int(int num) {
-    m_hash += PRIMES[m_index] * num;
+    m_hash += get_primes(m_index) * num;
     m_index = (m_index + 1) % MAX_PRIME_NUMBERS;
 }
 

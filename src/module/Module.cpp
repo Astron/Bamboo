@@ -1,10 +1,8 @@
 // Filename: Module.cpp
-#include "util/HashGenerator.h"
+#include "Module.h"
 #include "module/DistributedType.h"
 #include "module/Class.h"
 #include "module/Field.h"
-
-#include "Module.h"
 namespace bamboo { // open namespace
 
 
@@ -134,30 +132,6 @@ void Module::add_keyword(const std::string& keyword) {
 void Module::add_field(Field *field) {
     field->set_id((unsigned int)m_fields_by_id.size());
     m_fields_by_id.push_back(field);
-}
-
-uint32_t Module::get_hash() const {
-    HashGenerator hashgen;
-    generate_hash(hashgen);
-    return hashgen.get_hash();
-}
-
-// generate_hash accumulates the properties of this module into the hash.
-void Module::generate_hash(HashGenerator& hashgen) const {
-    hashgen.add_int(m_classes.size());
-    for(auto it = m_classes.begin(); it != m_classes.end(); ++it) {
-        (*it)->generate_hash(hashgen);
-    }
-
-    hashgen.add_int(m_structs.size());
-    for(auto it = m_structs.begin(); it != m_structs.end(); ++it) {
-        (*it)->generate_hash(hashgen);
-    }
-
-    hashgen.add_int(m_keywords.size());
-    for(auto it = m_keywords.begin(); it != m_keywords.end(); ++it) {
-        hashgen.add_string(*it);
-    }
 }
 
 

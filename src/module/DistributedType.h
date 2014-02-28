@@ -1,7 +1,7 @@
 // Filename: DistributedType.h
 #pragma once
-#include <stdint.h>
 #include <string> // std::string
+#include "traits/sizetag.h"
 namespace bamboo { // open namespace bamboo
 
 

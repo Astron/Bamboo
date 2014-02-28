@@ -8,7 +8,7 @@
 
 #include "default.h"
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // create_default_value returns a sensible default value for the given type (typically 0).
@@ -118,4 +118,4 @@ string create_default_value(const DistributedType *dtype, bool& is_implicit) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

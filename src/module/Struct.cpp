@@ -1,9 +1,7 @@
 // Filename: Struct.cpp
-#include "util/HashGenerator.h"
+#include "Struct.h"
 #include "module/Module.h"
 #include "module/Field.h"
-
-#include "Struct.h"
 using namespace std;
 namespace bamboo { // open namespace bamboo
 
@@ -91,16 +89,6 @@ bool Struct::add_field(Field *field) {
         }
     }
     return true;
-}
-
-// generate_hash accumulates the properties of this class into the hash.
-void Struct::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
-    hashgen.add_string(m_name);
-    hashgen.add_int(m_fields.size());
-    for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
-        (*it)->generate_hash(hashgen);
-    }
 }
 
 

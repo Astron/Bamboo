@@ -1,10 +1,8 @@
 // Filename: Parameter.cpp
-#include "util/HashGenerator.h"
-#include "value/default.h"
+#include "Parameter.h"
 #include "module/Struct.h"
 #include "module/Method.h"
-
-#include "Parameter.h"
+#include "traits/default.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -67,11 +65,6 @@ bool Parameter::set_default_value(const std::string& default_value) {
 // set_method sets a pointer to the method containing the parameter.
 void Parameter::set_method(Method *method) {
     m_method = method;
-}
-
-// generate_hash accumulates the properties of this type into the hash.
-void Parameter::generate_hash(HashGenerator& hashgen) const {
-    m_type->generate_hash(hashgen);
 }
 
 

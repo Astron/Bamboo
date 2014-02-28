@@ -54,9 +54,6 @@ class Struct : public DistributedType {
     //     Returns false if the field could not be added to the struct.
     virtual bool add_field(Field *field);
 
-    // generate_hash accumulates the properties of this type into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   protected:
     Struct(Module *module);
 

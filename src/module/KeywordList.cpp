@@ -1,5 +1,4 @@
 // Filename: KeywordList.cpp
-#include "util/HashGenerator.h"
 #include "KeywordList.h"
 namespace bamboo { // open namespace bamboo
 
@@ -53,14 +52,6 @@ bool KeywordList::add_keyword(const std::string& keyword) {
     }
 
     return inserted;
-}
-
-// generate_hash accumulates the properties of these keywords into the hash.
-void KeywordList::generate_hash(HashGenerator& hashgen) const {
-    hashgen.add_int(m_keywords.size());
-    for(auto it = m_keywords.begin(); it != m_keywords.end(); ++it) {
-        hashgen.add_string(*it);
-    }
 }
 
 

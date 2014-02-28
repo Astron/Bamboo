@@ -1,14 +1,11 @@
 // Filename: ArrayType.cpp
+#include "ArrayType.h"
 
 // This must be defined for inttypes.h to define the fixed with integer macros
 #if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
 #define __STDC_LIMIT_MACROS
 #endif
-
 #include <inttypes.h> // UINT64_MAX
-#include "util/HashGenerator.h"
-
-#include "ArrayType.h"
 namespace bamboo { // open namespace
 
 
@@ -61,18 +58,6 @@ ArrayType *ArrayType::as_array() {
 }
 const ArrayType *ArrayType::as_array() const {
     return this;
-}
-
-// generate_hash accumulates the properties of this type into the hash.
-void ArrayType::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
-    m_element_type->generate_hash(hashgen);
-    if(has_range()) {
-        hashgen.add_int(m_array_range.min.integer);
-        hashgen.add_int(m_array_range.max.integer);
-    } else {
-        hashgen.add_int(m_array_size);
-    }
 }
 
 
