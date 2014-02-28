@@ -1,7 +1,7 @@
 // Filename: NumericRange.h
 #pragma once
 #include <math.h> // INFINITY
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // A Number represent any C++ numeric type.
@@ -73,4 +73,4 @@ struct NumericRange {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo

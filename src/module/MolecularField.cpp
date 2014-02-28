@@ -3,7 +3,7 @@
 #include "module/Class.h"
 
 #include "MolecularField.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // constructor
@@ -85,4 +85,4 @@ void MolecularField::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

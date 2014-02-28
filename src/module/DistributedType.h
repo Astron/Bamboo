@@ -2,15 +2,8 @@
 #pragma once
 #include <stdint.h>
 #include <string> // std::string
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
-
-extern int sizetag_width;
-#ifdef BAMBOO_32BIT_SIZETAG
-typedef uint32_t sizetag_t;
-#else
-typedef uint16_t sizetag_t;
-#endif
 
 // Forward declaration
 class ArrayType;
@@ -95,5 +88,5 @@ class DistributedType {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "DistributedType.ipp"

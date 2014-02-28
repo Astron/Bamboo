@@ -103,7 +103,7 @@
 #define YYMAXDEPTH 1000
 
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Parser output
@@ -3536,4 +3536,4 @@ string number_value(Type type, uint64_t& number) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

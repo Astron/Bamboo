@@ -1,7 +1,7 @@
 // Filename: hash.h
 #pragma once
 #include <stdint.h>
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // Forward declarations
@@ -20,4 +20,4 @@ uint32_t structural_hash(const Module *);
 uint32_t legacy_hash(const Module *);
 
 
-} // close namespace dclass
+} // close namespace bamboo

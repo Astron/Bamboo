@@ -1,7 +1,7 @@
 // Filename: Field.h
 #pragma once
 #include "KeywordList.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 // Foward declarations
 class DistributedType;
@@ -72,5 +72,5 @@ class Field : public KeywordList {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Field.ipp"

@@ -1,5 +1,5 @@
 // Filename: NumericType.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -33,4 +33,4 @@ inline NumericRange NumericType::get_range() const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

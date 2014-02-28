@@ -7,7 +7,7 @@
 
 #include "HashGenerator.h"
 #include "PrimeNumberGenerator.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // We multiply each consecutive integer by the next prime number and
@@ -46,4 +46,4 @@ uint32_t HashGenerator::get_hash() const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

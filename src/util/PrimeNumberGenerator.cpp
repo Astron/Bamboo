@@ -6,7 +6,7 @@
 //
 
 #include "PrimeNumberGenerator.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 PrimeNumberGenerator PrimeNumberGenerator::singleton = PrimeNumberGenerator();
 
@@ -44,4 +44,4 @@ unsigned int PrimeNumberGenerator::operator [](unsigned int n) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

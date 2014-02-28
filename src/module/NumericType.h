@@ -2,7 +2,7 @@
 #pragma once
 #include "NumericRange.h"
 #include "DistributedType.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // A NumericType can represent any of the basic number types (ie. integers, floats, etc).
@@ -57,5 +57,5 @@ class NumericType : public DistributedType {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "NumericType.ipp"

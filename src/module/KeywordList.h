@@ -2,7 +2,7 @@
 #pragma once
 #include <vector>        // std::vector
 #include <unordered_set> // std::unordered_set
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Forward declaration
@@ -45,4 +45,4 @@ class KeywordList {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo

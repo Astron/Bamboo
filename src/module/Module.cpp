@@ -5,7 +5,7 @@
 #include "module/Field.h"
 
 #include "Module.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 typedef std::unordered_map<std::string, DistributedType *>::value_type TypeName;
@@ -161,4 +161,4 @@ void Module::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

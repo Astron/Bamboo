@@ -4,7 +4,7 @@
 
 #include "Method.h"
 using namespace std;
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // constructor
@@ -71,4 +71,4 @@ void Method::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

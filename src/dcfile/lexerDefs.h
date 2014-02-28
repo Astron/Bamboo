@@ -2,7 +2,7 @@
 #pragma once
 #include <iostream>
 #include <string>
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 void init_file_lexer(std::istream& in, const std::string& filename);
@@ -20,4 +20,4 @@ void lexer_warning(const std::string& msg);
 #define YY_NEVER_INTERACTIVE 1
 
 
-} // close namespace dclass
+} // close namespace bamboo

@@ -1,5 +1,5 @@
 // Filename: Field.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -49,4 +49,4 @@ inline const std::string& Field::get_default_value() const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

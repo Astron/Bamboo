@@ -1,7 +1,7 @@
 // Filename: KeywordList.cpp
 #include "util/HashGenerator.h"
 #include "KeywordList.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // empty list constructor
@@ -64,4 +64,4 @@ void KeywordList::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

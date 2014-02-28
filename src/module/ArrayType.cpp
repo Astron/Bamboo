@@ -9,7 +9,7 @@
 #include "util/HashGenerator.h"
 
 #include "ArrayType.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // type constructor
@@ -76,4 +76,4 @@ void ArrayType::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

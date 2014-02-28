@@ -1,5 +1,5 @@
 // Filename: Module.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -146,4 +146,4 @@ inline const std::string& Module::get_keyword(unsigned int n) const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

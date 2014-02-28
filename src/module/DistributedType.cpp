@@ -2,7 +2,7 @@
 #include "util/HashGenerator.h"
 
 #include "DistributedType.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 #ifdef DCLASS_32BIT_SIZETAG
@@ -57,4 +57,4 @@ void DistributedType::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

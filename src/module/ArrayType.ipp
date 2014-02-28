@@ -1,5 +1,5 @@
 // Filename: ArrayType.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -34,4 +34,4 @@ inline NumericRange ArrayType::get_range() const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

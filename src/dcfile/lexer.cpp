@@ -536,16 +536,16 @@ char *yytext;
 #include "dcfile/write.h" // indent
 #include <iostream>
 #include <unistd.h>
-using namespace dclass;
+using namespace bamboo;
 
 static int yyinput(void); // declared by flex.
-extern int dclass::run_lexer();
+extern int bamboo::run_lexer();
 extern "C" int should_lexer_wrap();
 
-#define YYSTYPE dclass::TokenType
+#define YYSTYPE bamboo::TokenType
 extern YYSTYPE yyltype;
 
-#define YY_DECL int dclass::run_lexer(void)
+#define YY_DECL int bamboo::run_lexer(void)
 #define yywrap should_lexer_wrap
 
 ////////////////////////////////////////////////////////////////////
@@ -581,7 +581,7 @@ static int initial_token;
 // Defining the interface to the lexer.
 ////////////////////////////////////////////////////////////////////
 
-void dclass::init_file_lexer(std::istream& in, const std::string& filename) {
+void bamboo::init_file_lexer(std::istream& in, const std::string& filename) {
 input_p = &in;
 dc_filename = filename;
 line_number = 0;
@@ -591,16 +591,16 @@ warning_count = 0;
 initial_token = START_DC_FILE;
 }
 
-void dclass::init_value_lexer(std::istream& in, const std::string& filename) {
+void bamboo::init_value_lexer(std::istream& in, const std::string& filename) {
 init_file_lexer(in, filename);
 initial_token = START_DC_VALUE;
 }
 
-int dclass::lexer_error_count() {
+int bamboo::lexer_error_count() {
 return error_count;
 }
 
-int dclass::lexer_warning_count() {
+int bamboo::lexer_warning_count() {
 return warning_count;
 }
 
@@ -613,7 +613,7 @@ int should_lexer_wrap(void) {
 return 1;
 }
 
-void dclass::lexer_error(const std::string& msg) {
+void bamboo::lexer_error(const std::string& msg) {
 std::cerr << "\nError";
 if(!dc_filename.empty()) {
     std::cerr << " in " << dc_filename;
@@ -625,7 +625,7 @@ indent(std::cerr, col_number - 1) << "^\n" << msg << "\n\n";
 error_count++;
 }
 
-void dclass::lexer_warning(const std::string& msg) {
+void bamboo::lexer_warning(const std::string& msg) {
 std::cerr << "\nWarning";
 if(!dc_filename.empty()) {
     std::cerr << " in " << dc_filename;

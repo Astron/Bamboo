@@ -9,7 +9,7 @@
 #include "util/HashGenerator.h"
 
 #include "NumericType.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Type constructor
@@ -205,4 +205,4 @@ void NumericType::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

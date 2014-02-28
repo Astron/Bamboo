@@ -5,7 +5,7 @@
 
 #include "read.h"
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // append opens the given file or stream and parses it as a .dc file.  The distributed
@@ -50,4 +50,4 @@ Module *read(const string& filename) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

@@ -1,5 +1,5 @@
 // Filename: Parameter.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -43,4 +43,4 @@ inline const std::string& Parameter::get_default_value() const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

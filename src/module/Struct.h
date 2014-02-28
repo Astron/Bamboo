@@ -5,7 +5,7 @@
 #include <unordered_map> // std::unordered_map
 
 #include "DistributedType.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // Foward declarations
@@ -74,5 +74,5 @@ class Struct : public DistributedType {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Struct.ipp"

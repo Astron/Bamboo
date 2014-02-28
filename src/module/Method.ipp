@@ -1,5 +1,5 @@
 // Filename: Method.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -39,4 +39,4 @@ inline const Parameter* Method::get_parameter_by_name(const std::string& name) c
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

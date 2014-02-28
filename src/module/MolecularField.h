@@ -2,7 +2,7 @@
 #pragma once
 #include "Field.h"
 #include "Struct.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // A MolecularField is an abstract field which provides an interface that can
@@ -38,4 +38,4 @@ class MolecularField : public Field, public Struct {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo

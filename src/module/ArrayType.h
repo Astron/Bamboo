@@ -4,7 +4,7 @@
 #include "module/NumericRange.h"
 
 #include "DistributedType.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // An ArrayType represents an array of some other kind of object, meaning
@@ -43,5 +43,5 @@ class ArrayType : public DistributedType {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "ArrayType.ipp"

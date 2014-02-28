@@ -2,7 +2,7 @@
 #pragma once
 #include <iostream> // std::istream
 #include <string>   // std::string
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Foward declarations
@@ -21,4 +21,4 @@ Module *read(std::istream& in, const std::string& filename);
 Module *read(const std::string& filename);
 
 
-} // close namespace dclass
+} // close namespace bamboo

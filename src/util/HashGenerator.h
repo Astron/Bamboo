@@ -8,7 +8,7 @@
 #pragma once
 #include <stdint.h> // for fixed-with integers
 #include <string>   // for std::string
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // A HashGenerator generates an arbitrary hash number from a sequence of ints.
@@ -30,4 +30,4 @@ private:
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo

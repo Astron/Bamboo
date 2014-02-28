@@ -5,7 +5,7 @@
 
 #include "Struct.h"
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 // public constructor
 Struct::Struct(Module *module, const string& name) : m_module(module), m_id(0), m_name(name) {
@@ -104,4 +104,4 @@ void Struct::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

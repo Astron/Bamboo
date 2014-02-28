@@ -5,7 +5,7 @@
 #include <unordered_map> // std::unordered_map
 
 #include "DistributedType.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 // Forward declarations
 class Parameter;
@@ -42,5 +42,5 @@ class Method : public DistributedType {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Method.ipp"

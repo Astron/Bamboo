@@ -3,7 +3,7 @@
 #include <string>        // std::string
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // Forward declarations
@@ -115,5 +115,5 @@ class Module {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Module.ipp"

@@ -1,5 +1,5 @@
 // Filename: DistributedType.ipp
-namespace dclass   // open namespace dclass
+namespace bamboo   // open namespace bamboo
 {
 
 
@@ -43,4 +43,4 @@ inline void DistributedType::set_alias(const std::string& alias)
 	m_alias = alias;
 }
 
-} // close namespace dclass
+} // close namespace bamboo

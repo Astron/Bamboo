@@ -1,7 +1,7 @@
 // Filename: Parameter.h
 #pragma once
 #include <string> // std::string
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // Foward declarations
@@ -59,5 +59,5 @@ class Parameter {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Parameter.ipp"

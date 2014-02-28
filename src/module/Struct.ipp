@@ -1,5 +1,5 @@
 // Filename: Struct.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -89,4 +89,4 @@ inline void Struct::set_id(unsigned int id)
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

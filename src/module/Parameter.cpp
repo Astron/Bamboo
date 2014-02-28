@@ -5,7 +5,7 @@
 #include "module/Method.h"
 
 #include "Parameter.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 // constructor
@@ -75,4 +75,4 @@ void Parameter::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

@@ -3,7 +3,7 @@
 
 #include "write.h"
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 ostream& indent(ostream& out, unsigned int indent_level) {
@@ -61,7 +61,7 @@ string format_type(unsigned int type) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo
 
 /*
 // write opens the indicated filename for output and writes a parseable

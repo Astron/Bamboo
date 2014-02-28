@@ -4,7 +4,7 @@
 #include <vector> // std::vector
 #include "module/DistributedType.h"
 #include "module/NumericRange.h"
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 // Foward declarations
 class Module;
@@ -66,8 +66,8 @@ public:
 
 // The bison-generated code expects to use the symbol 'YYSTYPE' to refer to the above class.
 #ifndef YYSTYPE
-#define YYSTYPE dclass::TokenType
+#define YYSTYPE bamboo::TokenType
 #endif
 extern YYSTYPE yylval;
 
-} // close namespace dclass
+} // close namespace bamboo

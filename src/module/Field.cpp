@@ -5,7 +5,7 @@
 #include "module/Struct.h"
 
 #include "Field.h"
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 // constructor
 Field::Field(DistributedType *type, const std::string& name) :
@@ -79,4 +79,4 @@ void Field::generate_hash(HashGenerator& hashgen) const {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

@@ -14,7 +14,7 @@
 #include "module/NumericType.h"
 
 using namespace std;
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 
 static void hash_module(HashGenerator& hashgen, const Module *file);
@@ -370,4 +370,4 @@ void hash_int_type(HashGenerator& hashgen, const NumericType *numeric) {
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

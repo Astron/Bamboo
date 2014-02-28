@@ -2,7 +2,7 @@
 #pragma once
 #include "Struct.h"
 #include <unordered_map> // std::unordered_map
-namespace dclass { // open namespace
+namespace bamboo { // open namespace
 
 
 // A Class is a special type of struct that have a couple advanced object-oriented features:
@@ -70,5 +70,5 @@ class Class : public Struct {
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
 #include "Class.ipp"

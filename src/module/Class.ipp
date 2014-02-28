@@ -1,5 +1,5 @@
 // Filename: Class.ipp
-namespace dclass   // open namespace
+namespace bamboo   // open namespace
 {
 
 
@@ -66,4 +66,4 @@ inline const Field* Class::get_base_field(unsigned int n) const
 }
 
 
-} // close namespace dclass
+} // close namespace bamboo

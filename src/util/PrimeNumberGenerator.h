@@ -7,7 +7,7 @@
 
 #pragma once
 #include <vector> // std::vector
-namespace dclass { // open namespace dclass
+namespace bamboo { // open namespace bamboo
 
 // A PrimeNumberGenerator this class generates a table of prime numbers, up to the limit of an int.
 //     For a given integer n, it will return the nth prime number.  This will involve a recompute
@@ -27,4 +27,4 @@ private:
 };
 
 
-} // close namespace dclass
+} // close namespace bamboo
