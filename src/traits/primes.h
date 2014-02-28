@@ -1,6 +1,5 @@
-// Filename: PrimeNumberGenerator.h
+// Filename: primes.h
 #pragma once
-#include <vector> // for std::vector
 using namespace std;
 namespace bamboo { // open namespace bamboo
 

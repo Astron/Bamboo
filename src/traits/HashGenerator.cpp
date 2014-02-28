@@ -1,6 +1,6 @@
 // Filename: HashGenerator.cpp
 #include "HashGenerator.h"
-#include "primes.h"
+#include "traits/primes.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -20,7 +20,7 @@ HashGenerator::HashGenerator() : m_hash(0), m_index(0) {}
 
 // add_int adds another integer to the hash so far.
 void HashGenerator::add_int(int num) {
-    m_hash += get_primes(m_index) * num;
+    m_hash += get_prime(m_index) * num;
     m_index = (m_index + 1) % MAX_PRIME_NUMBERS;
 }
 

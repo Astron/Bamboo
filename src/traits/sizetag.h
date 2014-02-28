@@ -12,7 +12,7 @@ namespace bamboo { // open namespace bamboo
 
 // kSizetagWidth is declared extern and compiled into the library for runtime width-checking.
 extern const int kSizetagWidth;
-int kSizetagMax = sizetag_t(-1);
+unsigned long long kSizetagMax = sizetag_t(-1);
 
 
 } // close namespace bamboo

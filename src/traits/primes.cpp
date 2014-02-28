@@ -1,6 +1,6 @@
-// Filename: hash.h
-#pragma once
-#include <stdint.h>
+// Filename: primes.cpp
+#include "primes.h"
+#include <vector> // for std::vector
 namespace bamboo { // open namespace
 
 
@@ -22,7 +22,7 @@ unsigned int get_prime(unsigned int n) {
         }
         if(maybe_prime) {
             // Hey, we found a prime!
-            m_primes.push_back(candidate);
+            primes.push_back(candidate);
         }
         candidate++;
     }

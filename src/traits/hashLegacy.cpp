@@ -1,6 +1,6 @@
-// Filename: hash.cpp
+// Filename: hashLegacy.cpp
 #include "hash.h"
-#include "util/HashGenerator.h"
+#include "HashGenerator.h"
 
 #include <set>      // std::set
 #include <iostream> // std::cerr
