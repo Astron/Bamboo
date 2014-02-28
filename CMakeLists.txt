@@ -87,7 +87,7 @@ set(TRAITS_SOURCES
   src/traits/hashLegacy.cpp
   src/traits/HashGenerator.cpp
   src/traits/primes.cpp
-  src/traits/sizetag.cpp)
+  src/traits/traits.cpp)
 
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
