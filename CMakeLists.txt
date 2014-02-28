@@ -89,6 +89,10 @@ set(TRAITS_SOURCES
   src/traits/primes.cpp
   src/traits/traits.cpp)
 
+set(WIRE_SOURCES
+  src/wire/Datagram.cpp
+  src/wire/DatagramIterator.cpp)
+
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 
@@ -96,16 +100,16 @@ if(BUILD_16BIT_SIZETAG)
   add_library(bamboo
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
-    ${NETWORK_SOURCES}
-    ${UTIL_SOURCES})
+    ${TRAITS_SOURCES}
+    ${WIRE_SOURCES})
   SET_TARGET_PROPERTIES(bamboo PROPERTIES LINK_FLAGS -lfl)
 endif()
 if(BUILD_32BIT_SIZETAG)
   add_library(bamboo32
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
-    ${NETWORK_SOURCES}
-    ${UTIL_SOURCES})
+    ${TRAITS_SOURCES}
+    ${WIRE_SOURCES})
   target_link_libraries(bamboo32 -lfl)
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
 endif()
