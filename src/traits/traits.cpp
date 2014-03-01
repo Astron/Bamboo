@@ -5,7 +5,7 @@ namespace bamboo { // open namespace bamboo
 
 
 // Compile sizetag width into binary
-#ifdef DCLASS_32BIT_SIZETAG
+#ifdef DCLASS_32BIkTypeSIZETAG
 const int kSizetagWidth = 32;
 #else
 const int kSizetagWidth = 16;

@@ -2,8 +2,8 @@
 #include "ArrayType.h"
 
 // This must be defined for inttypes.h to define the fixed with integer macros
-#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
-#define __STDC_LIMIT_MACROS
+#if defined(__cplusplus) && !defined(__STDC_LIMIkTypeMACROS)
+#define __STDC_LIMIkTypeMACROS
 #endif
 #include <inttypes.h> // UINT64_MAX
 namespace bamboo { // open namespace
@@ -28,26 +28,26 @@ ArrayType::ArrayType(DistributedType *element_type, const NumericRange& size) :
     }
 
     if(m_element_type->has_fixed_size() && m_array_size > 0) {
-        m_type = T_ARRAY;
+        m_subtype = kTypeArray;
         m_size = m_array_size * m_element_type->get_size();
     } else {
-        m_type = T_VARARRAY;
+        m_subtype = kTypeVararray;
         m_size = 0;
     }
 
 
 
-    if(m_element_type->get_type() == T_CHAR) {
-        if(m_type == T_ARRAY) {
-            m_type = T_STRING;
+    if(m_element_type->get_subtype() == kTypeChar) {
+        if(m_subtype == kTypeArray) {
+            m_subtype = kTypeString;
         } else {
-            m_type = T_VARSTRING;
+            m_subtype = kTypeVarstring;
         }
-    } else if(m_element_type->get_type() == T_UINT8) {
-        if(m_type == T_ARRAY) {
-            m_type = T_BLOB;
+    } else if(m_element_type->get_subtype() == kTypeUint8) {
+        if(m_subtype == kTypeArray) {
+            m_subtype = kTypeBlob;
         } else {
-            m_type = T_VARBLOB;
+            m_subtype = kTypeVarblob;
         }
     }
 }

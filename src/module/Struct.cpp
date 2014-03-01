@@ -7,12 +7,12 @@ namespace bamboo { // open namespace bamboo
 
 // public constructor
 Struct::Struct(Module *module, const string& name) : m_module(module), m_id(0), m_name(name) {
-    m_type = T_STRUCT;
+    m_subtype = kTypeStruct;
 }
 
 // protected constructor
 Struct::Struct(Module *module) : m_module(module), m_id(0) {
-    m_type = T_STRUCT;
+    m_subtype = kTypeStruct;
 }
 
 // destructor

@@ -15,45 +15,45 @@ ostream& indent(ostream& out, unsigned int indent_level) {
 
 string format_type(unsigned int type) {
     switch(type) {
-        case T_CHAR:
+        case kTypeChar:
             return "char";
-        case T_INT8:
+        case kTypeInt8:
             return "int8";
-        case T_INT16:
+        case kTypeInt16:
             return "int16";
-        case T_INT32:
+        case kTypeInt32:
             return "int32";
-        case T_INT64:
+        case kTypeInt64:
             return "int64";
-        case T_UINT8:
+        case kTypeUint8:
             return "uint8";
-        case T_UINT16:
+        case kTypeUint16:
             return "uint16";
-        case T_UINT32:
+        case kTypeUint32:
             return "uint32";
-        case T_UINT64:
+        case kTypeUint64:
             return "uint64";
-        case T_FLOAT32:
+        case kTypeFloat32:
             return "float32";
-        case T_FLOAT64:
+        case kTypeFloat64:
             return "float64";
-        case T_STRING:
+        case kTypeString:
             return "string";
-        case T_VARSTRING:
+        case kTypeVarstring:
             return "varstring";
-        case T_BLOB:
+        case kTypeBlob:
             return "blob";
-        case T_VARBLOB:
+        case kTypeVarblob:
             return "varblob";
-        case T_ARRAY:
+        case kTypeArray:
             return "array";
-        case T_VARARRAY:
+        case kTypeVararray:
             return "vararray";
-        case T_STRUCT:
+        case kTypeStruct:
             return "struct";
-        case T_METHOD:
+        case kTypeMethod:
             return "method";
-        case T_INVALID:
+        case kTypeInvalid:
             return "invalid";
         default:
             return "error";

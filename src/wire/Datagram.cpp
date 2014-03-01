@@ -21,8 +21,8 @@ sizetag_t Datagram::add_field(const Field* field, const vector<uint8_t>& packed)
 sizetag_t Datagram::add_dtype(const DistributedType *dtype,
                               const vector<uint8_t>& packed,
                               sizetag_t offset) {
-    switch(dtype->get_type()) {
-        case T_CHAR:
+    switch(dtype->get_subtype()) {
+        case kTypeChar:
         {
             check_read_length(packed, offset, sizeof(char));
             char r = *(char*)(&packed[offset]);
@@ -30,7 +30,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_char(r);
             return offset;
         }
-        case T_INT8:
+        case kTypeInt8:
         {
             check_read_length(packed, offset, sizeof(int8_t));
             int8_t r = *(int8_t*)(&packed[offset]);
@@ -38,7 +38,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_int8(r);
             return offset;
         }
-        case T_INT16:
+        case kTypeInt16:
         {
             check_read_length(packed, offset, sizeof(int16_t));
             int16_t r = *(int16_t*)(&packed[offset]);
@@ -46,7 +46,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_int16(r);
             return offset;
         }
-        case T_INT32:
+        case kTypeInt32:
         {
             check_read_length(packed, offset, sizeof(int32_t));
             int32_t r = *(int32_t*)(&packed[offset]);
@@ -54,7 +54,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_int32(r);
             return offset;
         }
-        case T_INT64:
+        case kTypeInt64:
         {
             check_read_length(packed, offset, sizeof(int64_t));
             int64_t r = *(int64_t*)(&packed[offset]);
@@ -62,7 +62,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_int64(r);
             return offset;
         }
-        case T_UINT8:
+        case kTypeUint8:
         {
             check_read_length(packed, offset, sizeof(uint8_t));
             uint8_t r = *(uint8_t*)(&packed[offset]);
@@ -70,7 +70,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_uint8(r);
             return offset;
         }
-        case T_UINT16:
+        case kTypeUint16:
         {
             check_read_length(packed, offset, sizeof(uint16_t));
             uint16_t r = *(uint16_t*)(&packed[offset]);
@@ -78,7 +78,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_uint16(r);
             return offset;
         }
-        case T_UINT32:
+        case kTypeUint32:
         {
             check_read_length(packed, offset, sizeof(uint32_t));
             uint32_t r = *(uint32_t*)(&packed[offset]);
@@ -86,7 +86,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_uint32(r);
             return offset;
         }
-        case T_UINT64:
+        case kTypeUint64:
         {
             check_read_length(packed, offset, sizeof(uint64_t));
             uint64_t r = *(uint64_t*)(&packed[offset]);
@@ -94,7 +94,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_uint64(r);
             return offset;
         }
-        case T_FLOAT32:
+        case kTypeFloat32:
         {
             check_read_length(packed, offset, sizeof(float));
             float r = *(float*)(&packed[offset]);
@@ -102,7 +102,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_float32(r);
             return offset;
         }
-        case T_FLOAT64:
+        case kTypeFloat64:
         {
             check_read_length(packed, offset, sizeof(double));
             double r = *(double*)(&packed[offset]);
@@ -110,8 +110,8 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             add_float64(r);
             return offset;
         }
-        case T_STRING:
-        case T_BLOB:
+        case kTypeString:
+        case kTypeBlob:
         {
             sizetag_t len = dtype->get_size();
             check_read_length(packed, offset, len);
@@ -119,7 +119,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             offset += len;
             return offset;
         }
-        case T_ARRAY:
+        case kTypeArray:
         {
             sizetag_t len = dtype->get_size();
             check_read_length(packed, offset, len);
@@ -145,8 +145,8 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             }
             return offset;
         }
-        case T_VARSTRING:
-        case T_VARBLOB:
+        case kTypeVarstring:
+        case kTypeVarblob:
         {
             check_read_length(packed, offset, sizeof(sizetag_t));
             sizetag_t len = *(sizetag_t*)(&packed[offset]);
@@ -157,7 +157,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             offset += len;
             return offset;
         }
-        case T_VARARRAY:
+        case kTypeVararray:
         {
             check_read_length(packed, offset, sizeof(sizetag_t));
             sizetag_t len = *(sizetag_t*)(&packed[offset]);
@@ -187,7 +187,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             }
             return offset;
         }
-        case T_STRUCT:
+        case kTypeStruct:
         {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
@@ -196,7 +196,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             }
             return offset;
         }
-        case T_METHOD:
+        case kTypeMethod:
         {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
@@ -205,7 +205,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             }
             return offset;
         }
-        case T_INVALID:
+        case kTypeInvalid:
         {
             return offset;
         }

@@ -27,63 +27,63 @@ string create_default_value(const DistributedType *dtype, bool& is_implicit) {
 
     // Unless we found a non-implicit value, we are an implicit value
     is_implicit = true;
-    switch(dtype->get_type()) {
-        case T_INT8: {
+    switch(dtype->get_subtype()) {
+        case kTypeInt8: {
             int8_t v = 0;
             return string((char *)&v, sizeof(int8_t));
         }
-        case T_INT16: {
+        case kTypeInt16: {
             uint16_t v = 0;
             return string((char *)&v, sizeof(int16_t));
         }
-        case T_INT32: {
+        case kTypeInt32: {
             int32_t v = 0;
             return string((char *)&v, sizeof(int32_t));
         }
-        case T_INT64: {
+        case kTypeInt64: {
             int64_t v = 0;
             return string((char *)&v, sizeof(int64_t));
         }
-        case T_CHAR:
-        case T_UINT8: {
+        case kTypeChar:
+        case kTypeUint8: {
             uint8_t v = 0;
             return string((char *)&v, sizeof(uint8_t));
         }
-        case T_UINT16: {
+        case kTypeUint16: {
             uint16_t v = 0;
             return string((char *)&v, sizeof(uint16_t));
         }
-        case T_UINT32: {
+        case kTypeUint32: {
             uint32_t v = 0;
             return string((char *)&v, sizeof(uint32_t));
         }
-        case T_UINT64: {
+        case kTypeUint64: {
             uint64_t v = 0;
             return string((char *)&v, sizeof(uint64_t));
         }
-        case T_FLOAT32: {
+        case kTypeFloat32: {
             float v = 0.0f;
             return string((char *)&v, sizeof(float));
         }
-        case T_FLOAT64: {
+        case kTypeFloat64: {
             double v = 0.0;
             return string((char *)&v, sizeof(double));
         }
-        case T_ARRAY:
-        case T_BLOB:
-        case T_STRING: {
+        case kTypeArray:
+        case kTypeBlob:
+        case kTypeString: {
             const ArrayType *array = dtype->as_array();
             uint64_t min_array_elements = array->get_range().min.uinteger;
             return string(min_array_elements, '\0');
         }
-        case T_VARARRAY:
-        case T_VARBLOB:
-        case T_VARSTRING: {
+        case kTypeVararray:
+        case kTypeVarblob:
+        case kTypeVarstring: {
             const ArrayType *array = dtype->as_array();
             sizetag_t len = (sizetag_t)array->get_range().min.uinteger;
             return string((char *)&len, sizeof(sizetag_t)) + string(len, '\0');
         }
-        case T_STRUCT: {
+        case kTypeStruct: {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
 
@@ -97,7 +97,7 @@ string create_default_value(const DistributedType *dtype, bool& is_implicit) {
             }
             return val;
         }
-        case T_METHOD: {
+        case kTypeMethod: {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
 

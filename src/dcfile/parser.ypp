@@ -14,7 +14,7 @@
 
 	#include "dcfile/token.h"
 	#include "dcfile/parser-defs.h"
-	#include "dcfile/write.h"           // format_type(Type);
+	#include "dcfile/write.h"           // format_type(Subtype);
 	#include "module/Module.h"
 	#include "module/DistributedType.h"
 	#include "module/NumericRange.h"
@@ -75,9 +75,9 @@
 	static bool check_depth();
 	static void depth_error(string what);
 	static void depth_error(int depth, string what);
-	static string number_value(Type type, double &number);
-	static string number_value(Type type, int64_t &number);
-	static string number_value(Type type, uint64_t &number);
+	static string number_value(Subtype type, double &number);
+	static string number_value(Subtype type, int64_t &number);
+	static string number_value(Subtype type, uint64_t &number);
 
 ////////////////////////////////////////////////////////////////////
 // Defining the interface to the parser.
@@ -86,7 +86,7 @@
 	static void dcparser_file(istream& in, const string& filename, Module& module)
 	{
 		parsed_module = &module;
-		dclexer_init(in, filename, START_DC_FILE);
+		dclexer_init(in, filename, STARkTypeDC_FILE);
 	}
 
 	static void dcparser_value(istream& in, const string& source,
@@ -95,7 +95,7 @@
 		parsed_value = &output;
 		current_depth = 0;
 		type_stack.push(TypeAndDepth(type, 0));
-		dclexer_init(in, source, START_DC_VALUE);
+		dclexer_init(in, source, STARkTypeDC_VALUE);
 	}
 
 	static void dcparser_cleanup()
@@ -120,8 +120,8 @@
 /* Initial Tokens */
 // These special tokens are used to set the starting state of the parser.
 //     The lexer places the appropriate one of these on the head of the input stream.
-%token START_DC_FILE
-%token START_DC_VALUE
+%token STARkTypeDC_FILE
+%token STARkTypeDC_VALUE
 
 /* Define keywords */
 // Declaration Keywords
@@ -132,7 +132,7 @@
 %token KW_TYPEDEF
 %token KW_KEYWORD
 
-// Type Keywords
+// Subtype Keywords
 %token KW_INT8
 %token KW_INT16
 %token KW_INT32
@@ -166,8 +166,8 @@
 %type <dtype> defined_type
 %type <dtype> builtin_array_type
 %type <dnumeric> numeric_type
-%type <type> array_type_token
-%type <type> numeric_type_token
+%type <subtype> array_type_token
+%type <subtype> numeric_type_token
 %type <int64> signed_integer
 %type <uint32> small_unsigned_integer
 %type <uint32> char_or_uint
@@ -211,8 +211,8 @@
 %%
 
 grammar
-	: START_DC_FILE file
-	| START_DC_VALUE value
+	: STARkTypeDC_FILE file
+	| STARkTypeDC_VALUE value
 	;
 
 
@@ -369,7 +369,7 @@ defined_type
 		DistributedType* dtype = parsed_module->get_type_by_name($1);
 		if(dtype == (DistributedType*)NULL)
 		{
-			dcerror("Type '" + string($1) + "' has not been declared.");
+			dcerror("Subtype '" + string($1) + "' has not been declared.");
 			$$ = NULL;
 			break;
 		}
@@ -739,7 +739,7 @@ nonmethod_type_no_array
 			break;
 		}
 
-		if($1->get_type() == T_METHOD)
+		if($1->get_subtype() == kTypeMethod)
 		{
 			dcerror("Cannot use a method type here.");
 			$$ = NULL;
@@ -857,21 +857,21 @@ defined_field
 builtin_array_type
 	: array_type_token
 	{
-		if($1 == T_STRING)
+		if($1 == kTypeString)
 		{
 			if(basic_string == NULL)
 			{
-				basic_string = new ArrayType(new NumericType(T_CHAR));
+				basic_string = new ArrayType(new NumericType(kTypeChar));
 				basic_string->set_alias("string");
 			}
 
 			$$ = basic_string;
 		}
-		else if($1 == T_BLOB)
+		else if($1 == kTypeBlob)
 		{
 			if(basic_blob == NULL)
 			{
-				basic_blob = new ArrayType(new NumericType(T_UINT8));
+				basic_blob = new ArrayType(new NumericType(kTypeUint8));
 				basic_blob->set_alias("blob");
 			}
 
@@ -885,15 +885,15 @@ builtin_array_type
 	}
 	| array_type_token '(' array_range ')'
 	{
-		if($1 == T_STRING)
+		if($1 == kTypeString)
 		{
-			ArrayType* arr = new ArrayType(new NumericType(T_CHAR), $3);
+			ArrayType* arr = new ArrayType(new NumericType(kTypeChar), $3);
 			arr->set_alias("string");
 			$$ = arr;
 		}
-		else if($1 == T_BLOB)
+		else if($1 == kTypeBlob)
 		{
-			ArrayType* arr = new ArrayType(new NumericType(T_UINT8), $3);
+			ArrayType* arr = new ArrayType(new NumericType(kTypeUint8), $3);
 			arr->set_alias("blob");
 			$$ = arr;
 		}
@@ -1152,7 +1152,7 @@ type_value
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		$$ = number_value(dtype->get_type(), $1);
+		$$ = number_value(dtype->get_subtype(), $1);
 	}
 	| UNSIGNED_INTEGER
 	{
@@ -1167,7 +1167,7 @@ type_value
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		$$ = number_value(dtype->get_type(), $1);
+		$$ = number_value(dtype->get_subtype(), $1);
 	}
 	| REAL
 	{
@@ -1182,7 +1182,7 @@ type_value
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		$$ = number_value(dtype->get_type(), $1);
+		$$ = number_value(dtype->get_subtype(), $1);
 	}
 	| STRING
 	{
@@ -1197,7 +1197,7 @@ type_value
 		}
 		type_stack.pop(); // Remove string type from stack
 
-		if(dtype->get_type() == T_STRING || dtype->get_type() == T_BLOB)
+		if(dtype->get_subtype() == kTypeString || dtype->get_subtype() == kTypeBlob)
 		{
 			if($1.length() != dtype->get_size())
 			{
@@ -1206,7 +1206,7 @@ type_value
 
 			$$ = $1;
 		}
-		else if(dtype->get_type() == T_VARSTRING || dtype->get_type() == T_VARBLOB)
+		else if(dtype->get_subtype() == kTypeVarstring || dtype->get_subtype() == kTypeVarblob)
 		{
 			// TODO: Check for range limits
 			// Prepend length tag
@@ -1216,7 +1216,7 @@ type_value
 		else
 		{
 			dcerror("Cannot use string value for non-string type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 			$$ = $1;
 		}
 	}
@@ -1233,7 +1233,7 @@ type_value
 		}
 		type_stack.pop(); // Remove type from stack
 
-		if(dtype->get_type() == T_BLOB)
+		if(dtype->get_subtype() == kTypeBlob)
 		{
 			if($1.length() != dtype->get_size())
 			{
@@ -1242,7 +1242,7 @@ type_value
 
 			$$ = $1;
 		}
-		else if(dtype->get_type() == T_VARBLOB)
+		else if(dtype->get_subtype() == kTypeVarblob)
 		{
 			// TODO: Check for range limits
 			$$ = $1;
@@ -1250,7 +1250,7 @@ type_value
 		else
 		{
 			dcerror("Cannot use hex value for non-blob type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 			$$ = $1;
 		}
 	}
@@ -1286,7 +1286,7 @@ method_value
 		else
 		{
 			dcerror("Cannot use method-value for non-method type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  parameter_values ')'
@@ -1336,7 +1336,7 @@ struct_value
 		else
 		{
 			dcerror("Cannot use struct-composition for non-struct type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  field_values '}'
@@ -1379,7 +1379,7 @@ array_value
 		if(!dtype->as_array())
 		{
 			dcerror("Cannot use array-composition for non-array type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 			$$ = "";
 			break;
 		}
@@ -1432,7 +1432,7 @@ array_value
 		else
 		{
 			dcerror("Cannot use array-composition for non-array type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  element_values ']'
@@ -1520,7 +1520,7 @@ array_expansion
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_type(), $1);
+		string base = number_value(dtype->get_subtype(), $1);
 
 		string val;
 		val.reserve(base.length() * $3);
@@ -1542,7 +1542,7 @@ array_expansion
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_type(), $1);
+		string base = number_value(dtype->get_subtype(), $1);
 
 		string val;
 		val.reserve(base.length() * $3);
@@ -1564,7 +1564,7 @@ array_expansion
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_type(), $1);
+		string base = number_value(dtype->get_subtype(), $1);
 
 		string val;
 		val.reserve(base.length() * $3);
@@ -1586,7 +1586,7 @@ array_expansion
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_type() == T_STRING)
+		if(dtype->get_subtype() == kTypeString)
 		{
 			if($1.length() != dtype->get_size())
 			{
@@ -1601,7 +1601,7 @@ array_expansion
 			}
 			$$ = val;
 		}
-		else if(dtype->get_type() == T_VARSTRING)
+		else if(dtype->get_subtype() == kTypeVarstring)
 		{
 			// TODO: Check for range limits
 			// Prepend length tag
@@ -1619,7 +1619,7 @@ array_expansion
 		else
 		{
 			dcerror("Cannot use string value for non-string type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 
 			string val;
 			val.reserve($1.length() * $3);
@@ -1642,7 +1642,7 @@ array_expansion
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_type() == T_BLOB)
+		if(dtype->get_subtype() == kTypeBlob)
 		{
 			if($1.length() != dtype->get_size())
 			{
@@ -1657,7 +1657,7 @@ array_expansion
 			}
 			$$ = val;
 		}
-		else if(dtype->get_type() == T_VARBLOB)
+		else if(dtype->get_subtype() == kTypeVarblob)
 		{
 			// TODO: Check for range limits
 			// Prepend length tag
@@ -1676,7 +1676,7 @@ array_expansion
 		else
 		{
 			dcerror("Cannot use hex value for non-blob type '"
-			             + format_type(dtype->get_type()) + "'.");
+			             + format_type(dtype->get_subtype()) + "'.");
 
 			string val;
 			val.reserve($1.length() * $3);
@@ -1695,22 +1695,22 @@ signed_integer
 	;
 
 array_type_token
-	: KW_STRING { $$ = T_STRING; }
-	| KW_BLOB { $$ = T_BLOB; }
+	: KW_STRING { $$ = kTypeString; }
+	| KW_BLOB { $$ = kTypeBlob; }
 	;
 
 numeric_type_token
-	: KW_CHAR { $$ = T_CHAR; }
-	| KW_INT8 { $$ = T_INT8; }
-	| KW_INT16 { $$ = T_INT16; }
-	| KW_INT32 { $$ = T_INT32; }
-	| KW_INT64 { $$ = T_INT64; }
-	| KW_UINT8 { $$ = T_UINT8; }
-	| KW_UINT16 { $$ = T_UINT16; }
-	| KW_UINT32 { $$ = T_UINT32; }
-	| KW_UINT64 { $$ = T_UINT64; }
-	| KW_FLOAT32 { $$ = T_FLOAT32; }
-	| KW_FLOAT64 { $$ = T_FLOAT64; }
+	: KW_CHAR { $$ = kTypeChar; }
+	| KW_INT8 { $$ = kTypeInt8; }
+	| KW_INT16 { $$ = kTypeInt16; }
+	| KW_INT32 { $$ = kTypeInt32; }
+	| KW_INT64 { $$ = kTypeInt64; }
+	| KW_UINT8 { $$ = kTypeUint8; }
+	| KW_UINT16 { $$ = kTypeUint16; }
+	| KW_UINT32 { $$ = kTypeUint32; }
+	| KW_UINT64 { $$ = kTypeUint64; }
+	| KW_FLOAT32 { $$ = kTypeFloat32; }
+	| KW_FLOAT64 { $$ = kTypeFloat64; }
 	;
 
 keyword_list
@@ -1826,11 +1826,11 @@ void depth_error(int depth, string what)
 	}
 }
 
-string number_value(Type type, double &number)
+string number_value(Subtype type, double &number)
 {
 	switch(type)
 	{
-		case T_FLOAT32:
+		case kTypeFloat32:
 		{
 			float v = number;
 			if(v == INFINITY || v == -INFINITY)
@@ -1840,19 +1840,19 @@ string number_value(Type type, double &number)
 
 			return string((char*)&v, sizeof(float));
 		}
-		case T_FLOAT64:
+		case kTypeFloat64:
 		{
 			return string((char*)&number, sizeof(double));
 		}
-		case T_INT8:
-		case T_INT16:
-		case T_INT32:
-		case T_INT64:
-		case T_CHAR:
-		case T_UINT8:
-		case T_UINT16:
-		case T_UINT32:
-		case T_UINT64:
+		case kTypeInt8:
+		case kTypeInt16:
+		case kTypeInt32:
+		case kTypeInt64:
+		case kTypeChar:
+		case kTypeUint8:
+		case kTypeUint16:
+		case kTypeUint32:
+		case kTypeUint64:
 		{
 			dcerror("Cannot use floating-point value for integer datatype.");
 			return string();
@@ -1865,11 +1865,11 @@ string number_value(Type type, double &number)
 	}
 }
 
-string number_value(Type type, int64_t &number)
+string number_value(Subtype type, int64_t &number)
 {
 	switch(type)
 	{
-		case T_INT8:
+		case kTypeInt8:
 		{
 			if(INT8_MIN > number || number > INT8_MAX)
 			{
@@ -1879,7 +1879,7 @@ string number_value(Type type, int64_t &number)
 			int8_t v = number;
 			return string((char*)&v, sizeof(int8_t));
 		}
-		case T_INT16:
+		case kTypeInt16:
 		{
 			if(INT16_MIN > number || number > INT16_MAX)
 			{
@@ -1889,7 +1889,7 @@ string number_value(Type type, int64_t &number)
 			uint16_t v = number;
 			return string((char*)&v, sizeof(int16_t));
 		}
-		case T_INT32:
+		case kTypeInt32:
 		{
 			if(INT32_MIN > number || number > INT32_MAX)
 			{
@@ -1899,15 +1899,15 @@ string number_value(Type type, int64_t &number)
 			int32_t v = number;
 			return string((char*)&v, sizeof(int32_t));
 		}
-		case T_INT64:
+		case kTypeInt64:
 		{
 			return string((char*)&number, sizeof(int64_t));
 		}
-		case T_CHAR:
-		case T_UINT8:
-		case T_UINT16:
-		case T_UINT32:
-		case T_UINT64:
+		case kTypeChar:
+		case kTypeUint8:
+		case kTypeUint16:
+		case kTypeUint32:
+		case kTypeUint64:
 		{
 			if(number < 0)
 			{
@@ -1916,8 +1916,8 @@ string number_value(Type type, int64_t &number)
 			uint64_t v = number;
 			return number_value(type, v);
 		}
-		case T_FLOAT32:
-		case T_FLOAT64:
+		case kTypeFloat32:
+		case kTypeFloat64:
 		{
 			// Note: Expecting number to be converted to a double by value (ie. -1 becomes -1.0)
 			double v = number;
@@ -1931,12 +1931,12 @@ string number_value(Type type, int64_t &number)
 	}
 }
 
-string number_value(Type type, uint64_t &number)
+string number_value(Subtype type, uint64_t &number)
 {
 	switch(type)
 	{
-		case T_CHAR:
-		case T_UINT8:
+		case kTypeChar:
+		case kTypeUint8:
 		{
 			if(number > UINT8_MAX)
 			{
@@ -1946,7 +1946,7 @@ string number_value(Type type, uint64_t &number)
 			uint8_t v = number;
 			return string((char*)&v, sizeof(uint8_t));
 		}
-		case T_UINT16:
+		case kTypeUint16:
 		{
 			if(number > UINT16_MAX)
 			{
@@ -1956,7 +1956,7 @@ string number_value(Type type, uint64_t &number)
 			uint16_t v = number;
 			return string((char*)&v, sizeof(uint16_t));
 		}
-		case T_UINT32:
+		case kTypeUint32:
 		{
 			if(number > UINT32_MAX)
 			{
@@ -1966,14 +1966,14 @@ string number_value(Type type, uint64_t &number)
 			uint32_t v = number;
 			return string((char*)&v, sizeof(uint32_t));
 		}
-		case T_UINT64:
+		case kTypeUint64:
 		{
 			return string((char*)&number, sizeof(uint64_t));
 		}
-		case T_INT8:
-		case T_INT16:
-		case T_INT32:
-		case T_INT64:
+		case kTypeInt8:
+		case kTypeInt16:
+		case kTypeInt32:
+		case kTypeInt64:
 		{
 			if(number > INT64_MAX)
 			{
@@ -1982,8 +1982,8 @@ string number_value(Type type, uint64_t &number)
 			int64_t v = number;
 			return number_value(type, v);
 		}
-		case T_FLOAT32:
-		case T_FLOAT64:
+		case kTypeFloat32:
+		case kTypeFloat64:
 		{
 			// Note: Expecting number to be converted to a double by value (ie. 3 becomes 3.0)
 			double v = number;

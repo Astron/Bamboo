@@ -37,12 +37,12 @@ bool Parameter::set_type(DistributedType *type) {
     }
 
     // Parameters can't have method types for now
-    if(type->get_type() == T_METHOD) {
+    if(type->get_subtype() == kTypeMethod) {
         return false;
     }
 
     // Parameters can't have class types for now
-    if(type->get_type() == T_STRUCT && type->as_struct()->as_class()) {
+    if(type->get_subtype() == kTypeStruct && type->as_struct()->as_class()) {
         return false;
     }
 

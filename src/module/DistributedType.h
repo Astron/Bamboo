@@ -14,28 +14,28 @@ class HashGenerator;
 
 
 // The Type enum are numeric constants representing the layout of the DistributedType
-enum Type {
+enum Subtype {
     /* Numeric Types */
-    T_INT8, T_INT16, T_INT32, T_INT64,
-    T_UINT8, T_UINT16, T_UINT32, T_UINT64,
-    T_CHAR, // equivalent to uint8, except that it should be printed as a string
-    T_FLOAT32, T_FLOAT64,
+    kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
+    kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
+    kTypeChar, // equivalent to uint8, except that it should be printed as a string
+    kTypeFloat32, kTypeFloat64,
 
     /* Array Types */
-    T_STRING,      // a human-printable string with fixed length
-    T_VARSTRING,   // a human-printable string with variable length
-    T_BLOB,        // any binary data stored as a string, fixed length
-    T_VARBLOB,     // any binary data stored as a varstring, variable length
-    T_ARRAY,       // any array with fixed byte-length (fixed array-size and element-length)
-    T_VARARRAY,    // any array with variable array-size or variable length elements
+    kTypeString,      // a human-printable string with fixed length
+    kTypeVarstring,   // a human-printable string with variable length
+    kTypeBlob,        // any binary data stored as a string, fixed length
+    kTypeVarblob,     // any binary data stored as a varstring, variable length
+    kTypeArray,       // any array with fixed byte-length (fixed array-size and element-length)
+    kTypeVararray,    // any array with variable array-size or variable length elements
 
     /* Complex Types */
-    T_STRUCT,
-    T_METHOD,
+    kTypeStruct,
+    kTypeMethod,
 
     // New additions should be added at the end to prevent the file hash from changing.
 
-    T_INVALID
+    kTypeInvalid
 };
 
 // A DistributedType is a shared type with a defined layout of data.
@@ -48,7 +48,7 @@ class DistributedType {
     virtual ~DistributedType();
 
     // get_type returns the type's fundamental type as an integer constant.
-    inline Type get_type() const;
+    inline Subtype get_subtype() const;
 
     // has_fixed_size returns true if the DistributedType has a fixed size in bytes.
     inline bool has_fixed_size() const;
@@ -78,11 +78,8 @@ class DistributedType {
     virtual Method *as_method();
     virtual const Method *as_method() const;
 
-    // generate_hash accumulates the properties of this file into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   protected:
-    Type m_type;
+    Subtype m_subtype;
     sizetag_t m_size;
     std::string m_alias;
 };

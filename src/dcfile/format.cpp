@@ -43,13 +43,13 @@ struct Formatter {
     }
 
     bool format(const DistributedType *dtype) {
-        Type type = dtype->get_type();
-        switch(type) {
-            case T_INVALID: {
+        Subtype subtype = dtype->get_subtype();
+        switch(subtype) {
+            case kTypeInvalid: {
                 out << "<invalid>";
                 break;
             }
-            case T_INT8: {
+            case kTypeInt8: {
                 if(!remaining(sizeof(int8_t)))
                 { return false; }
                 int v = *(int8_t *)(in + offset);
@@ -57,7 +57,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_INT16: {
+            case kTypeInt16: {
                 if(!remaining(sizeof(int16_t)))
                 { return false; }
                 int v = *(int16_t *)(in + offset);
@@ -65,7 +65,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_INT32: {
+            case kTypeInt32: {
                 if(!remaining(sizeof(int32_t)))
                 { return false; }
                 int v = *(int32_t *)(in + offset);
@@ -73,7 +73,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_INT64: {
+            case kTypeInt64: {
                 if(!remaining(sizeof(int64_t)))
                 { return false; }
                 int v = *(int64_t *)(in + offset);
@@ -81,7 +81,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_UINT8: {
+            case kTypeUint8: {
                 if(!remaining(sizeof(uint8_t)))
                 { return false; }
                 unsigned int v = *(uint8_t *)(in + offset);
@@ -89,7 +89,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_UINT16: {
+            case kTypeUint16: {
                 if(!remaining(sizeof(uint16_t)))
                 { return false; }
                 unsigned int v = *(uint16_t *)(in + offset);
@@ -97,7 +97,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_UINT32: {
+            case kTypeUint32: {
                 if(!remaining(sizeof(uint32_t)))
                 { return false; }
                 unsigned int v = *(uint32_t *)(in + offset);
@@ -105,7 +105,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_UINT64: {
+            case kTypeUint64: {
                 if(!remaining(sizeof(uint64_t)))
                 { return false; }
                 unsigned int v = *(uint64_t *)(in + offset);
@@ -113,7 +113,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_FLOAT32: {
+            case kTypeFloat32: {
                 if(!remaining(sizeof(float)))
                 { return false; }
                 float v = *(float *)(in + offset);
@@ -121,7 +121,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_FLOAT64: {
+            case kTypeFloat64: {
                 if(!remaining(sizeof(double)))
                 { return false; }
                 double v = *(double *)(in + offset);
@@ -129,7 +129,7 @@ struct Formatter {
                 out << v;
                 break;
             }
-            case T_CHAR: {
+            case kTypeChar: {
                 if(!remaining(sizeof(char)))
                 { return false; }
                 char v = *(char *)(in + offset);
@@ -137,7 +137,7 @@ struct Formatter {
                 offset += sizeof(char);
                 break;
             }
-            case T_STRING: {
+            case kTypeString: {
                 // Read string length
                 sizetag_t length = dtype->get_size();
 
@@ -168,7 +168,7 @@ struct Formatter {
                 }
                 break;
             }
-            case T_VARSTRING: {
+            case kTypeVarstring: {
 
                 // If we have a string alias format as a quoted string
                 if(dtype->has_alias() && dtype->get_alias() == "string") {
@@ -234,7 +234,7 @@ struct Formatter {
 
                 break;
             }
-            case T_BLOB: {
+            case kTypeBlob: {
                 // Read blob length
                 sizetag_t length = dtype->get_size();
 
@@ -272,7 +272,7 @@ struct Formatter {
 
                 break;
             }
-            case T_VARBLOB: {
+            case kTypeVarblob: {
                 // If we have a blob alias format as a hex constant
                 if(dtype->has_alias() && dtype->get_alias() == "blob") {
                     // Read blob length
@@ -336,7 +336,7 @@ struct Formatter {
 
                 break;
             }
-            case T_ARRAY: {
+            case kTypeArray: {
                 out << '[';
                 const ArrayType *arr = dtype->as_array();
                 bool ok = format(arr->get_element_type());
@@ -356,7 +356,7 @@ struct Formatter {
                 out << ']';
                 break;
             }
-            case T_VARARRAY: {
+            case kTypeVararray: {
                 out << '[';
                 // Read array byte length
                 if(!remaining(sizeof(sizetag_t))) {
@@ -401,7 +401,7 @@ struct Formatter {
                 out << ']';
                 break;
             }
-            case T_STRUCT: {
+            case kTypeStruct: {
                 out << '{';
                 const Struct *strct = dtype->as_struct();
                 size_t num_fields = strct->get_num_fields();
@@ -423,7 +423,7 @@ struct Formatter {
                 out << '}';
                 break;
             }
-            case T_METHOD: {
+            case kTypeMethod: {
                 out << '(';
                 const Method *method = dtype->as_method();
                 size_t num_params = method->get_num_parameters();

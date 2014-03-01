@@ -7,7 +7,7 @@ namespace bamboo { // open namespace
 
 // constructor
 Method::Method() {
-    m_type = T_METHOD;
+    m_subtype = kTypeMethod;
 }
 
 // destructor

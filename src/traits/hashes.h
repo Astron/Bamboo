@@ -1,4 +1,4 @@
-// Filename: hash.h
+// Filename: hashes.h
 #pragma once
 #include <stdint.h>
 namespace bamboo { // open namespace

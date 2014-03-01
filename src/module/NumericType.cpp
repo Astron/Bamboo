@@ -2,43 +2,43 @@
 #include "NumericType.h"
 
 // This must be defined for inttypes.h to define the fixed with integer macros
-#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
-#define __STDC_LIMIT_MACROS
+#if defined(__cplusplus) && !defined(__STDC_LIMIkTypeMACROS)
+#define __STDC_LIMIkTypeMACROS
 #endif
 #include <inttypes.h> // fixed-width integer limits
 namespace bamboo { // open namespace bamboo
 
 
 // Type constructor
-NumericType::NumericType(Type type) :
+NumericType::NumericType(Subtype type) :
     m_divisor(1), m_orig_modulus(0.0), m_orig_range() {
-    m_type = type;
+    m_subtype = type;
     switch(type) {
-        case T_CHAR:
-        case T_INT8:
-        case T_UINT8:
+        case kTypeChar:
+        case kTypeInt8:
+        case kTypeUint8:
             m_size = sizeof(int8_t);
             break;
-        case T_INT16:
-        case T_UINT16:
+        case kTypeInt16:
+        case kTypeUint16:
             m_size = sizeof(int16_t);
             break;
-        case T_INT32:
-        case T_UINT32:
+        case kTypeInt32:
+        case kTypeUint32:
             m_size = sizeof(int32_t);
             break;
-        case T_INT64:
-        case T_UINT64:
+        case kTypeInt64:
+        case kTypeUint64:
             m_size = sizeof(int64_t);
             break;
-        case T_FLOAT32:
+        case kTypeFloat32:
             m_size = sizeof(float);
             break;
-        case T_FLOAT64:
+        case kTypeFloat64:
             m_size = sizeof(double);
             break;
         default:
-            m_type = T_INVALID;
+            m_subtype = kTypeInvalid;
     }
 }
 
@@ -80,58 +80,58 @@ bool NumericType::set_modulus(double modulus) {
     uint64_t uint_modulus = floor(modulus * m_divisor + 0.5);
 
     // Check the range.  A valid range for the modulus is 1 to (maximum_value + 1) after scaling.
-    switch(m_type) {
-        case T_CHAR:
-        case T_UINT8:
+    switch(m_subtype) {
+        case kTypeChar:
+        case kTypeUint8:
             if(uint_modulus < 1 || UINT8_MAX + 1 < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_UINT16:
+        case kTypeUint16:
             if(uint_modulus < 1 || UINT16_MAX + 1 < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_UINT32:
+        case kTypeUint32:
             if(uint_modulus < 1 || UINT32_MAX + 1 < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_UINT64:
+        case kTypeUint64:
             if(uint_modulus < 1) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_INT8:
+        case kTypeInt8:
             if(uint_modulus < 1 || INT8_MAX + 1 < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_INT16:
+        case kTypeInt16:
             if(uint_modulus < 1 || INT16_MAX + 1 < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_INT32:
+        case kTypeInt32:
             if(uint_modulus < 1 || INT32_MAX + 1l < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_INT64:
+        case kTypeInt64:
             if(uint_modulus < 1) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
-        case T_FLOAT32:
-        case T_FLOAT64:
+        case kTypeFloat32:
+        case kTypeFloat64:
             m_modulus = float_modulus;
             break;
         default:
@@ -151,30 +151,30 @@ bool NumericType::set_range(const NumericRange& range) {
     }
 
     m_orig_range = range;
-    switch(m_type) {
-        case T_INT8:
-        case T_INT16:
-        case T_INT32:
-        case T_INT64: {
+    switch(m_subtype) {
+        case kTypeInt8:
+        case kTypeInt16:
+        case kTypeInt32:
+        case kTypeInt64: {
             int64_t min = (int64_t)floor(range.min.floating * m_divisor + 0.5);
             int64_t max = (int64_t)floor(range.max.floating * m_divisor + 0.5);
             m_range = NumericRange(min, max);
             // TODO: Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
             break;
         }
-        case T_CHAR:
-        case T_UINT8:
-        case T_UINT16:
-        case T_UINT32:
-        case T_UINT64: {
+        case kTypeChar:
+        case kTypeUint8:
+        case kTypeUint16:
+        case kTypeUint32:
+        case kTypeUint64: {
             uint64_t min = (uint64_t)floor(range.min.floating * m_divisor + 0.5);
             uint64_t max = (uint64_t)floor(range.max.floating * m_divisor + 0.5);
             m_range = NumericRange(min, max);
             // TODO: Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
             break;
         }
-        case T_FLOAT32:
-        case T_FLOAT64: {
+        case kTypeFloat32:
+        case kTypeFloat64: {
             double min = range.min.floating * m_divisor;
             double max = range.max.floating * m_divisor;
             m_range = NumericRange(min, max);

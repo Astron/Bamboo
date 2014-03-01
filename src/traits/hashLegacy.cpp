@@ -1,5 +1,5 @@
 // Filename: hashLegacy.cpp
-#include "hash.h"
+#include "hashes.h"
 #include "HashGenerator.h"
 
 #include <set>      // std::set
@@ -126,7 +126,7 @@ void hash_field(HashGenerator& hashgen, const Field *field) {
 
 
     /* Handle DCAtomicField */
-    if(field->get_type()->get_type() == T_METHOD) {
+    if(field->get_type()->get_subtype() == kTypeMethod) {
         // DCField::generate_hash()
         hashgen.add_string(field->get_name());
         hashgen.add_int(field->get_id());
@@ -214,8 +214,8 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list) {
 }
 
 void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
-    switch(type->get_type()) {
-        case T_STRUCT: {
+    switch(type->get_subtype()) {
+        case kTypeStruct: {
             // get_class()->generate_hash()
             const Struct *strct = type->as_struct();
             if(strct->as_class()) {
@@ -226,8 +226,8 @@ void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
             break;
         }
 
-        case T_ARRAY:
-        case T_VARARRAY: {
+        case kTypeArray:
+        case kTypeVararray: {
             const ArrayType *arr = type->as_array();
 
             // _element_type->generate_hash()
@@ -243,8 +243,8 @@ void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
             break;
         }
 
-        case T_BLOB:
-        case T_VARBLOB: {
+        case kTypeBlob:
+        case kTypeVarblob: {
             if(type->get_alias() == "blob") {
                 hashgen.add_int(L_BLOB); // _type
             } else {
@@ -263,8 +263,8 @@ void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
             break;
         }
 
-        case T_VARSTRING:
-        case T_STRING: {
+        case kTypeVarstring:
+        case kTypeString: {
             if(type->get_alias() == "string") {
                 hashgen.add_int(L_STRING); // _type
             } else {
@@ -283,46 +283,46 @@ void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
             break;
         }
 
-        case T_INT8:
+        case kTypeInt8:
             hashgen.add_int(L_INT8);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_INT16:
+        case kTypeInt16:
             hashgen.add_int(L_INT16);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_INT32:
+        case kTypeInt32:
             hashgen.add_int(L_INT32);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_INT64:
+        case kTypeInt64:
             hashgen.add_int(L_INT64);
             hash_int_type(hashgen, type->as_numeric());
             break;
 
-        case T_UINT8:
+        case kTypeUint8:
             hashgen.add_int(L_UINT8);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_UINT16:
+        case kTypeUint16:
             hashgen.add_int(L_UINT16);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_UINT32:
+        case kTypeUint32:
             hashgen.add_int(L_UINT32);
             hash_int_type(hashgen, type->as_numeric());
             break;
-        case T_UINT64:
+        case kTypeUint64:
             hashgen.add_int(L_UINT64);
             hash_int_type(hashgen, type->as_numeric());
             break;
 
-        case T_CHAR:
+        case kTypeChar:
             hashgen.add_int(L_CHAR);
             hash_int_type(hashgen, type->as_numeric());
             break;
 
-        case T_FLOAT64: {
+        case kTypeFloat64: {
             hashgen.add_int(L_FLOAT64); // _type
 
             const NumericType *numeric = type->as_numeric();
@@ -340,11 +340,11 @@ void hash_legacy_type(HashGenerator& hashgen, const DistributedType *type) {
             break;
         }
 
-        case T_FLOAT32:
+        case kTypeFloat32:
             cerr << "Warning: float32 ignored in legacy_hash.\n";
             break;
 
-        case T_INVALID:
+        case kTypeInvalid:
             cerr << "Error: Cannot generate legacy_hash, encountered invalid type.\n";
             break;
 

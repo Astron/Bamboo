@@ -5,14 +5,14 @@ namespace bamboo   // open namespace bamboo
 
 // null constructor
 inline DistributedType::DistributedType() :
-    m_type(T_INVALID), m_size(0)
+    m_subtype(kTypeInvalid), m_size(0)
 {
 }
 
-// get_type returns the type's fundamental type as an integer constant.
-inline Type DistributedType::get_type() const
+// get_subtype returns the type's fundamental type as an integer constant.
+inline Subtype DistributedType::get_subtype() const
 {
-    return m_type;
+    return m_subtype;
 }
 
 // has_fixed_size returns true if the DistributedType has a fixed size in bytes.

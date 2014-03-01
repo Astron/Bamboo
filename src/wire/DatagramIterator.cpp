@@ -44,81 +44,81 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
 #endif
 
     // For the unlucky types/machines, we have to figure out their size manually
-    switch(dtype->get_type()) {
-        case T_CHAR:
+    switch(dtype->get_subtype()) {
+        case kTypeChar:
         {
             char r = read_char();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_INT8:
+        case kTypeInt8:
         {
             int8_t r = read_int8();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_INT16:
+        case kTypeInt16:
         {
             int16_t r = read_int16();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_INT32:
+        case kTypeInt32:
         {
             int32_t r = read_int32();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_INT64:
+        case kTypeInt64:
         {
             int64_t r = read_int64();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_UINT8:
+        case kTypeUint8:
         {
             uint8_t r = read_uint8();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_UINT16:
+        case kTypeUint16:
         {
             uint16_t r = read_uint16();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_UINT32:
+        case kTypeUint32:
         {
             uint32_t r = read_uint32();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_UINT64:
+        case kTypeUint64:
         {
             uint64_t r = read_uint64();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_FLOAT32:
+        case kTypeFloat32:
         {
             float r = read_float32();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_FLOAT64:
+        case kTypeFloat64:
         {
             double r = read_float64();
             buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
             break;
         }
-        case T_STRING:
-        case T_BLOB:
+        case kTypeString:
+        case kTypeBlob:
         {
             vector<uint8_t> blob = read_data(dtype->get_size());
             buffer.insert(buffer.end(), blob.begin(), blob.end());
             break;
         }
-        case T_ARRAY:
+        case kTypeArray:
         {
             const ArrayType *arr = dtype->as_array();
             if(arr->get_element_type()->get_size() == 1) {
@@ -142,8 +142,8 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             }
             break;
         }
-        case T_VARSTRING:
-        case T_VARBLOB:
+        case kTypeVarstring:
+        case kTypeVarblob:
         {
             sizetag_t len = read_size();
             buffer.insert(buffer.end(), (uint8_t *)&len, (uint8_t *)&len + sizeof(sizetag_t));
@@ -152,7 +152,7 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             buffer.insert(buffer.end(), blob.begin(), blob.end());
             break;
         }
-        case T_VARARRAY:
+        case kTypeVararray:
         {
             sizetag_t len = read_size();
             buffer.insert(buffer.end(), (uint8_t *)&len, (uint8_t *)&len + sizeof(sizetag_t));
@@ -178,7 +178,7 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             }
             break;
         }
-        case T_STRUCT:
+        case kTypeStruct:
         {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
@@ -187,7 +187,7 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             }
             break;
         }
-        case T_METHOD:
+        case kTypeMethod:
         {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
@@ -196,7 +196,7 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             }
             break;
         }
-        case T_INVALID:
+        case kTypeInvalid:
         {
             break;
         }
@@ -219,16 +219,16 @@ void DatagramIterator::skip_dtype(const DistributedType *dtype) {
         return;
     }
 
-    switch(dtype->get_type()) {
-        case T_VARSTRING:
-        case T_VARBLOB:
-        case T_VARARRAY: {
+    switch(dtype->get_subtype()) {
+        case kTypeVarstring:
+        case kTypeVarblob:
+        case kTypeVararray: {
             sizetag_t length = read_size();
             check_read_length(length);
             m_offset += length;
             break;
         }
-        case T_STRUCT: {
+        case kTypeStruct: {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
@@ -236,7 +236,7 @@ void DatagramIterator::skip_dtype(const DistributedType *dtype) {
             }
             break;
         }
-        case T_METHOD: {
+        case kTypeMethod: {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
@@ -244,7 +244,8 @@ void DatagramIterator::skip_dtype(const DistributedType *dtype) {
             }
             break;
         }
-        default: {
+        default:
+        {
             // This case should be impossible, but a default is required by compilers
             break;
         }

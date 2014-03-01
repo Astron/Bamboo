@@ -12,7 +12,7 @@ namespace bamboo { // open namespace bamboo
 class NumericType : public DistributedType {
   public:
     // Type constructor
-    NumericType(Type type);
+    NumericType(Subtype type);
 
     // as_numeric returns this as a NumericType if it is numeric, or NULL otherwise.
     virtual NumericType *as_numeric();

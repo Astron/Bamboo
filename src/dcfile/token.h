@@ -26,7 +26,7 @@ class DCToken {
         uint64_t uint64;
         double real;
         bool flag;
-        Type type;
+        Subtype subtype;
 
         Class *dclass;
         Struct *dstruct;
