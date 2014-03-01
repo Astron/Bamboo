@@ -39,6 +39,7 @@ class DCToken {
     };
 
     std::string str;
+    std::vector<uint8_t> buffer;
     std::vector<std::string> strings;
     NumericRange range;
     struct NameType {

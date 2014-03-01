@@ -1,6 +1,7 @@
 // Filename: parser.h
 #pragma once
 #include <string> // std::string
+#include <vector> // std::vector
 namespace bamboo { // open namespace bamboo
 
 
@@ -24,8 +25,8 @@ bool parse_dcfile(Module *f, const std::string& filename);
 // parse_value reads a .dc-formatted parameter value and outputs the data in wire form matching
 //     the appropriate DistributedType and suitable for a default parameter value.
 //     If an error occurs, the error reason is returned instead of the parsed value.
-std::string parse_dcvalue(const DistributedType *, const std::string& formatted, bool& err);
-std::string parse_dcvalue(const DistributedType *, std::istream& in, bool& err);
+std::vector<uint8_t> parse_dcvalue(const DistributedType *, const std::string& formatted, bool& err);
+std::vector<uint8_t> parse_dcvalue(const DistributedType *, std::istream& in, bool& err);
 
 
 } // close namespace bamboo

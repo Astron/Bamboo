@@ -1,4 +1,5 @@
 #include "DatagramIterator.h"
+#include "traits/buffers.h"
 #include "module/ArrayType.h"
 #include "module/Struct.h"
 #include "module/Method.h"
@@ -37,8 +38,7 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
     if(dtype->has_fixed_size()) {
         // If field is a fixed-sized type like uint, int, float, etc
         // Also any other type lucky enough to be fixed size will be computed faster
-        vector<uint8_t> data = read_data(dtype->get_size());
-        buffer.insert(buffer.end(), data.begin(), data.end());
+        pack_value(read_data(dtype->get_size()), buffer);
         return;
     }
 #endif
@@ -46,85 +46,48 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
     // For the unlucky types/machines, we have to figure out their size manually
     switch(dtype->get_subtype()) {
         case kTypeChar:
-        {
-            char r = read_char();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_char(), buffer);
             break;
-        }
         case kTypeInt8:
-        {
-            int8_t r = read_int8();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_int8(), buffer);
             break;
-        }
         case kTypeInt16:
-        {
-            int16_t r = read_int16();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_int16(), buffer);
             break;
-        }
         case kTypeInt32:
-        {
-            int32_t r = read_int32();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_int32(), buffer);
             break;
-        }
         case kTypeInt64:
-        {
-            int64_t r = read_int64();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_int64(), buffer);
             break;
-        }
         case kTypeUint8:
-        {
-            uint8_t r = read_uint8();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_uint8(), buffer);
             break;
-        }
         case kTypeUint16:
-        {
-            uint16_t r = read_uint16();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_uint16(), buffer);
             break;
-        }
         case kTypeUint32:
-        {
-            uint32_t r = read_uint32();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_uint32(), buffer);
             break;
-        }
         case kTypeUint64:
-        {
-            uint64_t r = read_uint64();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_uint64(), buffer);
             break;
-        }
         case kTypeFloat32:
-        {
-            float r = read_float32();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_float32(), buffer);
             break;
-        }
         case kTypeFloat64:
-        {
-            double r = read_float64();
-            buffer.insert(buffer.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
+            pack_value(read_float64(), buffer);
             break;
-        }
         case kTypeString:
         case kTypeBlob:
-        {
-            vector<uint8_t> blob = read_data(dtype->get_size());
-            buffer.insert(buffer.end(), blob.begin(), blob.end());
+            pack_value(read_data(dtype->get_size()), buffer);
             break;
-        }
         case kTypeArray:
         {
             const ArrayType *arr = dtype->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
-                vector<uint8_t> blob = read_data(dtype->get_size());
-                buffer.insert(buffer.end(), blob.begin(), blob.end());
+                pack_value(read_data(dtype->get_size()), buffer);
                 break;
             }
 
@@ -146,22 +109,19 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
         case kTypeVarblob:
         {
             sizetag_t len = read_size();
-            buffer.insert(buffer.end(), (uint8_t *)&len, (uint8_t *)&len + sizeof(sizetag_t));
-
-            vector<uint8_t> blob = read_data(len);
-            buffer.insert(buffer.end(), blob.begin(), blob.end());
+            pack_value(len, buffer);
+            pack_value(read_data(len), buffer);
             break;
         }
         case kTypeVararray:
         {
             sizetag_t len = read_size();
-            buffer.insert(buffer.end(), (uint8_t *)&len, (uint8_t *)&len + sizeof(sizetag_t));
+            pack_value(len, buffer);
 
             const ArrayType* arr = dtype->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
-                vector<uint8_t> blob = read_data(len);
-                buffer.insert(buffer.end(), blob.begin(), blob.end());
+                pack_value(read_data(len), buffer);
                 break;
             }
 

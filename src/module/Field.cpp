@@ -3,10 +3,11 @@
 #include "module/Module.h"
 #include "module/Struct.h"
 #include "traits/default.h"
+using namespace std;
 namespace bamboo { // open namespace
 
 // constructor
-Field::Field(DistributedType *type, const std::string& name) :
+Field::Field(DistributedType *type, const string& name) :
     m_struct(nullptr), m_id(0), m_name(name), m_type(type), m_has_default_value(false) {
     bool implicit_value;
     m_default_value = create_default_value(type, implicit_value);
@@ -32,7 +33,7 @@ const MolecularField *Field::as_molecular() const {
 
 // set_name sets the name of this field.  Returns false if a field with
 //     the same name already exists in the containing struct.
-bool Field::set_name(const std::string& name) {
+bool Field::set_name(const string& name) {
     // Check to make sure no other fields in our struct have this name
     if(m_struct != nullptr && m_struct->get_field_by_name(name) != nullptr) {
         return false;
@@ -51,7 +52,7 @@ void Field::set_type(DistributedType *type) {
 
 // set_default_value establishes a default value for this field.
 //     Returns false if the value is invalid for the field.
-bool Field::set_default_value(const std::string& default_value) {
+bool Field::set_default_value(const vector<uint8_t>& default_value) {
     // TODO: Validate default value
     m_has_default_value = true;
     m_default_value = default_value;

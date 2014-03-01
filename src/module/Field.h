@@ -36,7 +36,7 @@ class Field : public KeywordList {
     inline bool has_default_value() const;
     // get_default_value returns the default value for this field.
     //     If a default value hasn't been set, returns an implicit default.
-    inline const std::string& get_default_value() const;
+    inline const std::vector<uint8_t>& get_default_value() const;
 
     // set_name sets the name of this field.  Returns false if a field with
     //     the same name already exists in the containing struct.
@@ -47,7 +47,7 @@ class Field : public KeywordList {
 
     // set_default_value defines a default value for this field.
     //     Returns false if the value is invalid for the field's type.
-    virtual bool set_default_value(const std::string& default_value);
+    virtual bool set_default_value(const std::vector<uint8_t>& default_value);
 
   protected:
     // set_id sets the unique index number associated with the field.
@@ -65,7 +65,7 @@ class Field : public KeywordList {
     DistributedType *m_type;
 
     bool m_has_default_value; // is true if an explicity default has been set
-    std::string m_default_value; // the binary data of the default value encoded in a string
+    std::vector<uint8_t> m_default_value; // the binary data of the default value encoded in a string
 };
 
 

@@ -1,5 +1,7 @@
 // Filename: byteorder.h
 #pragma once
+namespace bamboo { // open namespace bamboo
+
 
 // First, detect endianness. This is fairly compiler-specific, so if this
 // doesn't work on some compiler, more cases may need to be added.
@@ -7,9 +9,7 @@
 #define PLATFORM_BIG_ENDIAN
 #endif
 
-namespace bamboo { // open namespace bamboo
-	extern const bool kBigEndian;
-} // close namespace bamboo
+extern const bool kBigEndian;
 
 #ifdef PLATFORM_BIG_ENDIAN
 
@@ -54,6 +54,5 @@ static inline uint64_t swap_le_64(uint64_t x)
 #define swap_le(var) (var)
 #endif
 
-namespace bamboo { // open namespace bamboo
-	extern const bool kBigEndian;
+
 } // close namespace bamboo

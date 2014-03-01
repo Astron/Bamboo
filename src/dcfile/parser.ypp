@@ -26,6 +26,7 @@
 	#include "module/Method.h"
 	#include "module/Parameter.h"
 	#include "module/MolecularField.h"
+	#include "traits/buffers.h"
 
 	#define yylex dclex
 	#define yyparse dcparse
@@ -50,7 +51,7 @@
 
 	// Parser output
 	static Module* parsed_module = nullptr;
-	static string* parsed_value = nullptr;
+	static vector<uint8_t>* parsed_value = nullptr;
 
 	// Parser state
 	static Class* current_class = nullptr;
@@ -75,9 +76,9 @@
 	static bool check_depth();
 	static void depth_error(string what);
 	static void depth_error(int depth, string what);
-	static string number_value(Subtype type, double &number);
-	static string number_value(Subtype type, int64_t &number);
-	static string number_value(Subtype type, uint64_t &number);
+	static vector<uint8_t> number_value(Subtype type, double &number);
+	static vector<uint8_t> number_value(Subtype type, int64_t &number);
+	static vector<uint8_t> number_value(Subtype type, uint64_t &number);
 
 ////////////////////////////////////////////////////////////////////
 // Defining the interface to the parser.
@@ -90,7 +91,7 @@
 	}
 
 	static void dcparser_value(istream& in, const string& source,
-	                           const DistributedType* type, string& output)
+	                           const DistributedType* type, vector<uint8_t>& output)
 	{
 		parsed_value = &output;
 		current_depth = 0;
@@ -179,14 +180,14 @@
 %type <strings> import_symbol_list
 %type <str> import_alternatives
 // Note: These value non-terminals are obvious/simple in the grammar but have complex actions
-%type <str> type_value
-%type <str> array_value
-%type <str> element_values
-%type <str> method_value
-%type <str> parameter_values
-%type <str> struct_value
-%type <str> field_values
-%type <str> array_expansion
+%type <buffer> type_value
+%type <buffer> array_value
+%type <buffer> element_values
+%type <buffer> method_value
+%type <buffer> parameter_values
+%type <buffer> struct_value
+%type <buffer> field_values
+%type <buffer> array_expansion
 
 /* Complex Nonterminals */
 // These nonterminals are not-quite-obvious/kinda-hacky, but were made to statisfy a LALR-grammar.
@@ -236,12 +237,12 @@ value
 	}
 	| type_value
 	{
-		parsed_value->assign($1);
+		parsed_value->assign($1.begin(), $1.end());
 		if(!type_stack.empty()) depth_error(0, "type");
 	}
 	| method_value
 	{
-		parsed_value->assign($1);
+		parsed_value->assign($1.begin(), $1.end());
 		if(!type_stack.empty()) depth_error(0, "method");
 	}
 	;
@@ -1125,13 +1126,10 @@ number
 char_or_number
 	: CHAR
 	{
-		if($1.length() != 1)
-		{
+		if($1.length() != 1) {
 			dcerror("Single character required.");
 			$$ = 0;
-		}
-		else
-		{
+		} else {
 			$$ = (double)(unsigned char)$1[0];
 		}
 	}
@@ -1144,10 +1142,9 @@ type_value
 		if(!check_depth()) depth_error("signed integer");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Remove numeric type from stack
@@ -1159,10 +1156,9 @@ type_value
 		if(!check_depth()) depth_error("unsigned integer");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Remove numeric type from stack
@@ -1174,10 +1170,9 @@ type_value
 		if(!check_depth()) depth_error("floating point");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Remove numeric type from stack
@@ -1189,35 +1184,31 @@ type_value
 		if(!check_depth()) depth_error("string");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Remove string type from stack
 
-		if(dtype->get_subtype() == kTypeString || dtype->get_subtype() == kTypeBlob)
-		{
-			if($1.length() != dtype->get_size())
-			{
+		if(dtype->get_subtype() == kTypeString || dtype->get_subtype() == kTypeBlob) {
+			if($1.length() != dtype->get_size()) {
 				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
-			$$ = $1;
-		}
-		else if(dtype->get_subtype() == kTypeVarstring || dtype->get_subtype() == kTypeVarblob)
-		{
+			$$ = as_buffer($1);
+		} else if(dtype->get_subtype() == kTypeVarstring || dtype->get_subtype() == kTypeVarblob) {
 			// TODO: Check for range limits
 			// Prepend length tag
 			sizetag_t length = $1.length();
-			$$ = string((char*)&length, sizeof(sizetag_t)) + $1;
+			vector<uint8_t> buf = as_buffer(length);
+			pack_value($1, buf);
+			$$ = buf;
 		}
-		else
-		{
+		else {
 			dcerror("Cannot use string value for non-string type '"
 			             + format_type(dtype->get_subtype()) + "'.");
-			$$ = $1;
+			$$ = as_buffer($1);
 		}
 	}
 	| HEX_STRING
@@ -1225,33 +1216,26 @@ type_value
 		if(!check_depth()) depth_error("hex-string");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Remove type from stack
 
-		if(dtype->get_subtype() == kTypeBlob)
-		{
-			if($1.length() != dtype->get_size())
-			{
+		if(dtype->get_subtype() == kTypeBlob) {
+			if($1.length() != dtype->get_size()) {
 				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
-			$$ = $1;
-		}
-		else if(dtype->get_subtype() == kTypeVarblob)
-		{
+			$$ = as_buffer($1);
+		} else if(dtype->get_subtype() == kTypeVarblob) {
 			// TODO: Check for range limits
-			$$ = $1;
-		}
-		else
-		{
+			$$ = as_buffer($1);
+		} else {
 			dcerror("Cannot use hex value for non-blob type '"
 			             + format_type(dtype->get_subtype()) + "'.");
-			$$ = $1;
+			$$ = as_buffer($1);
 		}
 	}
 	| array_value
@@ -1264,35 +1248,30 @@ method_value
 		if(!check_depth()) depth_error("method");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
-		if(dtype->as_method())
-		{
+
+		if(dtype->as_method()) {
 			current_depth++;
 			const Method* method = dtype->as_method();
 
 			size_t num_params = method->get_num_parameters();
-			for(unsigned int i = 1; i <= num_params; ++i)
-			{
+			for(unsigned int i = 1; i <= num_params; ++i) {
 				// Reverse iteration
 				const Parameter* param = method->get_parameter(num_params-i);
 				// Add parameter types to stack such that the first is on top
 				type_stack.push(TypeAndDepth(param->get_type(), current_depth));
 			}
-		}
-		else
-		{
+		} else {
 			dcerror("Cannot use method-value for non-method type '"
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  parameter_values ')'
 	{
-		if(type_stack.top().type->as_method())
-		{
+		if(type_stack.top().type->as_method()) {
 			current_depth--;
 		}
 		type_stack.pop(); // Remove method type from the stack
@@ -1304,7 +1283,9 @@ parameter_values
 	: type_value
 	| parameter_values ',' type_value
 	{
-		$$ = $1 + $3;
+		vector<uint8_t> buf = $1;
+		pack_value($3, buf);
+		$$ = buf;
 	}
 	;
 
@@ -1314,35 +1295,30 @@ struct_value
 		if(!check_depth()) depth_error("struct");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
-		if(dtype->as_struct())
-		{
+
+		if(dtype->as_struct()) {
 			current_depth++;
 			const Struct* dstruct = dtype->as_struct();
 
 			size_t num_fields = dstruct->get_num_fields();
-			for(unsigned int i = 1; i <= num_fields; ++i)
-			{
+			for(unsigned int i = 1; i <= num_fields; ++i) {
 				// Reverse iteration
 				const Field* field = dstruct->get_field(num_fields-i);
 				// Add field types to stack such that the first is on top
 				type_stack.push(TypeAndDepth(field->get_type(), current_depth));
 			}
-		}
-		else
-		{
+		} else {
 			dcerror("Cannot use struct-composition for non-struct type '"
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  field_values '}'
 	{
-		if(type_stack.top().type->as_struct())
-		{
+		if(type_stack.top().type->as_struct()) {
 			current_depth--;
 		}
 		type_stack.pop(); // Remove method type from the stack
@@ -1355,11 +1331,15 @@ field_values
 	| method_value
 	| field_values ',' type_value
 	{
-		$$ = $1 + $3;
+		vector<uint8_t> buf = $1;
+		pack_value($3, buf);
+		$$ = buf;
 	}
 	| field_values ',' method_value
 	{
-		$$ = $1 + $3;
+		vector<uint8_t> buf = $1;
+		pack_value($3, buf);
+		$$ = buf;
 	}
 	;
 
@@ -1369,36 +1349,28 @@ array_value
 		if(!check_depth()) depth_error("array");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();;
 			break;
 		}
 		type_stack.pop();
-		if(!dtype->as_array())
-		{
+		if(!dtype->as_array()) {
 			dcerror("Cannot use array-composition for non-array type '"
 			             + format_type(dtype->get_subtype()) + "'.");
-			$$ = "";
+			$$ = vector<uint8_t>();;
 			break;
 		}
 		const ArrayType* array = dtype->as_array();
 
-		string val;
-
-		if(array->get_array_size() > 0)
-		{
+		if(array->get_array_size() > 0) {
 			// For fixed size arrays, an empty array is an error
 			dcerror("Fixed-sized array of size "
 			             + to_string(array->get_array_size())
 			             + " can't have 0 elements.");
-		}
-		else if(array->has_range())
-		{
+		} else if(array->has_range()) {
 			// If we have a range, 0 elements must be valid in the range
-			if(0 < array->get_range().min.uinteger)
-			{
+			if(0 < array->get_range().min.uinteger) {
 				dcerror("Too few elements in array value, minimum "
 				             + to_string(array->get_range().min.uinteger) + ".");
 			}
@@ -1406,20 +1378,19 @@ array_value
 
 		// Since a fixed-size array can't have zero elements, this always
 		// the default value for a varsize array, which is the length-tag 0.
-		$$ = string(sizeof(sizetag_t), '\0');
+		$$ = vector<uint8_t>(sizeof(sizetag_t), 0);
 	}
 	| '['
 	{
 		if(!check_depth()) depth_error("array");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
-		if(dtype->as_array())
-		{
+
+		if(dtype->as_array()) {
 			const ArrayType* array = dtype->as_array();
 
 			// For arrays we're going to do something pretty hacky:
@@ -1428,49 +1399,39 @@ array_value
 			//    the current_depth to the depth of our original symbol to check
 			//    if the array size is proper.
 			type_stack.push(TypeAndDepth(array->get_element_type(), current_depth));
-		}
-		else
-		{
+		} else {
 			dcerror("Cannot use array-composition for non-array type '"
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
 	  element_values ']'
 	{
-		if(type_stack.top().type->as_array())
-		{
+		if(type_stack.top().type->as_array()) {
 			uint64_t actual_size = current_depth - type_stack.top().depth;
 
 			const DistributedType* dtype = type_stack.top().type;
-			if(dtype == nullptr)
-			{
+			if(dtype == nullptr) {
 				// Ignore this field, it should have already generated an error
-				$$ = "";
+				$$ = vector<uint8_t>();
 				break;
 			}
 
 			const ArrayType* array = dtype->as_array();
-			if(array->has_range())
-			{
-				if(actual_size > array->get_range().max.uinteger)
-				{
+			if(array->has_range()) {
+				if(actual_size > array->get_range().max.uinteger) {
 					dcerror("Too many elements in array value, maximum "
 					             + to_string(array->get_range().max.uinteger) + ".");
-				}
-				else if(actual_size < array->get_range().min.uinteger)
-				{
+				} else if(actual_size < array->get_range().min.uinteger) {
 					dcerror("Too few elements in array value, minimum "
 					             + to_string(array->get_range().min.uinteger) + ".");
 				}
 			}
 
-			if(array->get_array_size() == 0)
-			{
-				sizetag_t length = $3.length();
-				$$ = string((char*)&length, sizeof(sizetag_t)) + $3;
-			}
-			else
-			{
+			if(array->get_array_size() == 0) {
+				vector<uint8_t> buf = as_buffer(sizetag_t($3.size()));
+				pack_value($3, buf);
+				$$ = buf;
+			} else {
 				$$ = $3;
 			}
 			current_depth = type_stack.top().depth;
@@ -1488,8 +1449,7 @@ element_values
 		// Don't increment the depth; the array_expansion will add to
 		// the current_depth depending on the number of elements it adds.
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
@@ -1498,7 +1458,10 @@ element_values
 	}
 	  array_expansion
 	{
-		$$ = $1 + $4;
+		// $4 packed onto end of $1
+		std::vector<uint8_t> buf = $1;
+		pack_value($4, buf);
+		$$ = buf;
 	}
 	;
 
@@ -1511,180 +1474,150 @@ array_expansion
 	| signed_integer '*' small_unsigned_integer
 	{
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_subtype(), $1);
-
-		string val;
-		val.reserve(base.length() * $3);
-		for(unsigned int i = 0; i < $3; ++i)
-		{
-			val += base;
+		vector<uint8_t> buf;
+		vector<uint8_t> base = number_value(dtype->get_subtype(), $1);
+		buf.reserve(base.size() * $3);
+		for(unsigned int i = 0; i < $3; ++i) {
+			pack_value(base, buf);
 		}
-		$$ = val;
+		$$ = buf;
 	}
 	| UNSIGNED_INTEGER '*' small_unsigned_integer
 	{
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_subtype(), $1);
-
-		string val;
-		val.reserve(base.length() * $3);
-		for(unsigned int i = 0; i < $3; ++i)
-		{
-			val += base;
+		vector<uint8_t> buf;
+		vector<uint8_t> base = number_value(dtype->get_subtype(), $1);
+		buf.reserve(base.size() * $3);
+		for(unsigned int i = 0; i < $3; ++i) {
+			pack_value(base, buf);
 		}
-		$$ = val;
+		$$ = buf;
 	}
 	| REAL '*' small_unsigned_integer
 	{
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		string base = number_value(dtype->get_subtype(), $1);
-
-		string val;
-		val.reserve(base.length() * $3);
-		for(unsigned int i = 0; i < $3; ++i)
-		{
-			val += base;
+		vector<uint8_t> buf;
+		vector<uint8_t> base = number_value(dtype->get_subtype(), $1);
+		buf.reserve(base.size() * $3);
+		for(unsigned int i = 0; i < $3; ++i) {
+			pack_value(base, buf);
 		}
-		$$ = val;
+		$$ = buf;
 	}
 	| STRING '*' small_unsigned_integer
 	{
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_subtype() == kTypeString)
-		{
-			if($1.length() != dtype->get_size())
-			{
+		if(dtype->get_subtype() == kTypeString) {
+			if($1.length() != dtype->get_size()) {
 				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
-			string val;
-			val.reserve($1.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += $1;
+			vector<uint8_t> buf;
+			buf.reserve($1.length() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value($1, buf);
 			}
-			$$ = val;
-		}
-		else if(dtype->get_subtype() == kTypeVarstring)
-		{
-			// TODO: Check for range limits
+			$$ = buf;
+		} else if(dtype->get_subtype() == kTypeVarstring) {
 			// Prepend length tag
-			sizetag_t length = $1.length();
-			string base = string((char*)&length, sizeof(sizetag_t)) + $1;
-
-			string val;
-			val.reserve(base.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += base;
+			vector<uint8_t> buf = as_buffer($1.length());
+			vector<uint8_t> base = as_buffer($1);
+			buf.reserve(base.size() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value(base, buf);
 			}
-			$$ = val;
-		}
-		else
-		{
+			$$ = buf;
+
+			// TODO: Check for range limits
+
+		} else {
 			dcerror("Cannot use string value for non-string type '"
 			             + format_type(dtype->get_subtype()) + "'.");
 
-			string val;
-			val.reserve($1.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += $1;
+			vector<uint8_t> buf;
+			buf.reserve($1.length() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value($1, buf);
 			}
-			$$ = val;
+			$$ = buf;
 		}
 	}
 	| HEX_STRING '*' small_unsigned_integer
 	{
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == nullptr)
-		{
+		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
-			$$ = "";
+			$$ = vector<uint8_t>();
 			break;
 		}
 		type_stack.pop(); // Pop that array element type
 		current_depth += $3; // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_subtype() == kTypeBlob)
-		{
-			if($1.length() != dtype->get_size())
-			{
+		if(dtype->get_subtype() == kTypeBlob) {
+			if($1.length() != dtype->get_size()) {
 				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
-			string val;
-			val.reserve($1.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += $1;
+			vector<uint8_t> buf;
+			buf.reserve($1.length() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value($1, buf);
 			}
-			$$ = val;
-		}
-		else if(dtype->get_subtype() == kTypeVarblob)
-		{
-			// TODO: Check for range limits
+			$$ = buf;
+		} else if(dtype->get_subtype() == kTypeVarblob) {
 			// Prepend length tag
-			sizetag_t length = $1.length();
-			string base = string((char*)&length, sizeof(sizetag_t)) + $1;
-
-			string val;
-			val.reserve(base.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += base;
+			vector<uint8_t> buf = as_buffer($1.length());
+			vector<uint8_t> base = as_buffer($1);
+			buf.reserve(base.size() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value(base, buf);
 			}
-			$$ = val;
+			$$ = buf;
 
-		}
-		else
-		{
+			// TODO: Check for range limits
+
+		} else {
 			dcerror("Cannot use hex value for non-blob type '"
 			             + format_type(dtype->get_subtype()) + "'.");
 
-			string val;
-			val.reserve($1.length() * $3);
-			for(unsigned int i = 0; i < $3; ++i)
-			{
-				val += $1;
+			vector<uint8_t> buf;
+			buf.reserve($1.length() * $3);
+			for(unsigned int i = 0; i < $3; ++i) {
+				pack_value($1, buf);
 			}
-			$$ = val;
+			$$ = buf;
 		}
 	}
 	;
@@ -1771,25 +1704,25 @@ bool parse_dcfile(Module *m, const string& filename) {
     }
     return parse_dcfile(m, in, filename);
 }
-string parse_dcvalue(const DistributedType *dtype, const string& formatted, bool& err) {
+vector<uint8_t> parse_dcvalue(const DistributedType *dtype, const string& formatted, bool& err) {
     istringstream strm(formatted);
     return parse_dcvalue(dtype, strm, err);
 
 }
-string parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
-    string value;
+vector<uint8_t> parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
+    vector<uint8_t> value;
     try {
         dcparser_value(in, "parse_value()", dtype, value);
         dcparse();
         dcparser_cleanup();
     } catch(const exception& e) {
         err = true;
-        return string("parse_value() error: ") + e.what();
+        return vector<uint8_t>();
     }
 
     if(dc_errors() > 0) {
         err = true;
-        return string("parse value(): unknown error");
+        return vector<uint8_t>();
     }
 
     err = false;
@@ -1804,46 +1737,32 @@ bool check_depth()
 
 void depth_error(string what)
 {
-	if(type_stack.empty() || current_depth < type_stack.top().depth)
-	{
+	if(type_stack.empty() || current_depth < type_stack.top().depth) {
 		dcerror("Too many nested values while parsing value for " + what + ".");
-	}
-	else
-	{
+	} else {
 		dcerror("Too few nested values while parsing value for " + what + ".");	
 	}
 }
 
 void depth_error(int depth, string what)
 {
-	if(current_depth > depth)
-	{
+	if(current_depth > depth) {
 		dcerror("Too few nested values before this " + what + " value.");
-	}
-	else
-	{
+	} else {
 		dcerror("Too many nested values before this " + what + " value.");
 	}
 }
 
-string number_value(Subtype type, double &number)
+vector<uint8_t> number_value(Subtype type, double &number)
 {
-	switch(type)
-	{
+	switch(type) {
 		case kTypeFloat32:
-		{
-			float v = number;
-			if(v == INFINITY || v == -INFINITY)
-			{
+			if(float(number) == INFINITY || float(number) == -INFINITY) {
 				dcerror("Value is out of range for type 'float32'.");
 			}
-
-			return string((char*)&v, sizeof(float));
-		}
+			return as_buffer(float(number));
 		case kTypeFloat64:
-		{
-			return string((char*)&number, sizeof(double));
-		}
+			return as_buffer(number);
 		case kTypeInt8:
 		case kTypeInt16:
 		case kTypeInt32:
@@ -1853,147 +1772,102 @@ string number_value(Subtype type, double &number)
 		case kTypeUint16:
 		case kTypeUint32:
 		case kTypeUint64:
-		{
 			dcerror("Cannot use floating-point value for integer datatype.");
-			return string();
-		}
+			return vector<uint8_t>();
 		default:
-		{
 			dcerror("Cannot use floating-point value for non-numeric datatype.");
-			return string();
-		}
+			return vector<uint8_t>();
 	}
 }
 
-string number_value(Subtype type, int64_t &number)
+vector<uint8_t> number_value(Subtype type, int64_t &number)
 {
-	switch(type)
-	{
+	switch(type) {
 		case kTypeInt8:
-		{
-			if(INT8_MIN > number || number > INT8_MAX)
-			{
+			if(INT8_MIN > number || number > INT8_MAX) {
 				dcerror("Signed integer out of range for type 'int8'.");
 			}
-
-			int8_t v = number;
-			return string((char*)&v, sizeof(int8_t));
-		}
+			return as_buffer(int8_t(number));
 		case kTypeInt16:
-		{
-			if(INT16_MIN > number || number > INT16_MAX)
-			{
+			if(INT16_MIN > number || number > INT16_MAX) {
 				dcerror("Signed integer out of range for type 'int16'.");
 			}
-
-			uint16_t v = number;
-			return string((char*)&v, sizeof(int16_t));
-		}
+			return as_buffer(int16_t(number));
 		case kTypeInt32:
-		{
-			if(INT32_MIN > number || number > INT32_MAX)
-			{
+			if(INT32_MIN > number || number > INT32_MAX) {
 				dcerror("Signed integer out of range for type 'int32'.");
 			}
-
-			int32_t v = number;
-			return string((char*)&v, sizeof(int32_t));
-		}
+			return as_buffer(int32_t(number));
 		case kTypeInt64:
-		{
-			return string((char*)&number, sizeof(int64_t));
-		}
+			return as_buffer(number);
 		case kTypeChar:
 		case kTypeUint8:
 		case kTypeUint16:
 		case kTypeUint32:
-		case kTypeUint64:
-		{
-			if(number < 0)
-			{
+		case kTypeUint64: {
+			if(number < 0) {
 				dcerror("Can't use negative value for unsigned integer datatype.");
 			}
-			uint64_t v = number;
-			return number_value(type, v);
+			uint64_t value = number;
+			return number_value(type, value);
 		}
 		case kTypeFloat32:
-		case kTypeFloat64:
-		{
-			// Note: Expecting number to be converted to a double by value (ie. -1 becomes -1.0)
-			double v = number;
-			return number_value(type, v);
+		case kTypeFloat64: {
+			// Note: Expecting number to be converted to a double by value (ie. 3 becomes 3.0)
+			double value = number;
+			return number_value(type, value);
 		}
 		default:
-		{
 			dcerror("Cannot use signed integer value for non-numeric datatype.");
-			return string();
-		}
+			return vector<uint8_t>();
 	}
 }
 
-string number_value(Subtype type, uint64_t &number)
+vector<uint8_t> number_value(Subtype type, uint64_t &number)
 {
 	switch(type)
 	{
 		case kTypeChar:
+			if(number > UINT8_MAX) {
+				dcerror("Unsigned integer out of range for type 'char'.");
+			}
+			return as_buffer(char(number));
 		case kTypeUint8:
-		{
-			if(number > UINT8_MAX)
-			{
+			if(number > UINT8_MAX) {
 				dcerror("Unsigned integer out of range for type 'uint8'.");
 			}
-
-			uint8_t v = number;
-			return string((char*)&v, sizeof(uint8_t));
-		}
+			return as_buffer(uint8_t(number));
 		case kTypeUint16:
-		{
-			if(number > UINT16_MAX)
-			{
+			if(number > UINT16_MAX) {
 				dcerror("Unsigned integer out of range for type 'uint16'.");
 			}
-
-			uint16_t v = number;
-			return string((char*)&v, sizeof(uint16_t));
-		}
+			return as_buffer(uint16_t(number));
 		case kTypeUint32:
-		{
-			if(number > UINT32_MAX)
-			{
+			if(number > UINT32_MAX) {
 				dcerror("Unsigned integer out of range for type 'uint32'.");
 			}
-
-			uint32_t v = number;
-			return string((char*)&v, sizeof(uint32_t));
-		}
+			return as_buffer(uint32_t(number));
 		case kTypeUint64:
-		{
-			return string((char*)&number, sizeof(uint64_t));
-		}
+			return as_buffer(number);
 		case kTypeInt8:
 		case kTypeInt16:
 		case kTypeInt32:
-		case kTypeInt64:
-		{
-			if(number > INT64_MAX)
-			{
+		case kTypeInt64: {
+			if(number > INT64_MAX) {
 				dcerror("Unsigned integer out of range for signed integer datatype.");
 			}
-			int64_t v = number;
-			return number_value(type, v);
+			int64_t value = number;
+			return number_value(type, value);
 		}
 		case kTypeFloat32:
-		case kTypeFloat64:
-		{
+		case kTypeFloat64: {
 			// Note: Expecting number to be converted to a double by value (ie. 3 becomes 3.0)
-			double v = number;
-			return number_value(type, v);
+			double value = number;
+			return number_value(type, value);
 		}
 		default:
-		{
 			dcerror("Cannot use unsigned integer value for non-numeric datatype.");
-			return string();
-		}
+			return vector<uint8_t>();
 	}
 }
 

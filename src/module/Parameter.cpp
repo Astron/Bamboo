@@ -3,11 +3,12 @@
 #include "module/Struct.h"
 #include "module/Method.h"
 #include "traits/default.h"
+using namespace std;
 namespace bamboo { // open namespace bamboo
 
 
 // constructor
-Parameter::Parameter(DistributedType *type, const std::string& name) :
+Parameter::Parameter(DistributedType *type, const string& name) :
     m_name(name), m_type(type), m_method(nullptr), m_has_default_value(false) {
     bool implicit_value;
     m_default_value = create_default_value(type, implicit_value);
@@ -20,7 +21,7 @@ Parameter::Parameter(DistributedType *type, const std::string& name) :
 
 // set_name sets the name of this parameter.  Returns false if a parameter with
 //     the same name already exists in the containing method.
-bool Parameter::set_name(const std::string& name) {
+bool Parameter::set_name(const string& name) {
     // Check to make sure no other fields in our struct have this name
     if(m_method != nullptr && m_method->get_parameter_by_name(name) != nullptr) {
         return false;
@@ -55,7 +56,7 @@ bool Parameter::set_type(DistributedType *type) {
 
 // set_default_value defines a default value for this parameter.
 //     Returns false if the value is invalid for the parameter's type.
-bool Parameter::set_default_value(const std::string& default_value) {
+bool Parameter::set_default_value(const vector<uint8_t>& default_value) {
     // TODO: Validate default value
     m_has_default_value = true;
     m_default_value = default_value;
