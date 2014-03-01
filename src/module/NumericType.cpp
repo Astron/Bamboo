@@ -146,7 +146,7 @@ bool NumericType::set_modulus(double modulus) {
 //     Returns false if the range is not valid for this type.
 bool NumericType::set_range(const NumericRange& range) {
     // TODO: Accept integer ranges
-    if(range.type != Number::FLOAT) {
+    if(range.type != Number::kFloat) {
         return false;
     }
 

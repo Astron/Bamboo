@@ -8,10 +8,10 @@ namespace bamboo { // open namespace bamboo
 // A Number represent any C++ numeric type.
 struct Number {
     enum Type {
-        NONE = 0,
-        INT,
-        UINT,
-        FLOAT,
+        kNan = 0,
+        kInt,
+        kUint,
+        kFloat,
     };
 
     Type type;
@@ -22,12 +22,12 @@ struct Number {
 
     };
 
-    Number()           : type(NONE),  integer(0)  {}
-    Number(int32_t n)  : type(INT),   integer(n)  {}
-    Number(int64_t n)  : type(INT),   integer(n)  {}
-    Number(uint32_t n) : type(UINT),  uinteger(n) {}
-    Number(uint64_t n) : type(UINT),  uinteger(n) {}
-    Number(double n)   : type(FLOAT), floating(n) {}
+    Number()           : type(kNan),  integer(0)  {}
+    Number(int32_t n)  : type(kInt),   integer(n)  {}
+    Number(int64_t n)  : type(kInt),   integer(n)  {}
+    Number(uint32_t n) : type(kUint),  uinteger(n) {}
+    Number(uint64_t n) : type(kUint),  uinteger(n) {}
+    Number(double n)   : type(kFloat), floating(n) {}
     Number operator=(int64_t n)  { return Number(n); }
     Number operator=(uint64_t n) { return Number(n); }
     Number operator=(double n)   { return Number(n); }
@@ -44,32 +44,32 @@ struct NumericRange {
     Number min;
     Number max;
 
-    inline NumericRange() : type(Number::NONE) {
-        min.type = max.type = Number::NONE;
+    inline NumericRange() : type(Number::kNan) {
+        min.type = max.type = Number::kNan;
         min.floating = -INFINITY;
         max.floating =  INFINITY;
     }
-    inline NumericRange(int32_t min, int32_t max)   : type(Number::INT),   min(min), max(max) {}
-    inline NumericRange(int64_t min, int64_t max)   : type(Number::INT),   min(min), max(max) {}
-    inline NumericRange(uint32_t min, uint32_t max) : type(Number::UINT),  min(min), max(max) {}
-    inline NumericRange(uint64_t min, uint64_t max) : type(Number::UINT),  min(min), max(max) {}
-    inline NumericRange(double min, double max)     : type(Number::FLOAT), min(min), max(max) {}
+    inline NumericRange(int32_t min, int32_t max)   : type(Number::kInt),   min(min), max(max) {}
+    inline NumericRange(int64_t min, int64_t max)   : type(Number::kInt),   min(min), max(max) {}
+    inline NumericRange(uint32_t min, uint32_t max) : type(Number::kUint),  min(min), max(max) {}
+    inline NumericRange(uint64_t min, uint64_t max) : type(Number::kUint),  min(min), max(max) {}
+    inline NumericRange(double min, double max)     : type(Number::kFloat), min(min), max(max) {}
 
     inline bool contains(Number num) const {
         switch(min.type) {
-            case Number::NONE:
+            case Number::kNan:
                 return true;
-            case Number::INT:
+            case Number::kInt:
                 return (min.integer <= num.integer && num.integer <= max.integer);
-            case Number::UINT:
+            case Number::kUint:
                 return (min.uinteger <= num.uinteger && num.uinteger <= max.uinteger);
-            case Number::FLOAT:
+            case Number::kFloat:
                 return (min.floating <= num.floating && num.floating <= max.floating);
         }
     }
 
     inline bool is_empty() const {
-        return (type == Number::NONE);
+        return (type == Number::kNan);
     }
 };
 

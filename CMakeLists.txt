@@ -100,7 +100,7 @@ set(BUILD_PACKAGE None
 set_property(CACHE BUILD_PACKAGE PROPERTY STRINGS None Default)
 if(NOT BUILD_PACKAGE MATCHES None)
   include(CPack)
-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bamboo is an object-oriented generic message protocol.")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bamboo is a library for defining object-oriented message protocols.")
   set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
 endif()
 
