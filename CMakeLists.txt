@@ -93,9 +93,18 @@ set(WIRE_SOURCES
   src/wire/Datagram.cpp
   src/wire/DatagramIterator.cpp)
 
-option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
-option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
+option(BUILD_SHARED_LIBS "Builds shared libraries instead of static libraries.")
 
+set(BUILD_PACKAGE None
+  CACHE STRING "Enables CPack to build packages.")
+set_property(CACHE BUILD_PACKAGE PROPERTY STRINGS None Default)
+if(NOT BUILD_PACKAGE MATCHES None)
+  include(CPack)
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bamboo is an object-oriented generic message protocol.")
+  set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
+endif()
+
+option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 if(BUILD_16BIT_SIZETAG)
   add_library(bamboo
     ${MODULE_SOURCES}
@@ -104,6 +113,8 @@ if(BUILD_16BIT_SIZETAG)
     ${WIRE_SOURCES})
   SET_TARGET_PROPERTIES(bamboo PROPERTIES LINK_FLAGS -lfl)
 endif()
+
+option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 if(BUILD_32BIT_SIZETAG)
   add_library(bamboo32
     ${MODULE_SOURCES}
