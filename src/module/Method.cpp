@@ -18,7 +18,7 @@ Method::~Method() {
     m_parameters.clear();
 }
 
-// as_method returns this as a Method if it is a method, or NULL otherwise.
+// as_method returns this as a Method if it is a method, or nullptr otherwise.
 Method *Method::as_method() {
     return this;
 }
@@ -29,7 +29,7 @@ const Method *Method::as_method() const {
 // add_parameter adds a new parameter to the method.
 bool Method::add_parameter(Parameter *param) {
     // Param should not be null
-    if(param == (Parameter *)NULL) {
+    if(param == nullptr) {
         return false;
     }
 

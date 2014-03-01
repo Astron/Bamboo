@@ -7,16 +7,16 @@ namespace bamboo { // open namespace
 
 
 // constructor
-Class::Class(Module *module, const string& name) : Struct(module, name), m_constructor(NULL) {}
+Class::Class(Module *module, const string& name) : Struct(module, name), m_constructor(nullptr) {}
 
 // destructor
 Class::~Class() {
-    if(m_constructor != (Field *)NULL) {
+    if(m_constructor != nullptr) {
         delete m_constructor;
     }
 }
 
-// as_class returns this Struct as a Class if it is a Class, or NULL otherwise.
+// as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
 Class *Class::as_class() {
     return this;
 }
@@ -50,12 +50,12 @@ void Class::add_child(Class *child) {
 //     Returns true if the field is successfully added, or false if the field cannot be added.
 bool Class::add_field(Field *field) {
     // Field can't be null
-    if(field == (Field *)NULL) {
+    if(field == nullptr) {
         return false;
     }
 
     // Classes can't share fields.
-    if(field->get_struct() != NULL && field->get_struct() != this) {
+    if(field->get_struct() != nullptr && field->get_struct() != this) {
         return false;
     }
 
@@ -67,7 +67,7 @@ bool Class::add_field(Field *field) {
     // If the field has the same name as the class, it is a constructor
     if(field->get_name() == m_name) {
         // Make sure we don't already have a constructor
-        if(m_constructor != (Field *)NULL) {
+        if(m_constructor != nullptr) {
             return false;
         }
 
@@ -117,7 +117,7 @@ bool Class::add_field(Field *field) {
     m_fields_by_name[field->get_name()] = field;
 
     // Update our size
-    if(field->as_molecular() == (MolecularField *)NULL
+    if(field->as_molecular() == nullptr
             && (has_fixed_size() || m_fields.size() == 1)) {
         if(field->get_type()->has_fixed_size()) {
             m_size += field->get_type()->get_size();

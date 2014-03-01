@@ -46,7 +46,7 @@ inline size_t Module::get_num_types() const
 	return m_types_by_id.size();
 }
 
-// get_type_by_id returns the requested type or NULL if there is no such type.
+// get_type_by_id returns the requested type or nullptr if there is no such type.
 inline DistributedType* Module::get_type_by_id(unsigned int id)
 {
 	if(id < m_types_by_id.size())
@@ -54,7 +54,7 @@ inline DistributedType* Module::get_type_by_id(unsigned int id)
 		return m_types_by_id[id];
 	}
 
-	return (DistributedType*)NULL;
+	return nullptr;
 }
 inline const DistributedType* Module::get_type_by_id(unsigned int id) const
 {
@@ -63,9 +63,9 @@ inline const DistributedType* Module::get_type_by_id(unsigned int id) const
 		return m_types_by_id[id];
 	}
 
-	return (const DistributedType*)NULL;
+	return (const DistributedType*)nullptr;
 }
-// get_type_by_name returns the requested type or NULL if there is no such type.
+// get_type_by_name returns the requested type or nullptr if there is no such type.
 inline DistributedType* Module::get_type_by_name(const std::string &name)
 {
 	auto type_ref = m_types_by_name.find(name);
@@ -74,7 +74,7 @@ inline DistributedType* Module::get_type_by_name(const std::string &name)
 		return type_ref->second;
 	}
 
-	return (DistributedType*)NULL;
+	return nullptr;
 }
 inline const DistributedType* Module::get_type_by_name(const std::string &name) const
 {
@@ -84,10 +84,10 @@ inline const DistributedType* Module::get_type_by_name(const std::string &name) 
 		return type_ref->second;
 	}
 
-	return (const DistributedType*)NULL;
+	return (const DistributedType*)nullptr;
 }
 
-// get_field_by_id returns the request field or NULL if there is no such field.
+// get_field_by_id returns the request field or nullptr if there is no such field.
 inline Field* Module::get_field_by_id(unsigned int id)
 {
 	if(id < m_fields_by_id.size())
@@ -95,7 +95,7 @@ inline Field* Module::get_field_by_id(unsigned int id)
 		return m_fields_by_id[id];
 	}
 
-	return (Field*)NULL;
+	return nullptr;
 }
 inline const Field* Module::get_field_by_id(unsigned int id) const
 {
@@ -104,7 +104,7 @@ inline const Field* Module::get_field_by_id(unsigned int id) const
 		return m_fields_by_id[id];
 	}
 
-	return (const Field*)NULL;
+	return (const Field*)nullptr;
 }
 
 // get_num_imports returns the number of imports in the module.

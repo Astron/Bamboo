@@ -21,7 +21,7 @@ string create_default_value(const DistributedType *dtype) {
 //     is_implicit will be true if all component values are implicit,
 //     or false otherwise (ie. at least one value was user-defined via set_default_value).
 string create_default_value(const DistributedType *dtype, bool& is_implicit) {
-    if(dtype == NULL) {
+    if(dtype == nullptr) {
         return "";
     }
 

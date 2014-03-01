@@ -14,7 +14,7 @@ MolecularField::MolecularField(Class *cls, const std::string& name) :
 MolecularField::~MolecularField() {
 }
 
-// as_molecular returns this as a MolecularField if it is molecular, or NULL otherwise.
+// as_molecular returns this as a MolecularField if it is molecular, or nullptr otherwise.
 MolecularField *MolecularField::as_molecular() {
     return this;
 }

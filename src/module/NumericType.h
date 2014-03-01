@@ -14,7 +14,7 @@ class NumericType : public DistributedType {
     // Type constructor
     NumericType(Subtype type);
 
-    // as_numeric returns this as a NumericType if it is numeric, or NULL otherwise.
+    // as_numeric returns this as a NumericType if it is numeric, or nullptr otherwise.
     virtual NumericType *as_numeric();
     virtual const NumericType *as_numeric() const;
 

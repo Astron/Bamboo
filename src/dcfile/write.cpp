@@ -214,7 +214,7 @@ void Parameter::write_typedef_name(ostream &out, bool brief, int indent_level,
 void SimpleParameter::output_instance(ostream &out, bool brief, const string &prename,
                                       const string &name, const string &postname) const
 {
-    if(get_typedef() != (Typedef *)NULL)
+    if(get_typedef() != nullptr)
     {
         output_typedef_name(out, brief, prename, name, postname);
 
@@ -317,7 +317,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
 void ArrayParameter::output_instance(ostream &out, bool brief, const string &prename,
                                      const string &name, const string &postname) const
 {
-    if(get_typedef() != (Typedef *)NULL)
+    if(get_typedef() != nullptr)
     {
         output_typedef_name(out, brief, prename, name, postname);
 
@@ -404,7 +404,7 @@ void Struct::write(ostream &out, bool brief, int indent_level) const
     out << "\n";
 
     // TODO: Move and update class writing
-    if(m_constructor != (Field*)NULL)
+    if(m_constructor != nullptr)
     {
         m_constructor->write(out, brief, indent_level + 2);
     }
@@ -465,7 +465,7 @@ void Struct::output_instance(ostream &out, bool brief, const string &prename,
 
     out << " {";
 
-    if(m_constructor != (Field*)NULL)
+    if(m_constructor != nullptr)
     {
         m_constructor->output(out, brief);
         out << "; ";

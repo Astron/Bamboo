@@ -52,7 +52,7 @@ void Class::generate_hash(HashGenerator& hashgen) const {
     }
 
     /* Hash our constructor */
-    if(m_constructor != (Field *)NULL) {
+    if(m_constructor != nullptr) {
         m_constructor->generate_hash(hashgen);
     }
 

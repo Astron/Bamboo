@@ -111,12 +111,12 @@
 
 
 	// Parser output
-	static Module* parsed_module = (Module*)NULL;
-	static string* parsed_value = (string*)NULL;
+	static Module* parsed_module = nullptr;
+	static string* parsed_value = nullptr;
 
 	// Parser state
-	static Class* current_class = (Class*)NULL;
-	static Struct* current_struct = (Struct*)NULL;
+	static Class* current_class = nullptr;
+	static Struct* current_struct = nullptr;
 
 	// Stack of distributed types for parsing values
 	struct TypeAndDepth
@@ -130,8 +130,8 @@
 
 	// These two types are really common types the parser doesn't need to make new
 	//     duplicates of every time a string or blob is used.
-	static ArrayType* basic_string = (ArrayType*)NULL;
-	static ArrayType* basic_blob = (ArrayType*)NULL;
+	static ArrayType* basic_string = nullptr;
+	static ArrayType* basic_blob = nullptr;
 
 	/* Helper functions */
 	static bool check_depth();
@@ -164,8 +164,8 @@
 	{
 		current_depth = 0;
 		type_stack = stack<TypeAndDepth>();
-		parsed_module = (Module*)NULL;
-		parsed_value = (string*)NULL;
+		parsed_module = nullptr;
+		parsed_value = nullptr;
 	}
 
 
@@ -1650,7 +1650,7 @@ yyreduce:
   case 24:
 #line 301 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[0].nametype).type == (DistributedType*)NULL)
+		if((yyvsp[0].nametype).type == nullptr)
 		{
 			// Ignore this typedef, it should have already produced an error
 			break;
@@ -1664,14 +1664,14 @@ yyreduce:
 		{
 			// Lets be really descriptive about why this failed
 			DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].nametype).name);
-			if(dtype == (DistributedType*)NULL)
+			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding typedef to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
-			if(dstruct == (Struct*)NULL)
+			if(dstruct == nullptr)
 			{
 				dcerror("Cannot add 'typedef " + (yyvsp[0].nametype).name
 				             + "' to module because a typedef was already declared with that name.");
@@ -1725,10 +1725,10 @@ yyreduce:
 #line 368 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			dcerror("Subtype '" + string((yyvsp[0].str)) + "' has not been declared.");
-			(yyval.dtype) = NULL;
+			(yyval.dtype) = nullptr;
 			break;
 		}
 
@@ -1761,14 +1761,14 @@ yyreduce:
 		{
 			// Lets be really descriptive about why this failed
 			DistributedType* dtype = parsed_module->get_type_by_name(current_class->get_name());
-			if(dtype == (DistributedType*)NULL)
+			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding class to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
-			if(dstruct == (Struct*)NULL)
+			if(dstruct == nullptr)
 			{
 				dcerror("Cannot add 'dclass " + current_class->get_name()
 				             + "' to module because a typedef was already declared with that name.");
@@ -1793,7 +1793,7 @@ yyreduce:
   case 36:
 #line 440 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[0].dclass) != (Class*)NULL)
+		if((yyvsp[0].dclass) != nullptr)
 		{
 			current_class->add_parent((yyvsp[0].dclass));
 		}
@@ -1804,7 +1804,7 @@ yyreduce:
   case 37:
 #line 447 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[0].dclass) != (Class*)NULL)
+		if((yyvsp[0].dclass) != nullptr)
 		{
 			current_class->add_parent((yyvsp[0].dclass));
 		}
@@ -1816,26 +1816,26 @@ yyreduce:
 #line 457 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			dcerror("'dclass " + string((yyvsp[0].str)) + "' has not been declared.");
-			(yyval.dclass) = NULL;
+			(yyval.dclass) = nullptr;
 			break;
 		}
 
 		Struct* dstruct = dtype->as_struct();
-		if(dstruct == (Struct*)NULL)
+		if(dstruct == nullptr)
 		{
 			dcerror("class cannot inherit from non-class type '" + string((yyvsp[0].str)) + "'.");
-			(yyval.dclass) = NULL;
+			(yyval.dclass) = nullptr;
 			break;
 		}
 
 		Class* dclass = dstruct->as_class();
-		if(dclass == (Class*)NULL)
+		if(dclass == nullptr)
 		{
 			dcerror("class cannot inherit from struct type '" + string((yyvsp[0].str)) + "'.");
-			(yyval.dclass) = NULL;
+			(yyval.dclass) = nullptr;
 			break;
 		}
 
@@ -1847,7 +1847,7 @@ yyreduce:
   case 41:
 #line 490 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[-1].dfield) == (Field*)NULL)
+		if((yyvsp[-1].dfield) == nullptr)
 		{
 			// Ignore this field, it should have already generated a parser error
 			break;
@@ -1886,17 +1886,17 @@ yyreduce:
   case 42:
 #line 528 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[-1].dfield) == (Field*)NULL)
+		if((yyvsp[-1].dfield) == nullptr)
 		{
 			// Ignore this field, it should have already generated a parser error
-			(yyval.dfield) = NULL;
+			(yyval.dfield) = nullptr;
 			break;
 		}
 
 		if((yyvsp[-1].dfield)->get_name().empty())
 		{
 			dcerror("An unnamed field can't be defined in a class.");
-			(yyval.dfield) = NULL;
+			(yyval.dfield) = nullptr;
 			break;
 		}
 
@@ -1935,14 +1935,14 @@ yyreduce:
 		{
 			// Lets be really descriptive about why this failed
 			DistributedType* dtype = parsed_module->get_type_by_name(current_struct->get_name());
-			if(dtype == (DistributedType*)NULL)
+			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding struct to module.");
 				break;
 			}
 
 			Struct* dstruct = dtype->as_struct();
-			if(dstruct == (Struct*)NULL)
+			if(dstruct == nullptr)
 			{
 				dcerror("Cannot add 'struct " + current_struct->get_name()
 				             + "' to module because a typedef was already declared with that name.");
@@ -1967,7 +1967,7 @@ yyreduce:
   case 48:
 #line 601 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[-1].dfield) == (Field*)NULL || (yyvsp[-1].dfield)->get_type() == (DistributedType*)NULL)
+		if((yyvsp[-1].dfield) == nullptr || (yyvsp[-1].dfield)->get_type() == nullptr)
 		{
 			// Ignore this field, it should have already generated a parser error
 			break;
@@ -2121,17 +2121,17 @@ yyreduce:
   case 70:
 #line 734 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[0].dtype) == (DistributedType*)NULL)
+		if((yyvsp[0].dtype) == nullptr)
 		{
-			// defined_type should have output an error, pass NULL upstream
-			(yyval.dtype) = NULL;
+			// defined_type should have output an error, pass nullptr upstream
+			(yyval.dtype) = nullptr;
 			break;
 		}
 
 		if((yyvsp[0].dtype)->get_subtype() == kTypeMethod)
 		{
 			dcerror("Cannot use a method type here.");
-			(yyval.dtype) = NULL;
+			(yyval.dtype) = nullptr;
 			break;
 		}
 
@@ -2184,7 +2184,7 @@ yyreduce:
 #line 779 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		MolecularField* mol = new MolecularField(current_class, (yyvsp[-2].str));
-		if((yyvsp[0].dfield) == (Field*)NULL)
+		if((yyvsp[0].dfield) == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.dmolecule) = mol;
@@ -2213,7 +2213,7 @@ yyreduce:
   case 78:
 #line 805 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		if((yyvsp[0].dfield) == (Field*)NULL)
+		if((yyvsp[0].dfield) == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.dmolecule) = (yyvsp[-2].dmolecule);
@@ -2250,15 +2250,15 @@ yyreduce:
 		if(!current_class)
 		{
 			dcerror("Field '" + (yyvsp[0].str) + "' not defined in current class.");
-			(yyval.dfield) = NULL;
+			(yyval.dfield) = nullptr;
 			break;
 		}
 
 		Field *field = current_class->get_field_by_name((yyvsp[0].str));
-		if(field == (Field*)NULL)
+		if(field == nullptr)
 		{
 			dcerror("Field '" + (yyvsp[0].str) + "' not defined in current class.");
-			(yyval.dfield) = NULL;
+			(yyval.dfield) = nullptr;
 			break;
 		}
 
@@ -2272,7 +2272,7 @@ yyreduce:
     {
 		if((yyvsp[0].subtype) == kTypeString)
 		{
-			if(basic_string == NULL)
+			if(basic_string == nullptr)
 			{
 				basic_string = new ArrayType(new NumericType(kTypeChar));
 				basic_string->set_alias("string");
@@ -2282,7 +2282,7 @@ yyreduce:
 		}
 		else if((yyvsp[0].subtype) == kTypeBlob)
 		{
-			if(basic_blob == NULL)
+			if(basic_blob == nullptr)
 			{
 				basic_blob = new ArrayType(new NumericType(kTypeUint8));
 				basic_blob->set_alias("blob");
@@ -2293,7 +2293,7 @@ yyreduce:
 		else
 		{
 			dcerror("Found builtin ArrayType not handled by parser.");
-			(yyval.dtype) = NULL;
+			(yyval.dtype) = nullptr;
 		}
 	}
 #line 2300 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
@@ -2317,7 +2317,7 @@ yyreduce:
 		else
 		{
 			dcerror("Found builtin ArrayType not handled by parser.");
-			(yyval.dtype) = NULL;
+			(yyval.dtype) = nullptr;
 		}
 	}
 #line 2324 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
@@ -2639,7 +2639,7 @@ yyreduce:
 		if(!check_depth()) depth_error("signed integer");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2658,7 +2658,7 @@ yyreduce:
 		if(!check_depth()) depth_error("unsigned integer");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2677,7 +2677,7 @@ yyreduce:
 		if(!check_depth()) depth_error("floating point");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2696,7 +2696,7 @@ yyreduce:
 		if(!check_depth()) depth_error("string");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2736,7 +2736,7 @@ yyreduce:
 		if(!check_depth()) depth_error("hex-string");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2774,7 +2774,7 @@ yyreduce:
 		if(!check_depth()) depth_error("method");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			break;
@@ -2829,7 +2829,7 @@ yyreduce:
 		if(!check_depth()) depth_error("struct");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			break;
@@ -2892,7 +2892,7 @@ yyreduce:
 		if(!check_depth()) depth_error("array");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -2940,7 +2940,7 @@ yyreduce:
 		if(!check_depth()) depth_error("array");
 
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			break;
@@ -2973,7 +2973,7 @@ yyreduce:
 			uint64_t actual_size = current_depth - type_stack.top().depth;
 
 			const DistributedType* dtype = type_stack.top().type;
-			if(dtype == (DistributedType*)NULL)
+			if(dtype == nullptr)
 			{
 				// Ignore this field, it should have already generated an error
 				(yyval.str) = "";
@@ -3019,7 +3019,7 @@ yyreduce:
 		// Don't increment the depth; the array_expansion will add to
 		// the current_depth depending on the number of elements it adds.
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			break;
@@ -3051,7 +3051,7 @@ yyreduce:
 #line 1512 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -3077,7 +3077,7 @@ yyreduce:
 #line 1534 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -3103,7 +3103,7 @@ yyreduce:
 #line 1556 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -3129,7 +3129,7 @@ yyreduce:
 #line 1578 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -3189,7 +3189,7 @@ yyreduce:
 #line 1634 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
-		if(dtype == (DistributedType*)NULL)
+		if(dtype == nullptr)
 		{
 			// Ignore this field, it should have already generated an error
 			(yyval.str) = "";
@@ -3599,7 +3599,7 @@ Module *read_dcfile(istream& in, const string& filename) {
         return m;
     }
 
-    return NULL;
+    return nullptr;
 }
 Module *read_dcfile(const string& filename) {
     Module *m = new Module();
@@ -3608,7 +3608,7 @@ Module *read_dcfile(const string& filename) {
         return m;
     }
 
-    return NULL;
+    return nullptr;
 }
 bool parse_dcfile(Module *m, istream& in, const string& filename) {
     dcparser_file(in, filename, *m);

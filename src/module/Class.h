@@ -14,7 +14,7 @@ class Class : public Struct {
     Class(Module *module, const std::string& name);
     virtual ~Class();
 
-    // as_class returns this Struct as a Class if it is a Class, or NULL otherwise.
+    // as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
     virtual Class *as_class();
     virtual const Class *as_class() const;
 
@@ -33,7 +33,7 @@ class Class : public Struct {
     //     or false if it just uses the default constructor.
     inline bool has_constructor() const;
     // get_constructor returns the constructor method for this class if it is defined,
-    //     or NULL if the class uses the default constructor.
+    //     or nullptr if the class uses the default constructor.
     inline Field *get_constructor();
     inline const Field *get_constructor() const;
 
