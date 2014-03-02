@@ -42,26 +42,93 @@ def generate(file_):
     clsDistType = module.add_class('DistributedType')
     clsNumType = module.add_class('NumericType')
     clsArrType = module.add_class('ArrayType')
+    clsClass = module.add_class('Class')
     clsStruct = module.add_class('Struct')
     clsMethod = module.add_class('Method')
+    clsMethod = module.add_class('Field')
+    clsMethod = module.add_class('Parameter')
+    structImport = module.add_class('Import')
+
+    # Wrap STL containers
+    module.add_container('std::vector<uint8_t>', 'uint8_t', 'vector', custom_name = 'buffer')
+    module.add_container('std::vector<std::string>', 'std::string', 'vector')
+
+    # Declare member variables
+    structImport.add_constructor([param('const std::string &', 'moduleName')])
+    structImport.add_instance_attribute('module', 'std::string')
+    structImport.add_instance_attribute('symbols', 'std::vector<std::string>')
 
     # Declare functions/methods
+    clsModule.add_constructor([])
+    add_method(clsModule, 'get_num_classes', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'get_num_structs', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'get_num_types', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'get_class',
+               retval('bamboo::Class *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsModule, 'get_struct',
+               retval('bamboo::Struct *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsModule, 'get_class_by_id',
+               retval('bamboo::Class *', caller_owns_return = False),
+               [param('unsigned int', 'id')])
+    add_method(clsModule, 'get_class_by_name',
+               retval('bamboo::Class *', caller_owns_return = False),
+               [param('const std::string&', 'name')])
+    add_method(clsModule, 'get_type_by_id',
+               retval('bamboo::DistributedType *', caller_owns_return = False),
+               [param('unsigned int', 'id')])
+    add_method(clsModule, 'get_type_by_name',
+               retval('bamboo::DistributedType *', caller_owns_return = False),
+               [param('const std::string&', 'name')])
+    add_method(clsModule, 'get_field_by_id',
+               retval('bamboo::Field *', caller_owns_return = False),
+               [param('unsigned int', 'id')])
+    add_method(clsModule, 'get_num_imports', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'get_import',
+               retval('bamboo::Import *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsModule, 'has_keyword', retval('bool'),
+               [param('const std::string&', 'keyword')], is_const = True)
+    add_method(clsModule, 'get_num_keywords', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'get_keyword', retval('const std::string'),
+               [param('unsigned int', 'n')], is_const = True)
+    add_method(clsModule, 'add_class', retval('bool'),
+               [param('bamboo::Class *', 'dclass', transfer_ownership = True)])
+    add_method(clsModule, 'add_struct', retval('bool'),
+               [param('bamboo::Struct *', 'dstruct', transfer_ownership = True)])
+    add_method(clsModule, 'add_import', None,
+               [param('bamboo::Import *', 'import', transfer_ownership = True)])
+    add_method(clsModule, 'add_typedef', retval('bool'),
+               [param('const std::string&', 'name'),
+                param('DistributedType *', 'type', transfer_ownership = False)])
+    add_method(clsModule, 'add_keyword', None, [param('const std::string&', 'keyword')])
     add_method(clsDistType, 'get_subtype', retval('bamboo::Subtype'), [], is_const = True)
     add_method(clsDistType, 'has_fixed_size', retval('bool'), [], is_const = True)
-    add_method(clsDistType, 'get_size', retval('int'), [], is_const = True)
+    add_method(clsDistType, 'get_size', retval('size_t'), [], is_const = True)
     add_method(clsDistType, 'has_alias', retval('bool'), [], is_const = True)
-    add_method(clsDistType, 'as_numeric', retval('bamboo::NumericType *', caller_owns_return = False), [], is_virtual = True)
-    add_method(clsDistType, 'as_array', retval('bamboo::ArrayType *', caller_owns_return = False), [], is_virtual = True)
-    add_method(clsDistType, 'as_struct', retval('bamboo::Struct*', caller_owns_return = False), [], is_virtual = True)
-    add_method(clsDistType, 'as_method', retval('bamboo::Method *', caller_owns_return = False), [], is_virtual = True)
-    add_method(clsDistType, 'get_alias', retval('const std::string'), [], is_const = True)
+    add_method(clsDistType, 'as_numeric',
+               retval('bamboo::NumericType *', caller_owns_return = False),
+               [], is_virtual = True)
+    add_method(clsDistType, 'as_array',
+               retval('bamboo::ArrayType *', caller_owns_return = False),
+               [], is_virtual = True)
+    add_method(clsDistType, 'as_struct',
+               retval('bamboo::Struct*', caller_owns_return = False),
+               [], is_virtual = True)
+    add_method(clsDistType, 'as_method',
+               retval('bamboo::Method *', caller_owns_return = False),
+               [], is_virtual = True)
+    add_method(clsDistType, 'get_alias',
+               retval('const std::string'),
+               [], is_const = True)
     add_method(clsDistType, 'set_alias', None, [param('const std::string&', 'alias')])
     add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = False),
                  [param('const std::string&', 'filename')])
     add_function(dcfile, 'parse_dcfile', retval('bool'),
                  [param('bamboo::Module *', 'module', transfer_ownership = False),
                   param('const std::string&', 'filename')])
-    add_function(dcfile, 'parse_dcvalue', retval('std::string'),
+    add_function(dcfile, 'parse_dcvalue', retval('std::vector<uint8_t>'),
                  [param('const bamboo::DistributedType *', 'type', transfer_ownership = False),
                   param('const std::string&', 'formattedValue'), param('bool&', 'isError')])
 

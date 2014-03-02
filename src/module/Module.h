@@ -92,12 +92,6 @@ class Module {
     // add_keyword adds a keyword with the name <keyword> to the list of declared keywords.
     void add_keyword(const std::string& keyword);
 
-    // get_hash returns a 32-bit hash representing the module.
-    uint32_t get_hash() const;
-
-    // generate_hash accumulates the properties of this module into the hash.
-    virtual void generate_hash(HashGenerator& hashgen) const;
-
   private:
     // add_field gives the field a unique id within the module.
     void add_field(Field *field);
