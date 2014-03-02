@@ -17,6 +17,7 @@ struct Import {
     std::string module;
     std::vector<std::string> symbols;
 
+    inline Import();
     inline Import(const std::string& module_name);
 };
 

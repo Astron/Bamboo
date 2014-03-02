@@ -1,91 +1,74 @@
 // Filename: Struct.ipp
-namespace bamboo   // open namespace
-{
+namespace bamboo { // open namespace
 
 
 // get_id returns a unique index number associated with this struct.
-inline unsigned int Struct::get_id() const
-{
-	return m_id;
+inline unsigned int Struct::get_id() const {
+    return m_id;
 }
 
 // get_name returns the name of this struct.
-inline const std::string& Struct::get_name() const
-{
-	return m_name;
+inline const std::string& Struct::get_name() const {
+    return m_name;
 }
 
 // get_module returns the Module object that contains the struct.
-inline Module* Struct::get_module()
-{
-	return m_module;
+inline Module *Struct::get_module() {
+    return m_module;
 }
-inline const Module* Struct::get_module() const
-{
-	return m_module;
+inline const Module *Struct::get_module() const {
+    return m_module;
 }
 
 
 // get_num_fields returns the number of fields in the struct.
-inline size_t Struct::get_num_fields() const
-{
-	return m_fields.size();
+inline size_t Struct::get_num_fields() const {
+    return m_fields.size();
 }
 
 // get_field returns the <n>th field of the struct or nullptr if out-of-range.
-inline Field* Struct::get_field(unsigned int n)
-{
-	return m_fields.at(n);
+inline Field *Struct::get_field(unsigned int n) {
+    return m_fields.at(n);
 }
-inline const Field* Struct::get_field(unsigned int n) const
-{
-	return m_fields.at(n);
+inline const Field *Struct::get_field(unsigned int n) const {
+    return m_fields.at(n);
 }
 
 // get_field_by_id returns the field with the index <id>, or nullptr if no such field exists.
-inline Field* Struct::get_field_by_id(unsigned int id)
-{
-	auto it = m_fields_by_id.find(id);
-	if(it == m_fields_by_id.end())
-	{
-		return nullptr;
-	}
-	return it->second;
+inline Field *Struct::get_field_by_id(unsigned int id) {
+    auto it = m_fields_by_id.find(id);
+    if(it == m_fields_by_id.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
-inline const Field* Struct::get_field_by_id(unsigned int id) const
-{
-	auto it = m_fields_by_id.find(id);
-	if(it == m_fields_by_id.end())
-	{
-		return nullptr;
-	}
-	return it->second;
+inline const Field *Struct::get_field_by_id(unsigned int id) const {
+    auto it = m_fields_by_id.find(id);
+    if(it == m_fields_by_id.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
 
 // get_field_by_name returns the field with <name>, or nullptr if no such field exists.
-inline Field* Struct::get_field_by_name(const std::string& name)
-{
-	auto it = m_fields_by_name.find(name);
-	if(it == m_fields_by_name.end())
-	{
-		return nullptr;
-	}
-	return it->second;
+inline Field *Struct::get_field_by_name(const std::string& name) {
+    auto it = m_fields_by_name.find(name);
+    if(it == m_fields_by_name.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
-inline const Field* Struct::get_field_by_name(const std::string& name) const
-{
-	auto it = m_fields_by_name.find(name);
-	if(it == m_fields_by_name.end())
-	{
-		return nullptr;
-	}
-	return it->second;
+inline const Field *Struct::get_field_by_name(const std::string& name) const {
+    auto it = m_fields_by_name.find(name);
+    if(it == m_fields_by_name.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
 
 // set_id sets the index number associated with this struct.
-inline void Struct::set_id(unsigned int id)
-{
-	m_id = id;
+inline void Struct::set_id(unsigned int id) {
+    m_id = id;
 }
 
 
