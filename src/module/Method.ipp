@@ -10,7 +10,7 @@ inline size_t Method::get_num_parameters() const {
 inline Parameter *Method::get_parameter(unsigned int n) {
     return m_parameters.at(n);
 }
-inline const Parameter *Method::get_parameter(unsigned int n) const\ {
+inline const Parameter *Method::get_parameter(unsigned int n) const {
     return m_parameters.at(n);
 }
 
