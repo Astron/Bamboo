@@ -13,13 +13,13 @@ with open(moduleFilename, 'wt') as file_:
     print('Generating file {}'.format(moduleFilename))
     generate(file_)
 
-module = Extension('bamboo',
+module = Extension('bamboo32',
 	include_dirs = ['../../src'],
 	sources = [moduleFilename],
-	libraries = ['bamboo'])
+	libraries = ['bamboo32'])
 module.extra_compile_args = ['--std=c++11']
-setup(name='bamboo', version='0.0',
-      description='Bamboo is a library for defining object-oriented message protocols.',
+setup(name='bamboo32', version='0.0',
+      description='Bamboo32 is a version of bamboo utilizing 32-bit sizetags.',
       author='kestred',
       author_email='kestred@riotcave.com',
       url = 'https://github.com/Astron/Bamboo',
