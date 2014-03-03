@@ -158,6 +158,87 @@ if(BUILD_SHARED_AND_STATIC)
   endif()
 endif()
 
+# Is Python installed, and should Python interfaces be generated?
+find_package(PythonLibs)
+find_package(PythonInterp)
+if(PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND (BUILD_SHARED_AND_STATIC OR BUILD_SHARED_LIBS))
+  set(PYTHON_FOUND TRUE)
+else()
+  unset(PYTHON_FOUND)
+endif()
+
+option(BUILD_PYTHON "Compiles python bindings for " ${PYTHON_FOUND})
+if(BUILD_PYTHON)
+  if(NOT BUILD_SHARED_AND_STATIC AND NOT BUILD_SHARED_LIBS)
+    message(FATAL_ERROR "Building python libraries requires shared libraries to be built.")
+  endif()
+  if(NOT PYTHONLIBS_FOUND)
+    message(FATAL_ERROR "Building python bindings is enabled, but python library wasn't found.")
+  endif()
+  if(NOT PYTHONINTERP_FOUND)
+    message(FATAL_ERROR "Building python bindings is enabled, but python interpreter wasn't found.")
+  endif()
+
+  include(${CMAKE_SOURCE_DIR}/cmake/modules/CheckPythonModule.cmake)
+  check_python_module(pybindgen)
+  if(NOT PYTHON_PYBINDGEN_FOUND)
+    message(FATAL_ERROR "Building python bindings is enabled, but PyBindGen wasn't found.")
+  endif()
+
+  # Get the python install directory
+  execute_process(
+    COMMAND ${PYTHON_EXECUTABLE}
+      -c "from distutils.sysconfig import get_python_lib; print get_python_lib(True)"
+      OUTPUT_VARIABLE PYTHON_ARCH_DIR)
+  STRING(REGEX REPLACE "(\r?\n)+$" "" PYTHON_ARCH_DIR "${PYTHON_ARCH_DIR}")
+  set(PYTHON_INSTALL_DIR "${PYTHON_ARCH_DIR}" CACHE STRING
+    "Path to the Python architecture-dependent package directory.")
+
+  # Create a working directory
+  add_custom_target(python-directory ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/python)
+
+  if(BUILD_16BIT_SIZETAG)
+    # Build the 16-bit python module
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp ${CMAKE_BINARY_DIR}/python/build/
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup.py build
+      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generator.py
+      IMPLICIT_DEPENDS
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/setup.py
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+    add_custom_target(python-bindings ALL
+      DEPENDS bamboo python-directory ${CMAKE_BINARY_DIR}/pythonBindings.cpp)
+
+    # Install the 16-bit python module
+    install(CODE "
+      message(STATUS \"Installing: ${PYTHON_ARCH_DIR}/bamboo.so\")
+      execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup.py install --quiet
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)")
+  endif()
+  if(BUILD_32BIT_SIZETAG)
+    # Build the 32-bit python module
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp ${CMAKE_BINARY_DIR}/python/build/
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py build
+      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generator.py
+      IMPLICIT_DEPENDS
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+    add_custom_target(python-bindings32 ALL
+      DEPENDS bamboo32 python-directory ${CMAKE_BINARY_DIR}/pythonBindings.cpp)
+
+    # Install the 32-bit python module
+    install(CODE "
+      message(STATUS \"Installing: ${PYTHON_ARCH_DIR}/bamboo32.so\")
+      execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py install --quiet
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)")
+  endif()
+endif()
+
 # Install header files
 install(DIRECTORY src/
   DESTINATION include/bamboo
@@ -170,18 +251,18 @@ install(EXPORT bamboo
 
 # Create symlinks on linux
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  function(generate_library_links FILE_EXT)
+  function(generate_library_links file_ext)
     set(PREFIX "${CMAKE_INSTALL_PREFIX}/lib")
     if(BUILD_16BIT_SIZETAG)
-      set(LINK16 "${PREFIX}/libbamboo${FILE_EXT}")
-      set(TARGET16 "${PREFIX}/bamboo/libbamboo${FILE_EXT}")
+      set(LINK16 "${PREFIX}/libbamboo${file_ext}")
+      set(TARGET16 "${PREFIX}/bamboo/libbamboo${file_ext}")
       install(CODE "
         message(STATUS \"Generating: Symlink ${LINK16}\")
         execute_process(COMMAND ln -sf \"${TARGET16}\" \"${LINK16}\")")
     endif()
     if(BUILD_32BIT_SIZETAG)
-      set(LINK32 "${PREFIX}/libbamboo32${FILE_EXT}")
-      set(TARGET32 "${PREFIX}/bamboo/libbamboo32${FILE_EXT}")
+      set(LINK32 "${PREFIX}/libbamboo32${file_ext}")
+      set(TARGET32 "${PREFIX}/bamboo/libbamboo32${file_ext}")
       install(CODE "
         message(STATUS \"Generating: Symlink ${LINK32}\")
         execute_process(COMMAND ln -sf \"${TARGET32}\" \"${LINK32}\")")

@@ -3,23 +3,41 @@ from distutils.core import setup, Extension
 from generator import generate
 import os
 
-try:
-	os.mkdir('build')
-except OSError:
-	pass
+buildDir = None
+scriptDir = os.path.dirname(os.path.realpath(__file__))
+if 'BINDINGS_BUILD_DIR' in os.environ:
+  buildDir = os.environ['BINDINGS_BUILD_DIRECTORY']
+else:
+  buildDir = os.path.join(scriptDir, '../../build')
 
-moduleFilename = os.path.join('build', 'pythonBindings.cpp')
+if 'BINDINGS_INCLUDE_DIRS' in os.environ:
+  includeDirs = os.environ['BINDINGS_INCLUDE_DIRS'].split(';')
+else:
+  includeDirs = [buildDir, os.path.join(scriptDir, '../../src')]
+
+if 'BINDINGS_LIBRARY_DIRS' in os.environ:
+  libraryDirs = os.environ['BINDINGS_LIBRARY_DIRS'].split(';')
+else:
+  libraryDirs = [buildDir]
+
+try:
+  os.mkdir(buildDir)
+except OSError:
+  pass
+
+moduleFilename = os.path.join(buildDir, 'python/pythonBindings32.cpp')
 with open(moduleFilename, 'wt') as file_:
     print('Generating file {}'.format(moduleFilename))
     generate(file_)
 
 module = Extension('bamboo32',
-	include_dirs = ['../../src'],
-	sources = [moduleFilename],
-	libraries = ['bamboo32'])
+  include_dirs = includeDirs,
+  sources = ['pythonBindings32.cpp'],
+  libraries = ['bamboo32'],
+  library_dirs = libraryDirs)
 module.extra_compile_args = ['--std=c++11']
 setup(name='bamboo32', version='0.0',
-      description='Bamboo32 is a version of bamboo utilizing 32-bit sizetags.',
+      description='Bamboo32 is a library for defining object-oriented message protocols.',
       author='kestred',
       author_email='kestred@riotcave.com',
       url = 'https://github.com/Astron/Bamboo',
