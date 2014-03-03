@@ -543,6 +543,8 @@ char *yytext;
 	#include "module/Module.h"
 	using namespace bamboo;
 
+	YYSTYPE yylval;
+
 	static int yyinput(void); // declared by flex.
 	extern int bamboo::dclex();
 	extern "C" int should_lexer_wrap();
@@ -583,7 +585,7 @@ char *yytext;
 // Defining the interface to the lexer.
 ////////////////////////////////////////////////////////////////////
 
-	void bamboo::dclexer_init(std::istream& in, const std::string& filename, int initial_token)
+	void bamboo::dclexer_init(std::istream& in, const std::string& filename, int initial)
 	{
 		input_p = &in;
 		dc_filename = filename;
@@ -591,7 +593,7 @@ char *yytext;
 		col_number = 0;
 		error_count = 0;
 		warning_count = 0;
-		initial_token = initial_token;
+		initial_token = initial;
 	}
 
 	int bamboo::dc_errors()
@@ -959,7 +961,7 @@ char *yytext;
 		col_number += yyleng;
 	}
 
-#line 963 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
+#line 965 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
 
 #define INITIAL 0
 
@@ -1166,7 +1168,7 @@ YY_DECL
 		}
 
 	{
-#line 444 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 446 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 
 
 
@@ -1178,7 +1180,7 @@ YY_DECL
 	}
 
 
-#line 1182 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
+#line 1184 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -1238,7 +1240,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 455 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 457 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// New line.  Save a copy of the line so we can print it out for the
 	// benefit of the user in case we get an error.
@@ -1255,7 +1257,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 469 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 471 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Eat whitespace.
 	accept();
@@ -1263,7 +1265,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 474 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 476 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Eat C++-style comments.
 	accept();
@@ -1271,7 +1273,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 479 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 481 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Eat C-style comments.
 	accept();
@@ -1280,7 +1282,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 486 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 488 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_DCLASS;
@@ -1288,7 +1290,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 491 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 493 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_STRUCT;
@@ -1296,7 +1298,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 496 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 498 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_FROM;
@@ -1304,7 +1306,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 501 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 503 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_IMPORT;
@@ -1312,7 +1314,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 506 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 508 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_KEYWORD;
@@ -1320,7 +1322,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 511 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 513 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_TYPEDEF;
@@ -1328,7 +1330,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 516 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 518 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_INT8;
@@ -1336,7 +1338,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 521 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 523 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_INT16;
@@ -1344,7 +1346,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 526 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 528 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_INT32;
@@ -1352,7 +1354,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 531 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 533 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_INT64;
@@ -1360,7 +1362,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 536 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 538 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_UINT8;
@@ -1368,7 +1370,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 541 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 543 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_UINT16;
@@ -1376,7 +1378,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 546 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 548 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_UINT32;
@@ -1384,7 +1386,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 551 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 553 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_UINT64;
@@ -1392,7 +1394,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 556 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 558 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_FLOAT32;
@@ -1400,7 +1402,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 561 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 563 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_FLOAT64;
@@ -1408,7 +1410,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 566 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 568 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_STRING;
@@ -1416,7 +1418,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 571 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 573 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_BLOB;
@@ -1424,7 +1426,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 576 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 578 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	accept();
 	return KW_CHAR;
@@ -1432,7 +1434,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 581 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 583 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// An unsigned integer number.
 	accept();
@@ -1460,7 +1462,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 606 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 608 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// A hexadecimal integer number.
 	accept();
@@ -1495,7 +1497,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 638 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 640 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// A floating-point number.
 	accept();
@@ -1506,7 +1508,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 646 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 648 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Quoted string.
 	accept();
@@ -1516,7 +1518,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 653 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 655 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Single-quoted string.
 	accept();
@@ -1526,7 +1528,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 660 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 662 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Long hex string.
 	accept();
@@ -1536,7 +1538,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 667 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 669 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Identifier or keyword.
 	accept();
@@ -1546,7 +1548,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 675 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 677 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 {
 	// Send any other printable character as itself.
 	accept();
@@ -1555,10 +1557,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 680 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 682 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
 ECHO;
 	YY_BREAK
-#line 1562 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
+#line 1564 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2516,4 +2518,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 680 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"
+#line 682 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/lexer.lpp"

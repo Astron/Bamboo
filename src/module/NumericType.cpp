@@ -2,8 +2,8 @@
 #include "NumericType.h"
 
 // This must be defined for inttypes.h to define the fixed with integer macros
-#if defined(__cplusplus) && !defined(__STDC_LIMIkTypeMACROS)
-#define __STDC_LIMIkTypeMACROS
+#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
+#define __STDC_LIMIT_MACROS
 #endif
 #include <inttypes.h> // fixed-width integer limits
 namespace bamboo { // open namespace bamboo

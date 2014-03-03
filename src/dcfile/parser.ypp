@@ -84,19 +84,19 @@
 // Defining the interface to the parser.
 ////////////////////////////////////////////////////////////////////
 
-	static void dcparser_file(istream& in, const string& filename, Module& module)
+	static void dcparser_init_file(istream& in, const string& filename, Module& module)
 	{
+		dclexer_init(in, filename, START_DC_FILE);
 		parsed_module = &module;
-		dclexer_init(in, filename, STARkTypeDC_FILE);
 	}
 
-	static void dcparser_value(istream& in, const string& source,
+	static void dcparser_init_value(istream& in, const string& source,
 	                           const DistributedType* type, vector<uint8_t>& output)
 	{
 		parsed_value = &output;
 		current_depth = 0;
 		type_stack.push(TypeAndDepth(type, 0));
-		dclexer_init(in, source, STARkTypeDC_VALUE);
+		dclexer_init(in, source, START_DC_VALUE);
 	}
 
 	static void dcparser_cleanup()
@@ -121,8 +121,8 @@
 /* Initial Tokens */
 // These special tokens are used to set the starting state of the parser.
 //     The lexer places the appropriate one of these on the head of the input stream.
-%token STARkTypeDC_FILE
-%token STARkTypeDC_VALUE
+%token START_DC_FILE
+%token START_DC_VALUE
 
 /* Define keywords */
 // Declaration Keywords
@@ -212,8 +212,8 @@
 %%
 
 grammar
-	: STARkTypeDC_FILE file
-	| STARkTypeDC_VALUE value
+	: START_DC_FILE file
+	| START_DC_VALUE value
 	;
 
 
@@ -224,9 +224,6 @@ file
 	| file dstruct
 	| file import
 	| file typedef
-	{
-
-	}
 	| file keyword_decl
 	;
 
@@ -1690,7 +1687,7 @@ Module *read_dcfile(const string& filename) {
     return nullptr;
 }
 bool parse_dcfile(Module *m, istream& in, const string& filename) {
-    dcparser_file(in, filename, *m);
+    dcparser_init_file(in, filename, *m);
     dcparse();
     dcparser_cleanup();
     return (dc_errors() == 0);
@@ -1712,7 +1709,7 @@ vector<uint8_t> parse_dcvalue(const DistributedType *dtype, const string& format
 vector<uint8_t> parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
     vector<uint8_t> value;
     try {
-        dcparser_value(in, "parse_value()", dtype, value);
+        dcparser_init_value(in, "parse_value()", dtype, value);
         dcparse();
         dcparser_cleanup();
     } catch(const exception& e) {

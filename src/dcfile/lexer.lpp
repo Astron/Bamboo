@@ -17,6 +17,8 @@
 	#include "module/Module.h"
 	using namespace bamboo;
 
+	YYSTYPE yylval;
+
 	static int yyinput(void); // declared by flex.
 	extern int bamboo::dclex();
 	extern "C" int should_lexer_wrap();
@@ -57,7 +59,7 @@
 // Defining the interface to the lexer.
 ////////////////////////////////////////////////////////////////////
 
-	void bamboo::dclexer_init(std::istream& in, const std::string& filename, int initial_token)
+	void bamboo::dclexer_init(std::istream& in, const std::string& filename, int initial)
 	{
 		input_p = &in;
 		dc_filename = filename;
@@ -65,7 +67,7 @@
 		col_number = 0;
 		error_count = 0;
 		warning_count = 0;
-		initial_token = initial_token;
+		initial_token = initial;
 	}
 
 	int bamboo::dc_errors()

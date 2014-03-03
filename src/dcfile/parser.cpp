@@ -146,19 +146,19 @@
 // Defining the interface to the parser.
 ////////////////////////////////////////////////////////////////////
 
-	static void dcparser_file(istream& in, const string& filename, Module& module)
+	static void dcparser_init_file(istream& in, const string& filename, Module& module)
 	{
+		dclexer_init(in, filename, START_DC_FILE);
 		parsed_module = &module;
-		dclexer_init(in, filename, STARkTypeDC_FILE);
 	}
 
-	static void dcparser_value(istream& in, const string& source,
+	static void dcparser_init_value(istream& in, const string& source,
 	                           const DistributedType* type, vector<uint8_t>& output)
 	{
 		parsed_value = &output;
 		current_depth = 0;
 		type_stack.push(TypeAndDepth(type, 0));
-		dclexer_init(in, source, STARkTypeDC_VALUE);
+		dclexer_init(in, source, START_DC_VALUE);
 	}
 
 	static void dcparser_cleanup()
@@ -211,8 +211,8 @@ extern int yydebug;
     HEX_STRING = 261,
     IDENTIFIER = 262,
     CHAR = 263,
-    STARkTypeDC_FILE = 264,
-    STARkTypeDC_VALUE = 265,
+    START_DC_FILE = 264,
+    START_DC_VALUE = 265,
     KW_DCLASS = 266,
     KW_STRUCT = 267,
     KW_FROM = 268,
@@ -547,23 +547,23 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,   215,   215,   216,   221,   222,   223,   224,   225,   226,
-     230,   234,   238,   243,   251,   256,   265,   266,   273,   274,
-     281,   285,   293,   294,   301,   346,   350,   358,   368,   383,
-     387,   388,   396,   395,   435,   436,   440,   447,   457,   488,
-     489,   490,   528,   552,   560,   559,   599,   600,   601,   635,
-     636,   640,   641,   642,   643,   647,   652,   651,   666,   673,
-     678,   687,   686,   698,   697,   709,   708,   722,   729,   730,
-     734,   752,   756,   760,   764,   768,   772,   779,   805,   837,
-     859,   887,   910,   911,   912,   913,   917,   921,   930,   939,
-     951,   963,   970,   980,   984,   991,  1001,  1014,  1015,  1016,
-    1017,  1022,  1021,  1035,  1042,  1047,  1056,  1055,  1067,  1066,
-    1080,  1081,  1082,  1086,  1087,  1088,  1092,  1104,  1108,  1121,
-    1122,  1123,  1127,  1136,  1140,  1154,  1168,  1182,  1214,  1241,
-    1242,  1247,  1246,  1283,  1284,  1294,  1293,  1330,  1331,  1332,
-    1338,  1347,  1384,  1383,  1445,  1447,  1446,  1469,  1474,  1493,
-    1512,  1531,  1577,  1626,  1627,  1631,  1632,  1636,  1637,  1638,
-    1639,  1640,  1641,  1642,  1643,  1644,  1645,  1646,  1650,  1654,
-    1667
+     227,   231,   235,   240,   248,   253,   262,   263,   270,   271,
+     278,   282,   290,   291,   298,   343,   347,   355,   365,   380,
+     384,   385,   393,   392,   432,   433,   437,   444,   454,   485,
+     486,   487,   525,   549,   557,   556,   596,   597,   598,   632,
+     633,   637,   638,   639,   640,   644,   649,   648,   663,   670,
+     675,   684,   683,   695,   694,   706,   705,   719,   726,   727,
+     731,   749,   753,   757,   761,   765,   769,   776,   802,   834,
+     856,   884,   907,   908,   909,   910,   914,   918,   927,   936,
+     948,   960,   967,   977,   981,   988,   998,  1011,  1012,  1013,
+    1014,  1019,  1018,  1032,  1039,  1044,  1053,  1052,  1064,  1063,
+    1077,  1078,  1079,  1083,  1084,  1085,  1089,  1101,  1105,  1118,
+    1119,  1120,  1124,  1133,  1137,  1151,  1165,  1179,  1211,  1238,
+    1239,  1244,  1243,  1280,  1281,  1291,  1290,  1327,  1328,  1329,
+    1335,  1344,  1381,  1380,  1442,  1444,  1443,  1466,  1471,  1490,
+    1509,  1528,  1574,  1623,  1624,  1628,  1629,  1633,  1634,  1635,
+    1636,  1637,  1638,  1639,  1640,  1641,  1642,  1643,  1647,  1651,
+    1664
 };
 #endif
 
@@ -573,26 +573,25 @@ static const yytype_uint16 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "UNSIGNED_INTEGER", "REAL", "STRING",
-  "HEX_STRING", "IDENTIFIER", "CHAR", "STARkTypeDC_FILE",
-  "STARkTypeDC_VALUE", "KW_DCLASS", "KW_STRUCT", "KW_FROM", "KW_IMPORT",
-  "KW_TYPEDEF", "KW_KEYWORD", "KW_INT8", "KW_INT16", "KW_INT32",
-  "KW_INT64", "KW_UINT8", "KW_UINT16", "KW_UINT32", "KW_UINT64",
-  "KW_FLOAT32", "KW_FLOAT64", "KW_STRING", "KW_BLOB", "KW_CHAR", "';'",
-  "'.'", "'*'", "','", "'/'", "'['", "']'", "'{'", "'}'", "':'", "'='",
-  "'('", "')'", "'%'", "'-'", "'+'", "$accept", "grammar", "file", "value",
-  "import", "import_module", "import_symbols", "import_symbol_list",
-  "import_alternatives", "typedef", "typedef_type",
-  "nonmethod_type_with_name", "defined_type", "keyword_decl",
-  "keyword_decl_list", "dclass", "$@1", "class_inheritance",
-  "class_parents", "defined_class", "class_fields", "class_field",
-  "dstruct", "$@2", "struct_fields", "struct_field", "named_field",
-  "unnamed_field", "$@3", "field_with_name", "field_with_name_as_array",
-  "field_with_name_and_default", "$@4", "$@5", "$@6", "method_as_field",
-  "nonmethod_type", "nonmethod_type_no_array", "type_with_array",
-  "molecular", "defined_field", "builtin_array_type", "numeric_type",
-  "numeric_token_only", "numeric_with_range", "numeric_with_modulus",
-  "numeric_with_divisor", "method", "method_body", "parameter", "$@7",
-  "param_with_name", "param_with_name_as_array",
+  "HEX_STRING", "IDENTIFIER", "CHAR", "START_DC_FILE", "START_DC_VALUE",
+  "KW_DCLASS", "KW_STRUCT", "KW_FROM", "KW_IMPORT", "KW_TYPEDEF",
+  "KW_KEYWORD", "KW_INT8", "KW_INT16", "KW_INT32", "KW_INT64", "KW_UINT8",
+  "KW_UINT16", "KW_UINT32", "KW_UINT64", "KW_FLOAT32", "KW_FLOAT64",
+  "KW_STRING", "KW_BLOB", "KW_CHAR", "';'", "'.'", "'*'", "','", "'/'",
+  "'['", "']'", "'{'", "'}'", "':'", "'='", "'('", "')'", "'%'", "'-'",
+  "'+'", "$accept", "grammar", "file", "value", "import", "import_module",
+  "import_symbols", "import_symbol_list", "import_alternatives", "typedef",
+  "typedef_type", "nonmethod_type_with_name", "defined_type",
+  "keyword_decl", "keyword_decl_list", "dclass", "$@1",
+  "class_inheritance", "class_parents", "defined_class", "class_fields",
+  "class_field", "dstruct", "$@2", "struct_fields", "struct_field",
+  "named_field", "unnamed_field", "$@3", "field_with_name",
+  "field_with_name_as_array", "field_with_name_and_default", "$@4", "$@5",
+  "$@6", "method_as_field", "nonmethod_type", "nonmethod_type_no_array",
+  "type_with_array", "molecular", "defined_field", "builtin_array_type",
+  "numeric_type", "numeric_token_only", "numeric_with_range",
+  "numeric_with_modulus", "numeric_with_divisor", "method", "method_body",
+  "parameter", "$@7", "param_with_name", "param_with_name_as_array",
   "param_with_name_and_default", "$@8", "$@9", "numeric_range",
   "array_range", "char_or_uint", "small_unsigned_integer", "number",
   "char_or_number", "type_value", "method_value", "$@10",
@@ -1536,120 +1535,112 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 9:
-#line 227 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
-    {
-
-	}
-#line 1545 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 235 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+        case 11:
+#line 232 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		parsed_value->clear();
 	}
-#line 1553 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1544 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 239 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 236 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		parsed_value->assign((yyvsp[0].buffer).begin(), (yyvsp[0].buffer).end());
 		if(!type_stack.empty()) depth_error(0, "type");
 	}
-#line 1562 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1553 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 244 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 241 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		parsed_value->assign((yyvsp[0].buffer).begin(), (yyvsp[0].buffer).end());
 		if(!type_stack.empty()) depth_error(0, "method");
 	}
-#line 1571 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1562 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 252 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 249 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		Import* import = new Import((yyvsp[0].str));
 		parsed_module->add_import(import);
 	}
-#line 1580 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1571 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 257 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 254 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		Import* import = new Import((yyvsp[-2].str));
 		import->symbols.assign((yyvsp[0].strings).begin(), (yyvsp[0].strings).end());
 		parsed_module->add_import(import);
 	}
-#line 1590 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1581 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 265 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 262 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.str) = (yyvsp[0].str); }
-#line 1596 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1587 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 267 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 264 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.str) = (yyvsp[-2].str) + string(".") + (yyvsp[0].str);
 	}
-#line 1604 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1595 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 273 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 270 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.strings) = (yyvsp[0].strings); }
-#line 1610 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1601 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 275 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 272 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.strings) = vector<string>();
 	}
-#line 1618 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1609 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 282 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 279 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.strings) = vector<string>(1, (yyvsp[0].str));
 	}
-#line 1626 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1617 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 286 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 283 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyvsp[-2].strings).push_back((yyvsp[0].str));
 		(yyval.strings) = (yyvsp[-2].strings);
 	}
-#line 1635 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1626 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 293 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 290 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.str) = (yyvsp[0].str); }
-#line 1641 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1632 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 295 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 292 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.str) = (yyvsp[-2].str) + string("/") + (yyvsp[0].str);
 	}
-#line 1649 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1640 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 302 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 299 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].nametype).type == nullptr)
 		{
@@ -1691,39 +1682,39 @@ yyreduce:
 			}
 		}
 	}
-#line 1695 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1686 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 347 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 344 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.nametype) = (yyvsp[0].nametype);
 	}
-#line 1703 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1694 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 351 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 348 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.nametype) = (yyvsp[-3].nametype);
 		(yyval.nametype).type = new ArrayType((yyvsp[-3].nametype).type, (yyvsp[-1].range));
 	}
-#line 1712 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1703 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 359 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 356 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		DCToken::NameType nt;
 		nt.type = (yyvsp[-1].dtype);
 		nt.name = (yyvsp[0].str);
 		(yyval.nametype) = nt;
 	}
-#line 1723 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1714 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 369 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 366 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
 		if(dtype == nullptr)
@@ -1735,27 +1726,27 @@ yyreduce:
 
 		(yyval.dtype) = dtype;
 	}
-#line 1739 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1730 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 389 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 386 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		parsed_module->add_keyword((yyvsp[0].str));
 	}
-#line 1747 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1738 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 396 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 393 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_class = new Class(parsed_module, (yyvsp[0].str));
 	}
-#line 1755 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1746 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 400 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 397 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		bool class_added = parsed_module->add_class(current_class);
 		if(!class_added)
@@ -1788,33 +1779,33 @@ yyreduce:
 			}
 		}
 	}
-#line 1792 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1783 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 441 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 438 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].dclass) != nullptr)
 		{
 			current_class->add_parent((yyvsp[0].dclass));
 		}
 	}
-#line 1803 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1794 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 448 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 445 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].dclass) != nullptr)
 		{
 			current_class->add_parent((yyvsp[0].dclass));
 		}
 	}
-#line 1814 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1805 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 458 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 455 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
 		if(dtype == nullptr)
@@ -1842,11 +1833,11 @@ yyreduce:
 
 		(yyval.dclass) = dclass;
 	}
-#line 1846 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1837 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 491 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 488 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[-1].dfield) == nullptr)
 		{
@@ -1881,11 +1872,11 @@ yyreduce:
 			}
 		}
 	}
-#line 1885 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1876 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 529 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 526 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[-1].dfield) == nullptr)
 		{
@@ -1909,27 +1900,27 @@ yyreduce:
 
 		(yyval.dfield) = (yyvsp[-1].dfield);
 	}
-#line 1913 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1904 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 553 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 550 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dfield) = (Field*)(yyvsp[0].dmolecule);
 	}
-#line 1921 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1912 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 560 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 557 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_struct = new Struct(parsed_module, (yyvsp[0].str));
 	}
-#line 1929 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1920 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 564 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 561 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		bool struct_added = parsed_module->add_struct(current_struct);
 		if(!struct_added)
@@ -1962,11 +1953,11 @@ yyreduce:
 			}
 		}
 	}
-#line 1966 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1957 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 602 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 599 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[-1].dfield) == nullptr || (yyvsp[-1].dfield)->get_type() == nullptr)
 		{
@@ -1997,47 +1988,56 @@ yyreduce:
 			}
 		}
 	}
-#line 2001 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 1992 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 648 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 645 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dfield) = new Field((yyvsp[0].dtype));
 	}
-#line 2009 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2000 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 652 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 649 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_depth = 0;
 		type_stack.push(TypeAndDepth((yyvsp[-1].dtype), 0));
 	}
-#line 2018 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2009 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 657 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 654 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		Field* field = new Field((yyvsp[-3].dtype));
 		if(!type_stack.empty()) depth_error(0, "unnamed field");
 		field->set_default_value((yyvsp[0].buffer));
 		(yyval.dfield) = field;
 	}
-#line 2029 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2020 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 667 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 664 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dfield) = new Field((yyvsp[0].nametype).type, (yyvsp[0].nametype).name);
+	}
+#line 2028 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 671 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+    {
+		(yyvsp[-3].dfield)->set_type(new ArrayType((yyvsp[-3].dfield)->get_type(), (yyvsp[-1].range)));
+		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
 #line 2037 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 674 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+  case 60:
+#line 676 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyvsp[-3].dfield)->set_type(new ArrayType((yyvsp[-3].dfield)->get_type(), (yyvsp[-1].range)));
 		(yyval.dfield) = (yyvsp[-3].dfield);
@@ -2045,82 +2045,73 @@ yyreduce:
 #line 2046 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 679 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+  case 61:
+#line 684 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		(yyvsp[-3].dfield)->set_type(new ArrayType((yyvsp[-3].dfield)->get_type(), (yyvsp[-1].range)));
-		(yyval.dfield) = (yyvsp[-3].dfield);
+		current_depth = 0;
+		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
 	}
 #line 2055 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 687 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
-    {
-		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
-	}
-#line 2064 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 62:
-#line 692 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 689 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->get_name() + "'");
 		(yyvsp[-3].dfield)->set_default_value((yyvsp[0].buffer));
 		(yyval.dfield) = (yyvsp[-3].dfield);
+	}
+#line 2065 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 63:
+#line 695 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+    {
+		current_depth = 0;
+		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
 	}
 #line 2074 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 698 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
-    {
-		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
-	}
-#line 2083 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 64:
-#line 703 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 700 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->get_name() + "'");
 		(yyvsp[-3].dfield)->set_default_value((yyvsp[0].buffer));
 		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
-#line 2093 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2084 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 709 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 706 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_depth = 0;
 		type_stack.push(TypeAndDepth((yyvsp[-2].dfield)->get_type(), 0));
 	}
-#line 2102 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2093 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 714 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 711 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!type_stack.empty()) depth_error(0, "method");
 		(yyvsp[-4].dfield)->set_default_value((yyvsp[-2].buffer));
 		(yyval.dfield) = (yyvsp[-4].dfield);
 	}
-#line 2112 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2103 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 723 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 720 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dfield) = new Field((yyvsp[0].dmethod), (yyvsp[-1].str));
 	}
-#line 2120 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2111 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 735 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 732 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].dtype) == nullptr)
 		{
@@ -2138,51 +2129,51 @@ yyreduce:
 
 		(yyval.dtype) = (yyvsp[0].dtype);
 	}
-#line 2142 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2133 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 753 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 750 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dtype) = (DistributedType*)(yyvsp[0].dnumeric);
 	}
-#line 2150 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2141 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 761 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 758 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dtype) = new ArrayType((yyvsp[-3].dnumeric), (yyvsp[-1].range));
 	}
-#line 2158 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2149 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 765 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 762 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
-#line 2166 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2157 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 769 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 766 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
-#line 2174 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2165 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 773 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 770 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
-#line 2182 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2173 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 780 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 777 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		MolecularField* mol = new MolecularField(current_class, (yyvsp[-2].str));
 		if((yyvsp[0].dfield) == nullptr)
@@ -2208,11 +2199,11 @@ yyreduce:
 
 		(yyval.dmolecule) = mol;
 	}
-#line 2212 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2203 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 806 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 803 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].dfield) == nullptr)
 		{
@@ -2242,11 +2233,11 @@ yyreduce:
 
 		(yyval.dmolecule) = (yyvsp[-2].dmolecule);
 	}
-#line 2246 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2237 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 838 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 835 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!current_class)
 		{
@@ -2265,11 +2256,11 @@ yyreduce:
 
 		(yyval.dfield) = field;
 	}
-#line 2269 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2260 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 860 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 857 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].subtype) == kTypeString)
 		{
@@ -2297,11 +2288,11 @@ yyreduce:
 			(yyval.dtype) = nullptr;
 		}
 	}
-#line 2301 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2292 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 888 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 885 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[-3].subtype) == kTypeString)
 		{
@@ -2321,17 +2312,17 @@ yyreduce:
 			(yyval.dtype) = nullptr;
 		}
 	}
-#line 2325 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2316 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 917 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 914 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.dnumeric) = new NumericType((yyvsp[0].subtype)); }
-#line 2331 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2322 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 922 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 919 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-3].dnumeric)->set_range((yyvsp[-1].range)))
 		{
@@ -2340,11 +2331,11 @@ yyreduce:
 
 		(yyval.dnumeric) = (yyvsp[-3].dnumeric);
 	}
-#line 2344 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2335 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 931 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 928 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-3].dnumeric)->set_range((yyvsp[-1].range)))
 		{
@@ -2353,11 +2344,11 @@ yyreduce:
 
 		(yyval.dnumeric) = (yyvsp[-3].dnumeric);
 	}
-#line 2357 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2348 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 940 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 937 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-3].dnumeric)->set_range((yyvsp[-1].range)))
 		{
@@ -2366,11 +2357,11 @@ yyreduce:
 
 		(yyval.dnumeric) = (yyvsp[-3].dnumeric);
 	}
-#line 2370 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2361 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 952 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 949 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-2].dnumeric)->set_modulus((yyvsp[0].real)))
 		{
@@ -2379,49 +2370,49 @@ yyreduce:
 
 		(yyval.dnumeric) = (yyvsp[-2].dnumeric);
 	}
-#line 2383 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2374 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 964 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 961 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-2].dnumeric)->set_divisor((yyvsp[0].uint32)))
 		{
 			dcerror("Invalid divisor for type.");
 		}
 	}
-#line 2394 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2385 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 971 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 968 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!(yyvsp[-2].dnumeric)->set_divisor((yyvsp[0].uint32)))
 		{
 			dcerror("Invalid divisor for type.");
 		}
 	}
-#line 2405 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2396 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 981 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 978 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dmethod) = new Method();
 	}
-#line 2413 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2404 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 985 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 982 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dmethod) = (yyvsp[-1].dmethod);
 	}
-#line 2421 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2412 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 992 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 989 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		Method* fn = new Method();
 		bool param_added = fn->add_parameter((yyvsp[0].dparam));
@@ -2431,11 +2422,11 @@ yyreduce:
 		}
 		(yyval.dmethod) = fn;
 	}
-#line 2435 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2426 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 1002 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 999 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		bool param_added = (yyvsp[-2].dmethod)->add_parameter((yyvsp[0].dparam));
 		if(!param_added)
@@ -2445,47 +2436,56 @@ yyreduce:
 		}
 		(yyval.dmethod) = (yyvsp[-2].dmethod);
 	}
-#line 2449 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2440 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 1018 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1015 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dparam) = new Parameter((yyvsp[0].dtype));
 	}
-#line 2457 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2448 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 1022 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1019 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_depth = 0;
 		type_stack.push(TypeAndDepth((yyvsp[-1].dtype),0));
 	}
-#line 2466 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2457 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 1027 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1024 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		Parameter* param = new Parameter((yyvsp[-3].dtype));
 		if(!type_stack.empty()) depth_error(0, "type");
 		param->set_default_value((yyvsp[0].buffer));
 		(yyval.dparam) = param;
 	}
-#line 2477 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2468 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 1036 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1033 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.dparam) = new Parameter((yyvsp[-1].dtype), (yyvsp[0].str));
+	}
+#line 2476 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 104:
+#line 1040 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+    {
+		(yyvsp[-3].dparam)->set_type(new ArrayType((yyvsp[-3].dparam)->get_type(), (yyvsp[-1].range)));
+		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
 #line 2485 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 104:
-#line 1043 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+  case 105:
+#line 1045 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyvsp[-3].dparam)->set_type(new ArrayType((yyvsp[-3].dparam)->get_type(), (yyvsp[-1].range)));
 		(yyval.dparam) = (yyvsp[-3].dparam);
@@ -2493,91 +2493,82 @@ yyreduce:
 #line 2494 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 105:
-#line 1048 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+  case 106:
+#line 1053 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
-		(yyvsp[-3].dparam)->set_type(new ArrayType((yyvsp[-3].dparam)->get_type(), (yyvsp[-1].range)));
-		(yyval.dparam) = (yyvsp[-3].dparam);
+		current_depth = 0;
+		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
 	}
 #line 2503 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 106:
-#line 1056 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
-    {
-		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
-	}
-#line 2512 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 107:
-#line 1061 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1058 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->get_name() + "'");
 		(yyvsp[-3].dparam)->set_default_value((yyvsp[0].buffer));
 		(yyval.dparam) = (yyvsp[-3].dparam);
+	}
+#line 2513 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 108:
+#line 1064 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+    {
+		current_depth = 0;
+		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
 	}
 #line 2522 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 108:
-#line 1067 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
-    {
-		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
-	}
-#line 2531 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 109:
-#line 1072 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1069 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->get_name() + "'");
 		(yyvsp[-3].dparam)->set_default_value((yyvsp[0].buffer));
 		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
-#line 2541 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2532 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 110:
-#line 1080 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1077 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange(); }
-#line 2547 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2538 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 111:
-#line 1081 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1078 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange((yyvsp[0].real), (yyvsp[0].real)); }
-#line 2553 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2544 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 1082 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1079 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange((yyvsp[-2].real), (yyvsp[0].real)); }
-#line 2559 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2550 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 113:
-#line 1086 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1083 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange(); }
-#line 2565 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2556 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 114:
-#line 1087 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1084 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange((yyvsp[0].uint32), (yyvsp[0].uint32)); }
-#line 2571 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2562 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 115:
-#line 1088 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1085 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.range) = NumericRange((yyvsp[-2].uint32), (yyvsp[0].uint32)); }
-#line 2577 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2568 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 116:
-#line 1093 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1090 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].str).length() != 1)
 		{
@@ -2589,11 +2580,11 @@ yyreduce:
 			(yyval.uint32) = (unsigned char)(yyvsp[0].str)[0];
 		}
 	}
-#line 2593 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2584 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 118:
-#line 1109 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1106 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		unsigned int num = (unsigned int)(yyvsp[0].uint64);
 		if(num != (yyvsp[0].uint64))
@@ -2603,23 +2594,23 @@ yyreduce:
 		}
 		(yyval.uint32) = num;
 	}
-#line 2607 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2598 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 119:
-#line 1121 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1118 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.real) = (double)(yyvsp[0].uint64); }
-#line 2613 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2604 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 120:
-#line 1122 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1119 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.real) = (double)(yyvsp[0].int64); }
-#line 2619 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2610 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 122:
-#line 1128 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1125 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if((yyvsp[0].str).length() != 1) {
 			dcerror("Single character required.");
@@ -2628,11 +2619,11 @@ yyreduce:
 			(yyval.real) = (double)(unsigned char)(yyvsp[0].str)[0];
 		}
 	}
-#line 2632 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2623 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 1141 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1138 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("signed integer");
 
@@ -2646,11 +2637,11 @@ yyreduce:
 
 		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].int64));
 	}
-#line 2650 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2641 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 125:
-#line 1155 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1152 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("unsigned integer");
 
@@ -2664,11 +2655,11 @@ yyreduce:
 
 		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].uint64));
 	}
-#line 2668 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2659 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 126:
-#line 1169 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1166 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("floating point");
 
@@ -2682,11 +2673,11 @@ yyreduce:
 
 		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].real));
 	}
-#line 2686 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2677 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 127:
-#line 1183 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1180 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("string");
 
@@ -2718,11 +2709,11 @@ yyreduce:
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
 		}
 	}
-#line 2722 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2713 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 128:
-#line 1215 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1212 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("hex-string");
 
@@ -2749,11 +2740,11 @@ yyreduce:
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
 		}
 	}
-#line 2753 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2744 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 131:
-#line 1247 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1244 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("method");
 
@@ -2779,11 +2770,11 @@ yyreduce:
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
-#line 2783 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2774 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 132:
-#line 1273 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1270 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(type_stack.top().type->as_method()) {
 			current_depth--;
@@ -2791,21 +2782,21 @@ yyreduce:
 		type_stack.pop(); // Remove method type from the stack
 		(yyval.buffer) = (yyvsp[-1].buffer);
 	}
-#line 2795 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2786 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 134:
-#line 1285 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1282 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		vector<uint8_t> buf = (yyvsp[-2].buffer);
 		pack_value((yyvsp[0].buffer), buf);
 		(yyval.buffer) = buf;
 	}
-#line 2805 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2796 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 135:
-#line 1294 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1291 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("struct");
 
@@ -2831,11 +2822,11 @@ yyreduce:
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
-#line 2835 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2826 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 136:
-#line 1320 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1317 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(type_stack.top().type->as_struct()) {
 			current_depth--;
@@ -2843,31 +2834,31 @@ yyreduce:
 		type_stack.pop(); // Remove method type from the stack
 		(yyval.buffer) = (yyvsp[-1].buffer);
 	}
-#line 2847 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2838 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 139:
-#line 1333 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1330 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		vector<uint8_t> buf = (yyvsp[-2].buffer);
 		pack_value((yyvsp[0].buffer), buf);
 		(yyval.buffer) = buf;
 	}
-#line 2857 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2848 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 140:
-#line 1339 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1336 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		vector<uint8_t> buf = (yyvsp[-2].buffer);
 		pack_value((yyvsp[0].buffer), buf);
 		(yyval.buffer) = buf;
 	}
-#line 2867 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2858 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 141:
-#line 1348 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1345 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("array");
 
@@ -2903,11 +2894,11 @@ yyreduce:
 		// the default value for a varsize array, which is the length-tag 0.
 		(yyval.buffer) = vector<uint8_t>(sizeof(sizetag_t), 0);
 	}
-#line 2907 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2898 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 142:
-#line 1384 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1381 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!check_depth()) depth_error("array");
 
@@ -2931,11 +2922,11 @@ yyreduce:
 			             + format_type(dtype->get_subtype()) + "'.");
 		}
 	}
-#line 2935 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2926 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 143:
-#line 1408 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1405 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(type_stack.top().type->as_array()) {
 			uint64_t actual_size = current_depth - type_stack.top().depth;
@@ -2970,11 +2961,11 @@ yyreduce:
 
 		type_stack.pop(); // Remove array type from the stack
 	}
-#line 2974 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2965 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 145:
-#line 1447 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1444 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		// We popped off the only element we added, so we're back to the array
 		// Don't increment the depth; the array_expansion will add to
@@ -2987,31 +2978,31 @@ yyreduce:
 		const ArrayType* array = dtype->as_array();
 		type_stack.push(TypeAndDepth(array->get_element_type(), current_depth));
 	}
-#line 2991 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2982 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 146:
-#line 1460 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1457 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		// $4 packed onto end of $1
 		std::vector<uint8_t> buf = (yyvsp[-3].buffer);
 		pack_value((yyvsp[0].buffer), buf);
 		(yyval.buffer) = buf;
 	}
-#line 3002 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 2993 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 147:
-#line 1470 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1467 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		current_depth++;
 		(yyval.buffer) = (yyvsp[0].buffer);
 	}
-#line 3011 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3002 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 148:
-#line 1475 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1472 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
@@ -3030,11 +3021,11 @@ yyreduce:
 		}
 		(yyval.buffer) = buf;
 	}
-#line 3034 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3025 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 149:
-#line 1494 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1491 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
@@ -3053,11 +3044,11 @@ yyreduce:
 		}
 		(yyval.buffer) = buf;
 	}
-#line 3057 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3048 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 150:
-#line 1513 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1510 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
@@ -3076,11 +3067,11 @@ yyreduce:
 		}
 		(yyval.buffer) = buf;
 	}
-#line 3080 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3071 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 151:
-#line 1532 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1529 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
@@ -3126,11 +3117,11 @@ yyreduce:
 			(yyval.buffer) = buf;
 		}
 	}
-#line 3130 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3121 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 152:
-#line 1578 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1575 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		const DistributedType* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
@@ -3176,109 +3167,109 @@ yyreduce:
 			(yyval.buffer) = buf;
 		}
 	}
-#line 3180 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3171 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 153:
-#line 1626 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1623 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.int64) = (yyvsp[0].uint64); }
-#line 3186 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3177 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 154:
-#line 1627 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1624 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.int64) = -(yyvsp[0].uint64); }
-#line 3192 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3183 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 155:
-#line 1631 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1628 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeString; }
-#line 3198 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3189 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 156:
-#line 1632 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1629 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeBlob; }
-#line 3204 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3195 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 157:
-#line 1636 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1633 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeChar; }
-#line 3210 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3201 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 158:
-#line 1637 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1634 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeInt8; }
-#line 3216 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3207 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 159:
-#line 1638 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1635 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeInt16; }
-#line 3222 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3213 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 160:
-#line 1639 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1636 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeInt32; }
-#line 3228 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3219 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 161:
-#line 1640 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1637 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeInt64; }
-#line 3234 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3225 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 162:
-#line 1641 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1638 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeUint8; }
-#line 3240 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3231 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 163:
-#line 1642 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1639 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeUint16; }
-#line 3246 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3237 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 164:
-#line 1643 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1640 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeUint32; }
-#line 3252 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3243 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 165:
-#line 1644 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1641 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeUint64; }
-#line 3258 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3249 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 166:
-#line 1645 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1642 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeFloat32; }
-#line 3264 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3255 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 167:
-#line 1646 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1643 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     { (yyval.subtype) = kTypeFloat64; }
-#line 3270 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3261 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 168:
-#line 1651 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1648 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		(yyval.strings) = vector<string>();
 	}
-#line 3278 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3269 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 169:
-#line 1655 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
+#line 1652 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1646  */
     {
 		if(!parsed_module->has_keyword((yyvsp[0].str)))
 		{
@@ -3289,11 +3280,11 @@ yyreduce:
 		(yyvsp[-1].strings).push_back((yyvsp[0].str));
 		(yyval.strings) = (yyvsp[-1].strings);
 	}
-#line 3293 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3284 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 3297 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
+#line 3288 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3521,7 +3512,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1671 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1906  */
+#line 1668 "/media/Storage/Devel/git/astron/bamboo/src/dcfile/parser.ypp" /* yacc.c:1906  */
  /* Start helper function section */
 
 
@@ -3544,7 +3535,7 @@ Module *read_dcfile(const string& filename) {
     return nullptr;
 }
 bool parse_dcfile(Module *m, istream& in, const string& filename) {
-    dcparser_file(in, filename, *m);
+    dcparser_init_file(in, filename, *m);
     dcparse();
     dcparser_cleanup();
     return (dc_errors() == 0);
@@ -3566,7 +3557,7 @@ vector<uint8_t> parse_dcvalue(const DistributedType *dtype, const string& format
 vector<uint8_t> parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
     vector<uint8_t> value;
     try {
-        dcparser_value(in, "parse_value()", dtype, value);
+        dcparser_init_value(in, "parse_value()", dtype, value);
         dcparse();
         dcparser_cleanup();
     } catch(const exception& e) {
