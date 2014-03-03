@@ -117,7 +117,6 @@ if(BUILD_16BIT_SIZETAG)
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
     ${WIRE_SOURCES})
-  set_target_properties(bamboo PROPERTIES LINK_FLAGS -lfl)
   install(TARGETS bamboo EXPORT bamboo DESTINATION lib/bamboo)
 endif()
 
@@ -128,7 +127,6 @@ if(BUILD_32BIT_SIZETAG)
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
     ${WIRE_SOURCES})
-  target_link_libraries(bamboo32 -lfl)
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
   install(TARGETS bamboo32 EXPORT bamboo32 DESTINATION lib/bamboo)
 endif()
@@ -140,7 +138,6 @@ if(BUILD_SHARED_AND_STATIC)
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
       ${WIRE_SOURCES})
-    set_target_properties(bamboo-static PROPERTIES LINK_FLAGS -lfl)
     if(NOT WIN32)
       set_target_properties(bamboo-static PROPERTIES OUTPUT_NAME bamboo)
     endif()
@@ -152,7 +149,7 @@ if(BUILD_SHARED_AND_STATIC)
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
       ${WIRE_SOURCES})
-    target_link_libraries(bamboo32-static -lfl)
+
     target_compile_definitions(bamboo32-static PUBLIC BAMBOO_32BIT_SIZETAG)
     if(NOT WIN32)
       set_target_properties(bamboo32-static PROPERTIES OUTPUT_NAME bamboo32)

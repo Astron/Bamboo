@@ -52,6 +52,6 @@ class DCToken {
 } // close namespace
 
 // The bison-generated code expects to use the symbol 'YYSTYPE' to refer to the above class.
-#ifndef YYSTYPE
-#define YYSTYPE bamboo::DCToken
+#ifndef DCSTYPE
+#define DCSTYPE bamboo::DCToken
 #endif

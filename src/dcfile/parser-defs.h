@@ -30,20 +30,28 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
-# define YY_YY_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
+#ifndef YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
+# define YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
 /* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 1
-#endif
+#ifndef DCDEBUG
+# if defined YYDEBUG
 #if YYDEBUG
-extern int yydebug;
+#   define DCDEBUG 1
+#  else
+#   define DCDEBUG 0
+#  endif
+# else /* ! defined YYDEBUG */
+#  define DCDEBUG 1
+# endif /* ! defined YYDEBUG */
+#endif  /* ! defined DCDEBUG */
+#if DCDEBUG
+extern int dcdebug;
 #endif
 
 /* Token type.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
+#ifndef DCTOKENTYPE
+# define DCTOKENTYPE
+  enum dctokentype
   {
     UNSIGNED_INTEGER = 258,
     REAL = 259,
@@ -78,8 +86,8 @@ extern int yydebug;
 /* Value type.  */
 
 
-extern YYSTYPE yylval;
+extern DCSTYPE dclval;
 
-int yyparse (void);
+int dcparse (void);
 
-#endif /* !YY_YY_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED  */
+#endif /* !YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED  */

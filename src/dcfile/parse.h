@@ -1,5 +1,6 @@
 // Filename: parser.h
 #pragma once
+#include <stdint.h>
 #include <string> // std::string
 #include <vector> // std::vector
 namespace bamboo { // open namespace bamboo

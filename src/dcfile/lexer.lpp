@@ -17,8 +17,6 @@
 	#include "module/Module.h"
 	using namespace bamboo;
 
-	YYSTYPE yylval;
-
 	static int yyinput(void); // declared by flex.
 	extern int bamboo::dclex();
 	extern "C" int should_lexer_wrap();
@@ -437,6 +435,7 @@
 
 %}
 
+%option prefix="dc"
 %option nounput
 
 INTEGERNUM  ([0-9]+)
@@ -585,20 +584,20 @@ REALNUM     ((([0-9]+[.])|([0-9]*[.][0-9]+))([eE][+-]?[0-9]+)?)
 	accept();
 
 	// atoll isn't fully portable, so we'll decode the integer by hand.
-	yylval.str = yytext;
-	yylval.uint64 = 0;
+	dclval.str = yytext;
+	dclval.uint64 = 0;
 	const char *p = yytext;
 	while(*p != '\0')
 	{
-		uint64_t next_value = yylval.uint64 * 10;
-		if(next_value < yylval.uint64)
+		uint64_t next_value = dclval.uint64 * 10;
+		if(next_value < dclval.uint64)
 		{
 			dcerror("Number out of range.");
-			yylval.uint64 = 1;
+			dclval.uint64 = 1;
 			return UNSIGNED_INTEGER;
 		}
 
-		yylval.uint64 = next_value + (*p - '0');
+		dclval.uint64 = next_value + (*p - '0');
 		++p;
 	}
 
@@ -610,26 +609,26 @@ REALNUM     ((([0-9]+[.])|([0-9]*[.][0-9]+))([eE][+-]?[0-9]+)?)
 	accept();
 
 	// As above, we'll decode the hex string by hand.
-	yylval.str = yytext;
-	yylval.uint64 = 0;
+	dclval.str = yytext;
+	dclval.uint64 = 0;
 	const char *p = yytext + 2;
 	while(*p != '\0')
 	{
-		uint64_t next_value = yylval.uint64 * 16;
-		if(next_value < yylval.uint64)
+		uint64_t next_value = dclval.uint64 * 16;
+		if(next_value < dclval.uint64)
 		{
 			dcerror("Number out of range.");
-			yylval.uint64 = 1;
+			dclval.uint64 = 1;
 			return UNSIGNED_INTEGER;
 		}
 
 		if(isalpha(*p))
 		{
-			yylval.uint64 = next_value + (tolower(*p) - 'a' + 10);
+			dclval.uint64 = next_value + (tolower(*p) - 'a' + 10);
 		}
 		else
 		{
-			yylval.uint64 = next_value + (*p - '0');
+			dclval.uint64 = next_value + (*p - '0');
 		}
 		++p;
 	}
@@ -640,36 +639,36 @@ REALNUM     ((([0-9]+[.])|([0-9]*[.][0-9]+))([eE][+-]?[0-9]+)?)
 {REALNUM} {
 	// A floating-point number.
 	accept();
-	yylval.real = atof(yytext);
-	yylval.str = yytext;
+	dclval.real = atof(yytext);
+	dclval.str = yytext;
 	return REAL;
 }
 
 ["] {
 	// Quoted string.
 	accept();
-	yylval.str = scan_quoted_string('"');
+	dclval.str = scan_quoted_string('"');
 	return STRING;
 }
 
 ['] {
 	// Single-quoted string.
 	accept();
-	yylval.str = scan_quoted_string('\'');
+	dclval.str = scan_quoted_string('\'');
 	return CHAR;
 }
 
 [<] {
 	// Long hex string.
 	accept();
-	yylval.str = scan_hex_string();
+	dclval.str = scan_hex_string();
 	return HEX_STRING;
 }
 
 [A-Za-z_][A-Za-z_0-9]* {
 	// Identifier or keyword.
 	accept();
-	yylval.str = yytext;
+	dclval.str = yytext;
 	return IDENTIFIER;
 }
 

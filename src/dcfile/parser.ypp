@@ -28,13 +28,13 @@
 	#include "module/MolecularField.h"
 	#include "traits/buffers.h"
 
-	#define yylex dclex
-	#define yyparse dcparse
-	#define yyerror dcerror
-	#define yywarning dcwarning
-	#define yychar dcyychar
-	#define yydebug dcyydebug
-	#define yynerrs dcyynerrs
+	//#define yylex dclex
+	//#define yyparse dcparse
+	//#define yyerror dcerror
+	//#define yywarning dcwarning
+	//#define yychar dcyychar
+	//#define yydebug dcyydebug
+	//#define yynerrs dcyynerrs
 
 	// Because our token type contains objects of type string, which
 	// require correct copy construction (and not simply memcpying), we
@@ -45,6 +45,7 @@
 	#define YYMAXDEPTH 1000
 
 	using namespace std;
+	using namespace bamboo;
 	namespace bamboo   // open namespace bamboo
 	{
 
@@ -69,8 +70,8 @@
 
 	// These two types are really common types the parser doesn't need to make new
 	//     duplicates of every time a string or blob is used.
-	static ArrayType* basic_string = nullptr;
-	static ArrayType* basic_blob = nullptr;
+	static ArrayType* default_string = nullptr;
+	static ArrayType* default_blob = nullptr;
 
 	/* Helper functions */
 	static bool check_depth();
@@ -107,9 +108,12 @@
 		parsed_value = nullptr;
 	}
 
+
+	} // close namespace bamboo
 %}
 
 // Use verbose errors
+%define api.prefix {dc}
 %error-verbose
 %debug
 
@@ -857,23 +861,23 @@ builtin_array_type
 	{
 		if($1 == kTypeString)
 		{
-			if(basic_string == nullptr)
+			if(default_string == nullptr)
 			{
-				basic_string = new ArrayType(new NumericType(kTypeChar));
-				basic_string->set_alias("string");
+				default_string = new ArrayType(new NumericType(kTypeChar));
+				default_string->set_alias("string");
 			}
 
-			$$ = basic_string;
+			$$ = default_string;
 		}
 		else if($1 == kTypeBlob)
 		{
-			if(basic_blob == nullptr)
+			if(default_blob == nullptr)
 			{
-				basic_blob = new ArrayType(new NumericType(kTypeUint8));
-				basic_blob->set_alias("blob");
+				default_blob = new ArrayType(new NumericType(kTypeUint8));
+				default_blob->set_alias("blob");
 			}
 
-			$$ = basic_blob;
+			$$ = default_blob;
 		}
 		else
 		{
@@ -1666,6 +1670,7 @@ empty
 	;
 
 %% /* Start helper function section */
+namespace bamboo { // open namespace bamboo
 
 
 Module *read_dcfile(istream& in, const string& filename) {
