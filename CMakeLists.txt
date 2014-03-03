@@ -94,6 +94,12 @@ set(WIRE_SOURCES
   src/wire/DatagramIterator.cpp)
 
 option(BUILD_SHARED_LIBS "Builds shared libraries instead of static libraries.")
+option(BUILD_SHARED_AND_STATIC "Build both shared and static libraries.")
+if(BUILD_SHARED_AND_STATIC)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL
+    "Builds shared libraries instead of static libraries." FORCE)
+  set(LIBRARY_TYPE SHARED)
+endif()
 
 set(BUILD_PACKAGE None
   CACHE STRING "Enables CPack to build packages.")
@@ -106,21 +112,91 @@ endif()
 
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 if(BUILD_16BIT_SIZETAG)
-  add_library(bamboo
+  add_library(bamboo ${LIBRARY_TYPE}
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
     ${WIRE_SOURCES})
-  SET_TARGET_PROPERTIES(bamboo PROPERTIES LINK_FLAGS -lfl)
+  set_target_properties(bamboo PROPERTIES LINK_FLAGS -lfl)
+  install(TARGETS bamboo EXPORT bamboo DESTINATION lib/bamboo)
 endif()
 
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 if(BUILD_32BIT_SIZETAG)
-  add_library(bamboo32
+  add_library(bamboo32 ${LIBRARY_TYPE}
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
     ${WIRE_SOURCES})
   target_link_libraries(bamboo32 -lfl)
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
+  install(TARGETS bamboo32 EXPORT bamboo32 DESTINATION lib/bamboo)
+endif()
+
+if(BUILD_SHARED_AND_STATIC)
+  if(BUILD_16BIT_SIZETAG)
+    add_library(bamboo-static STATIC
+      ${MODULE_SOURCES}
+      ${DCFILE_SOURCES}
+      ${TRAITS_SOURCES}
+      ${WIRE_SOURCES})
+    set_target_properties(bamboo-static PROPERTIES LINK_FLAGS -lfl)
+    if(NOT WIN32)
+      set_target_properties(bamboo-static PROPERTIES OUTPUT_NAME bamboo)
+    endif()
+    install(TARGETS bamboo-static DESTINATION lib/bamboo)
+  endif()
+  if(BUILD_32BIT_SIZETAG)
+    add_library(bamboo32-static STATIC
+      ${MODULE_SOURCES}
+      ${DCFILE_SOURCES}
+      ${TRAITS_SOURCES}
+      ${WIRE_SOURCES})
+    target_link_libraries(bamboo32-static -lfl)
+    target_compile_definitions(bamboo32-static PUBLIC BAMBOO_32BIT_SIZETAG)
+    if(NOT WIN32)
+      set_target_properties(bamboo32-static PROPERTIES OUTPUT_NAME bamboo32)
+    endif()
+    install(TARGETS bamboo32-static DESTINATION lib/bamboo)
+  endif()
+endif()
+
+# Install header files
+install(DIRECTORY src/
+  DESTINATION include/bamboo
+  FILES_MATCHING PATTERN "*.h")
+
+# Generate CMake Find module
+install(EXPORT bamboo
+  NAMESPACE bamboo_
+  DESTINATION lib/bamboo)
+
+# Create symlinks on linux
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  function(generate_library_links FILE_EXT)
+    set(PREFIX "${CMAKE_INSTALL_PREFIX}/lib")
+    if(BUILD_16BIT_SIZETAG)
+      set(LINK16 "${PREFIX}/libbamboo${FILE_EXT}")
+      set(TARGET16 "${PREFIX}/bamboo/libbamboo${FILE_EXT}")
+      install(CODE "
+        message(STATUS \"Generating: Symlink ${LINK16}\")
+        execute_process(COMMAND ln -sf \"${TARGET16}\" \"${LINK16}\")")
+    endif()
+    if(BUILD_32BIT_SIZETAG)
+      set(LINK32 "${PREFIX}/libbamboo32${FILE_EXT}")
+      set(TARGET32 "${PREFIX}/bamboo/libbamboo32${FILE_EXT}")
+      install(CODE "
+        message(STATUS \"Generating: Symlink ${LINK32}\")
+        execute_process(COMMAND ln -sf \"${TARGET32}\" \"${LINK32}\")")
+    endif()
+  endfunction()
+
+  if(BUILD_SHARED_AND_STATIC)
+    generate_library_links(".so")
+    generate_library_links(".a")
+  elseif(BUILD_SHARED_LIBS)
+    generate_library_links(".so")
+  else()
+    generate_library_links(".a")
+  endif()
 endif()
