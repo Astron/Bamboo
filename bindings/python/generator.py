@@ -31,23 +31,26 @@ def generate(file_):
     dcfile.add_include('"dcfile/parse.h"')
     dcfile.add_include('"dcfile/write.h"')
 
+    # Declare classes
+    clsModule = module.add_class('Module')
+    clsDistType = module.add_class('DistributedType')
+    clsNumType = module.add_class('NumericType', parent = clsDistType)
+    clsArrType = module.add_class('ArrayType', parent = clsDistType)
+    clsMethod = module.add_class('Method', parent = clsDistType)
+    clsStruct = module.add_class('Struct', parent = clsDistType)
+    clsClass = module.add_class('Class', parent = clsStruct)
+    clsParameter = module.add_class('Parameter')
+    clsField = module.add_class('Field')
+    structImport = module.add_struct('Import')
+    structNumber = module.add_struct('Number')
+    structNumericRange = module.add_class('NumericRange')
+
     # Declare enums
     enumSubtype = module.add_enum('Subtype', [
         'kTypeInt8', 'kTypeInt16', 'kTypeInt32', 'kTypeInt64', 'kTypeUint8', 'kTypeUint16',
         'kTypeUint32', 'kTypeUint64', 'kTypeChar', 'kTypeFloat32', 'kTypeFloat64', 'kTypeString',
         'kTypeVarstring', 'kTypeBlob', 'kTypeVarblob', 'kTypeStruct', 'kTypeMethod', 'kTypeInvalid'])
-
-    # Declare classes
-    clsModule = module.add_class('Module')
-    clsDistType = module.add_class('DistributedType')
-    clsNumType = module.add_class('NumericType')
-    clsArrType = module.add_class('ArrayType')
-    clsClass = module.add_class('Class')
-    clsStruct = module.add_class('Struct')
-    clsMethod = module.add_class('Method')
-    clsMethod = module.add_class('Field')
-    clsMethod = module.add_class('Parameter')
-    structImport = module.add_class('Import')
+    enumNumtype = structNumber.add_enum('Type', ['kNan', 'kInt', 'kUint', 'kFloat'])
 
     # Wrap STL containers
     module.add_container('std::vector<uint8_t>', 'uint8_t', 'vector', custom_name = 'buffer')
@@ -57,6 +60,13 @@ def generate(file_):
     structImport.add_constructor([param('const std::string &', 'moduleName')])
     structImport.add_instance_attribute('module', 'std::string')
     structImport.add_instance_attribute('symbols', 'std::vector<std::string>')
+    structNumber.add_instance_attribute('type', 'Type')
+    structNumber.add_instance_attribute('integer', 'int64_t')
+    structNumber.add_instance_attribute('uinteger', 'uint64_t')
+    structNumber.add_instance_attribute('floating', 'double')
+    structNumericRange.add_instance_attribute('type', 'Type')
+    structNumericRange.add_instance_attribute('min', 'Number')
+    structNumericRange.add_instance_attribute('max', 'Number')
 
     # Declare functions/methods
     clsModule.add_constructor([])
@@ -123,6 +133,14 @@ def generate(file_):
                retval('const std::string'),
                [], is_const = True)
     add_method(clsDistType, 'set_alias', None, [param('const std::string&', 'alias')])
+    add_method(clsNumType, 'get_divisor', retval('unsigned int'), [], is_const = True)
+    add_method(clsNumType, 'has_modulus', retval('bool'), [], is_const = True)
+    add_method(clsNumType, 'get_modulus', retval('double'), [], is_const = True)
+    add_method(clsNumType, 'has_range', retval('bool'), [], is_const = True)
+    add_method(clsNumType, 'get_range', retval('bamboo::NumericRange'), [], is_const = True)
+    add_method(clsNumType, 'set_divisor', retval('bool'), [param('unsigned int', 'divisor')])
+    add_method(clsNumType, 'set_modulus', retval('bool'), [param('double', 'modulus')])
+    add_method(clsNumType, 'set_range', retval('bool'), [param('const NumericRange&', 'range')])
     add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = False),
                  [param('const std::string&', 'filename')])
     add_function(dcfile, 'parse_dcfile', retval('bool'),

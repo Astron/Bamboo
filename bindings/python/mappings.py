@@ -33,6 +33,16 @@ altnames = {
     'get_alias':      ['get_alias',      'getAlias'],
     'set_alias':      ['set_alias',      'setAlias'],
 
+    # NumericType
+    'get_divisor': ['get_divisor', 'getDivisor'],
+    'has_modulus': ['has_modulus', 'hasModulus'],
+    'get_modulus': ['get_modulus', 'getModulus'],
+    'has_range':   ['has_range',   'hasRange'],
+    'get_range':   ['get_range',   'getRange'],
+    'set_divisor': ['set_divisor', 'setDivisor'],
+    'set_modulus': ['set_modulus', 'setModulus'],
+    'set_range':   ['set_range',   'setRange'],
+
     # dcfile/parse.h
     # The sluggified versions of these names are temporarily disabled because of a pybindgen bug
     # We could probably circumvent the bug with some kind of patching system for 'pythonBindings.cpp'
@@ -82,6 +92,25 @@ docstrings = {
 'Creates a new alias in the module for a given type.',
     'add_keyword':
 'Adds the keyword to the list of keywords accepted by the module.',
+    'get_divisor':
+'Retuns the divisior of the numeric, with a default value of one.',
+    'has_modulus':
+'Returns true if the numeric is constrained by a modulus.',
+    'get_modulus':
+'Returns a double precision floating-point representation of the modulus value.',
+    'has_range':
+'Returns true if the numeric is constrained by a range.',
+    'get_range':
+'Returns the NumericRange that constrains this type\'s values.',
+    'set_divisor':
+'Sets a divisor for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the divisor is not valid for this type.',
+    'set_modulus':
+'Sets a modulus for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the modulus is not valid for this type.',
+    'set_range':
+'Sets a range for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the range is not valid for this type.',
 
     # DistributedType
     'get_subtype':
