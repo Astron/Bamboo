@@ -1,5 +1,6 @@
 // Filename: default.h
-#include "traits/buffers.h"
+#include <stdint.h>
+#include <vector>
 namespace bamboo { // open namespace bamboo
 
 
