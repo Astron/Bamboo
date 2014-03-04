@@ -1,6 +1,7 @@
 // Filename: Buffer.h
 #pragma once
 #include "buffers.h"
+#include <stdexcept>
 namespace bamboo {
 
 
@@ -11,6 +12,7 @@ struct Buffer {
     std::vector<uint8_t> data;
     sizetag_t offset;
 
+    Buffer() : data(), offset(0) {}
     Buffer(std::vector<uint8_t> buf) : data(buf), offset(0) {}
     Buffer(const Buffer& buf) : data(buf.data), offset(buf.offset) {}
     Buffer& operator=(std::vector<uint8_t> rhs) {
@@ -22,8 +24,19 @@ struct Buffer {
 
     Buffer copy() { return Buffer(*this); }
 
-    uint8_t& operator[](size_t index) { return data[index]; }
-    const uint8_t& operator[](size_t index) const { return data[index]; }
+    uint8_t& operator[](sizetag_t index) { return data[index]; }
+    const uint8_t& operator[](sizetag_t index) const { return data[index]; }
+
+    // These functions are primarily for use with bindings.
+    // In C++ code, use array subscription instead.
+    uint8_t get_byte(sizetag_t index) const {
+        if(index >= data.size()) { throw std::range_error("Buffer index out of range."); }
+        return data[index];
+    }
+    void set_byte(sizetag_t index, uint8_t byte){
+        if(index >= data.size()) { throw std::range_error("Buffer index out of range."); }
+        data[index] = byte;
+    }
 
     inline bool read_bool() { return bamboo::read_bool(data, offset); }
     inline char read_char() { return bamboo::read_char(data, offset); }

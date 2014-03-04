@@ -43,8 +43,13 @@ altnames = {
     'set_modulus': ['set_modulus', 'setModulus'],
     'set_range':   ['set_range',   'setRange'],
 
+    # Buffer
+    # These methods are for python array subscription
+    'get_byte': ['__getitem__'],
+    'set_byte': ['__setitem__'],
+
     # dcfile/parse.h
-    # The sluggified versions of these names are temporarily disabled because of a pybindgen bug
+    # The camel versions of these names are temporarily disabled because of a pybindgen bug
     # We could probably circumvent the bug with some kind of patching system for 'pythonBindings.cpp'
     'read_dcfile':   ['read_dcfile'],   #readDCFile
     'parse_dcfile':  ['parse_dcfile'],  #parseDCFile
@@ -133,6 +138,8 @@ docstrings = {
 'Returns the name used to define the type, or the empty string.',
     'set_alias':
 'Gives this type an alternate name <alias>.',
+
+    # Buffer
 
     # dcfile/parse
     'read_dcfile':
