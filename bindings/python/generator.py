@@ -10,6 +10,7 @@ def generate(file_):
     traits = SubModule('traits', bamboo)
     module = SubModule('module', bamboo)
     dcfile = SubModule('dcfile', bamboo)
+    wire = SubModule('wire', bamboo)
 
     # Declare includes
     traits.add_include('"traits/byteorder.h"')
@@ -31,6 +32,8 @@ def generate(file_):
     dcfile.add_include('"dcfile/format.h"')
     dcfile.add_include('"dcfile/parse.h"')
     dcfile.add_include('"dcfile/write.h"')
+    wire.add_include('"wire/Datagram.h"')
+    wire.add_include('"wire/DatagramIterator.h"')
 
     # Declare classes
     structBuffer = traits.add_struct('Buffer')
@@ -48,6 +51,8 @@ def generate(file_):
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
+    clsDatagram = wire.add_class('Datagram')
+    clsDgIter = wire.add_class('DatagramIterator')
 
     # Declare enums
     enumSubtype = module.add_enum('Subtype', [
@@ -146,6 +151,62 @@ def generate(file_):
     add_method(clsNumType, 'set_range', retval('bool'), [param('const NumericRange&', 'range')])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
+    add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])
+    add_method(structBuffer, 'seek', None, [param('unsigned int')])
+    add_method(structBuffer, 'tell', retval('unsigned int'), [])
+    add_method(structBuffer, 'size', retval('unsigned int'), [])
+    add_method(structBuffer, 'read_bool', retval('bool'), [])
+    add_method(structBuffer, 'read_char', retval('char'), [])
+    add_method(structBuffer, 'read_int8', retval('int8_t'), [])
+    add_method(structBuffer, 'read_int16', retval('int16_t'), [])
+    add_method(structBuffer, 'read_int32', retval('int32_t'), [])
+    add_method(structBuffer, 'read_int64', retval('int64_t'), [])
+    add_method(structBuffer, 'read_uint8', retval('uint8_t'), [])
+    add_method(structBuffer, 'read_uint16', retval('uint16_t'), [])
+    add_method(structBuffer, 'read_uint32', retval('uint32_t'), [])
+    add_method(structBuffer, 'read_uint64', retval('uint64_t'), [])
+    add_method(structBuffer, 'read_float32', retval('float'), [])
+    add_method(structBuffer, 'read_float64', retval('double'), [])
+    add_method(structBuffer, 'pack_bool', None, [param('bool', 'val')])
+    add_method(structBuffer, 'pack_char', None, [param('char', 'val')])
+    add_method(structBuffer, 'pack_int8', None, [param('int8_t', 'val')])
+    add_method(structBuffer, 'pack_int16', None, [param('int16_t', 'val')])
+    add_method(structBuffer, 'pack_int32', None, [param('int32_t', 'val')])
+    add_method(structBuffer, 'pack_int64', None, [param('int64_t', 'val')])
+    add_method(structBuffer, 'pack_uint8', None, [param('uint8_t', 'val')])
+    add_method(structBuffer, 'pack_uint16', None, [param('uint16_t', 'val')])
+    add_method(structBuffer, 'pack_uint32', None, [param('uint32_t', 'val')])
+    add_method(structBuffer, 'pack_uint64', None, [param('uint64_t', 'val')])
+    add_method(structBuffer, 'pack_float32', None, [param('float', 'val')])
+    add_method(structBuffer, 'pack_float64', None, [param('double', 'val')])
+    add_method(structBuffer, 'pack_string', None, [param('const std::string&', 'val')])
+    add_method(structBuffer, 'pack_buffer', None, [param('const bamboo::Buffer&', 'val')])
+    add_method(structBuffer, 'from_bool', retval('bamboo::Buffer'),
+               [param('bool', 'val')], is_static = True)
+    add_method(structBuffer, 'from_char', retval('bamboo::Buffer'),
+               [param('char', 'val')], is_static = True)
+    add_method(structBuffer, 'from_int8', retval('bamboo::Buffer'),
+               [param('int8_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_int16', retval('bamboo::Buffer'),
+               [param('int16_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_int32', retval('bamboo::Buffer'),
+               [param('int32_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_int64', retval('bamboo::Buffer'),
+               [param('int64_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_uint8', retval('bamboo::Buffer'),
+               [param('uint8_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_uint16', retval('bamboo::Buffer'),
+               [param('uint16_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_uint32', retval('bamboo::Buffer'),
+               [param('uint32_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_uint64', retval('bamboo::Buffer'),
+               [param('uint64_t', 'val')], is_static = True)
+    add_method(structBuffer, 'from_float32', retval('bamboo::Buffer'),
+               [param('float', 'val')], is_static = True)
+    add_method(structBuffer, 'from_float64', retval('bamboo::Buffer'),
+               [param('double', 'val')], is_static = True)
+    add_method(structBuffer, 'from_string', retval('bamboo::Buffer'),
+               [param('const std::string&', 'val')], is_static = True)
     add_method(structBuffer, 'get_byte', retval('uint8_t'),
                [param('unsigned int', 'index')], throw = [indexError])
     add_method(structBuffer, 'set_byte', None,

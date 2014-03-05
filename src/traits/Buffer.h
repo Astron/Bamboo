@@ -21,8 +21,12 @@ struct Buffer {
         return *this;
     }
     operator std::vector<uint8_t>&() { return data; }
+    operator const std::vector<uint8_t>&() const { return data; }
 
-    Buffer copy() { return Buffer(*this); }
+    Buffer copy() const { return Buffer(*this); }
+    void seek(sizetag_t index) { offset = index; }
+    sizetag_t tell() const { return offset; }
+    sizetag_t size() const { return data.size(); }
 
     uint8_t& operator[](sizetag_t index) { return data[index]; }
     const uint8_t& operator[](sizetag_t index) const { return data[index]; }
