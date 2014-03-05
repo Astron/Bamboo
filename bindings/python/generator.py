@@ -152,7 +152,7 @@ def generate(file_):
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])
-    add_method(structBuffer, 'seek', None, [param('unsigned int')])
+    add_method(structBuffer, 'seek', None, [param('unsigned int', 'index')])
     add_method(structBuffer, 'tell', retval('unsigned int'), [])
     add_method(structBuffer, 'size', retval('unsigned int'), [])
     add_method(structBuffer, 'read_bool', retval('bool'), [])
