@@ -78,6 +78,9 @@ class DistributedType {
     virtual Method *as_method();
     virtual const Method *as_method() const;
 
+    // to_string returns a short string representation suitable for debug/development output.
+    virtual std::string to_string();
+
   protected:
     Subtype m_subtype;
     sizetag_t m_size;

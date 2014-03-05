@@ -41,6 +41,8 @@ bool Method::add_parameter(Parameter *param) {
             // But the parameter had a name conflict
             return false;
         }
+        // The size of the list is the index of the next item in the list
+        m_indices_by_name[param->get_name()] = m_parameters.size();
     }
 
     // Add the parameter to the main list

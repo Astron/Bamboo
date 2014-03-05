@@ -42,6 +42,8 @@ class Struct : public DistributedType {
     // get_field returns the <n>th field of the struct.
     inline Field *get_field(unsigned int n);
     inline const Field *get_field(unsigned int n) const;
+    // get_field_names returns a mapping of field names to field number in the struct.
+    inline const std::unordered_map<std::string, unsigned int>& get_field_names() const;
 
     // get_field_by_id returns the field with the index <id>, or nullptr if no such field exists.
     inline Field *get_field_by_id(unsigned int id);
@@ -66,6 +68,7 @@ class Struct : public DistributedType {
     std::string m_name;
 
     std::vector<Field *> m_fields;
+    std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Field *> m_fields_by_name;
     std::unordered_map<unsigned int, Field *> m_fields_by_id;
 };

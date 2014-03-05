@@ -115,6 +115,7 @@ bool Class::add_field(Field *field) {
     m_module->add_field(field);
     m_fields_by_id[field->get_id()] = field;
     m_fields_by_name[field->get_name()] = field;
+    m_indices_by_name[field->get_name()] = m_fields.size() - 1;
 
     // Update our size
     if(field->as_molecular() == nullptr
@@ -163,13 +164,17 @@ void Class::add_inherited_field(Class *parent, Field *field) {
     // Add the field to the list of fields, sorted by id
     if(m_fields.size() == 0) {
         m_fields.push_back(field);
+        m_indices_by_name[field->get_name()] = 1;
     } else {
+        unsigned int index = m_fields.size() - 1;
         // Note: Iterate in reverse because fields added later are more likely to be at the end
         for(auto it = m_fields.rbegin(); it != m_fields.rend(); ++it) {
             if((*it)->get_id() < field->get_id()) {
                 m_fields.insert(it.base(), field);
+                m_indices_by_name[field->get_name()] = index;
                 break;
             }
+            index -= 1;
         }
     }
 
@@ -197,6 +202,7 @@ void Class::shadow_field(Field *field) {
 
     m_fields_by_id.erase(field->get_id());
     m_fields_by_name.erase(field->get_name());
+    m_indices_by_name.erase(field->get_name());
     for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
         if((*it) == field) {
             m_fields.erase(it);

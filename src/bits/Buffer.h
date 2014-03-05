@@ -34,11 +34,11 @@ struct Buffer {
     // These functions are primarily for use with bindings.
     // In C++ code, use array subscription instead.
     uint8_t get_byte(sizetag_t index) const {
-        if(index >= data.size()) { throw std::range_error("Buffer index out of range."); }
+        if(index >= data.size()) { throw std::out_of_range("Buffer index out of range."); }
         return data[index];
     }
     void set_byte(sizetag_t index, uint8_t byte){
-        if(index >= data.size()) { throw std::range_error("Buffer index out of range."); }
+        if(index >= data.size()) { throw std::out_of_range("Buffer index out of range."); }
         data[index] = byte;
     }
 

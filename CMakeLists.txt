@@ -78,17 +78,20 @@ set(MODULE_SOURCES
   src/module/MolecularField.cpp
   src/module/Parameter.cpp)
 
-set(DCFILE_SOURCES
-  src/dcfile/parser.cpp
-  src/dcfile/lexer.cpp
-  src/dcfile/write.cpp
-  src/dcfile/format.cpp)
-
 set(TRAITS_SOURCES
   src/traits/default.cpp
   src/traits/hashLegacy.cpp
   src/traits/HashGenerator.cpp
   src/traits/primes.cpp)
+
+set(OBJECTS_SOURCES
+  src/objects/ObjectData.cpp)
+
+set(DCFILE_SOURCES
+  src/dcfile/parser.cpp
+  src/dcfile/lexer.cpp
+  src/dcfile/write.cpp
+  src/dcfile/format.cpp)
 
 set(WIRE_SOURCES
   src/wire/Datagram.cpp

@@ -33,6 +33,11 @@ inline Field *Struct::get_field(unsigned int n) {
 inline const Field *Struct::get_field(unsigned int n) const {
     return m_fields.at(n);
 }
+// get_field_names returns a mapping of field names to field number in the struct.
+inline const std::unordered_map<std::string, unsigned int>& Struct::get_field_names() const {
+    return m_indices_by_name;
+}
+
 
 // get_field_by_id returns the field with the index <id>, or nullptr if no such field exists.
 inline Field *Struct::get_field_by_id(unsigned int id) {

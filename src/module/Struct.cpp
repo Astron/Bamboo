@@ -69,11 +69,12 @@ bool Struct::add_field(Field *field) {
         // Try to add the field
         bool inserted = m_fields_by_name.insert(
                             unordered_map<string, Field *>::value_type(field->get_name(), field)).second;
-
         if(!inserted) {
             // But the field had a name conflict
             return false;
         }
+        // The index of this named field is the next available index
+        m_indices_by_name[field->get_name()] = m_fields.size();
     }
 
     // Struct fields are accessible by id.

@@ -38,7 +38,7 @@ def generate(file_):
 
     # Declare classes
     structBuffer = bits.add_struct('Buffer')
-    indexError = bits.add_exception('range_error', custom_name = 'IndexError',
+    indexError = bits.add_exception('out_of_range', custom_name = 'IndexError',
         foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
     clsModule = module.add_class('Module')
     clsDistType = module.add_class('DistributedType')

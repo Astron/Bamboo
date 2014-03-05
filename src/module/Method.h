@@ -1,6 +1,5 @@
 // Filename: Method.h
 #pragma once
-#include <stddef.h>      // size_t
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
 #include "DistributedType.h"
@@ -21,9 +20,11 @@ class Method : public DistributedType {
 
     // get_num_parameters returns the number of parameters/arguments of the method.
     inline size_t get_num_parameters() const;
-    // get_par returns the <n>th parameter of the method.
+    // get_parameter returns the <n>th parameter of the method.
     inline Parameter *get_parameter(unsigned int n);
     inline const Parameter *get_parameter(unsigned int n) const;
+    // get_parameter_names returns a mapping of param names to param number in the method.
+    inline const std::unordered_map<std::string, unsigned int>& get_parameter_names() const;
     // get_parameter_by_name returns the requested parameter or nullptr if there is no such param.
     inline Parameter *get_parameter_by_name(const std::string& name);
     inline const Parameter *get_parameter_by_name(const std::string& name) const;
@@ -34,6 +35,7 @@ class Method : public DistributedType {
 
   private:
     std::vector<Parameter *> m_parameters; // the "arguments" or parameters of the method
+    std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Parameter *> m_parameters_by_name;
 };
 
