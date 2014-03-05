@@ -7,16 +7,16 @@ from mappings import docstrings
 def generate(file_):
     # Declare modules
     bamboo = Module('bamboo', cpp_namespace="::bamboo")
-    traits = SubModule('traits', bamboo)
+    bits = SubModule('bits', bamboo)
     module = SubModule('module', bamboo)
+    traits = SubModule('traits', bamboo)
     dcfile = SubModule('dcfile', bamboo)
     wire = SubModule('wire', bamboo)
 
     # Declare includes
-    traits.add_include('"traits/byteorder.h"')
-    traits.add_include('"traits/hashes.h"')
-    traits.add_include('"traits/sizetag.h"')
-    traits.add_include('"traits/Buffer.h"')
+    traits.add_include('"bits/byteorder.h"')
+    traits.add_include('"bits/sizetag.h"')
+    traits.add_include('"bits/Buffer.h"')
     module.add_include('"module/ArrayType.h"')
     module.add_include('"module/Class.h"')
     module.add_include('"module/DistributedType.h"')
@@ -29,6 +29,7 @@ def generate(file_):
     module.add_include('"module/NumericType.h"')
     module.add_include('"module/Parameter.h"')
     module.add_include('"module/Struct.h"')
+    traits.add_include('"traits/hashes.h"')
     dcfile.add_include('"dcfile/format.h"')
     dcfile.add_include('"dcfile/parse.h"')
     dcfile.add_include('"dcfile/write.h"')
@@ -36,8 +37,8 @@ def generate(file_):
     wire.add_include('"wire/DatagramIterator.h"')
 
     # Declare classes
-    structBuffer = traits.add_struct('Buffer')
-    indexError = traits.add_exception('range_error', custom_name = 'IndexError',
+    structBuffer = bits.add_struct('Buffer')
+    indexError = bits.add_exception('range_error', custom_name = 'IndexError',
         foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
     clsModule = module.add_class('Module')
     clsDistType = module.add_class('DistributedType')

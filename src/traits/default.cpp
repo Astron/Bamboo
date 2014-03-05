@@ -1,6 +1,6 @@
 // Filename: default.cpp
 #include "default.h"
-#include "traits/buffers.h"
+#include "bits/buffers.h"
 #include "module/ArrayType.h"
 #include "module/Struct.h"
 #include "module/Field.h"

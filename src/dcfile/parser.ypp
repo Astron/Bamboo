@@ -26,7 +26,7 @@
 	#include "module/Method.h"
 	#include "module/Parameter.h"
 	#include "module/MolecularField.h"
-	#include "traits/buffers.h"
+	#include "bits/buffers.h"
 
 	//#define yylex dclex
 	//#define yyparse dcparse

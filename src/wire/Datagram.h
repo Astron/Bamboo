@@ -4,8 +4,8 @@
 #include <sstream>   // for std::sstream
 #include <stdexcept> // for std::runtime_error
 #include <string.h>  // for memcpy
-#include "traits/sizetag.h"
-#include "traits/byteorder.h"
+#include "bits/sizetag.h"
+#include "bits/byteorder.h"
 namespace bamboo {  // close namespace bamboo
 
 

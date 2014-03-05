@@ -1,6 +1,6 @@
 // Filename: MolecularField.cpp
 #include "MolecularField.h"
-#include "traits/buffers.h"
+#include "bits/buffers.h"
 #include "module/Class.h"
 namespace bamboo { // open namespace bamboo
 

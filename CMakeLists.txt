@@ -63,6 +63,8 @@ if(FLEX_FOUND)
     MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp)
 endif(FLEX_FOUND)
 
+set(BITS_SOURCES src/bits/bits.cpp)
+
 set(MODULE_SOURCES
   src/module/DistributedType.cpp
   src/module/NumericType.cpp
@@ -86,8 +88,7 @@ set(TRAITS_SOURCES
   src/traits/default.cpp
   src/traits/hashLegacy.cpp
   src/traits/HashGenerator.cpp
-  src/traits/primes.cpp
-  src/traits/traits.cpp)
+  src/traits/primes.cpp)
 
 set(WIRE_SOURCES
   src/wire/Datagram.cpp
