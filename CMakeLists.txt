@@ -144,6 +144,7 @@ endif()
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 if(BUILD_16BIT_SIZETAG)
   add_library(bamboo ${LIBRARY_TYPE}
+    ${BITS_SOURCES}
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
@@ -154,6 +155,7 @@ endif()
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 if(BUILD_32BIT_SIZETAG)
   add_library(bamboo32 ${LIBRARY_TYPE}
+    ${BITS_SOURCES}
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
@@ -165,6 +167,7 @@ endif()
 if(BUILD_SHARED_AND_STATIC)
   if(BUILD_16BIT_SIZETAG)
     add_library(bamboo-static STATIC
+      ${BITS_SOURCES}
       ${MODULE_SOURCES}
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
@@ -176,6 +179,7 @@ if(BUILD_SHARED_AND_STATIC)
   endif()
   if(BUILD_32BIT_SIZETAG)
     add_library(bamboo32-static STATIC
+      ${BITS_SOURCES}
       ${MODULE_SOURCES}
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
