@@ -39,29 +39,56 @@ endif()
 
 ## Handle Bison and Flex components
 find_package(BISON)
-if(BISON_FOUND)
-  add_custom_command(
-    SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
-    COMMAND ${BISON_EXECUTABLE}
-    ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser-defs.h
-         -o ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
-         ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
-    COMMENT "Generating dcfile/parser.cpp"
-    OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
-    MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp)
-endif(BISON_FOUND)
-
 find_package(FLEX)
-if(FLEX_FOUND)
-  add_custom_command(
-    SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
-    COMMAND ${FLEX_EXECUTABLE}
-    ARGS -o${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
-         ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
-    COMMENT "Generating dcfile/lexer.cpp"
-    OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
-    MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp)
-endif(FLEX_FOUND)
+
+if(FLEX_FOUND AND BISON_FOUND AND
+   ${BISON_VERSION} VERSION_GREATER "3.0.0")
+  set(GENERATE_PARSER_DEFAULT On)
+else()
+  set(GENERATE_PARSER_DEFAULT Off)
+endif()
+
+option(GENERATE_PARSER
+  "Uses bison and flex to generate parser files automatically.
+  Uses prebuilt files when disabled."
+  ${GENRATE_PARSER_DEFAULT})
+if(GENERATE_PARSER)
+  if(NOT FLEX_FOUND)
+    message(FATAL_ERROR
+      "Generating parser files is enabled, but flex not found.")
+  endif()
+  if(NOT BISON_FOUND)
+    message(FATAL_ERROR
+      "Generating parser files is enabled, but bison not found.")
+  endif()
+  if(${BISON_VERSION} VERSION_LESS "3.0.0")
+    message(FATAL_ERROR
+      "Generating parser files is enabled, but bison-version < 3")
+  endif()
+
+  if(BISON_FOUND)
+    add_custom_command(
+      SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
+      COMMAND ${BISON_EXECUTABLE}
+      ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser-defs.h
+           -o ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
+           ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
+      COMMENT "Generating dcfile/parser.cpp"
+      OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
+      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp)
+  endif(BISON_FOUND)
+
+  if(FLEX_FOUND)
+    add_custom_command(
+      SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
+      COMMAND ${FLEX_EXECUTABLE}
+      ARGS -o${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
+           ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
+      COMMENT "Generating dcfile/lexer.cpp"
+      OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
+      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp)
+  endif(FLEX_FOUND)
+endif()
 
 set(BITS_SOURCES src/bits/bits.cpp)
 
