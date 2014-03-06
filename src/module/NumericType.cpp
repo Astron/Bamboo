@@ -1,11 +1,6 @@
 // Filename: NumericType.cpp
 #include "NumericType.h"
-
-// This must be defined for inttypes.h to define the fixed with integer macros
-#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
-#define __STDC_LIMIT_MACROS
-#endif
-#include <inttypes.h> // fixed-width integer limits
+#include <limits> // for fixed-width integer limits
 namespace bamboo { // open namespace bamboo
 
 
@@ -83,19 +78,19 @@ bool NumericType::set_modulus(double modulus) {
     switch(m_subtype) {
         case kTypeChar:
         case kTypeUint8:
-            if(uint_modulus < 1 || UINT8_MAX + 1 < uint_modulus) {
+            if(uint_modulus < 1 || uint16_t(std::numeric_limits<uint8_t>::max()) + 1u < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
         case kTypeUint16:
-            if(uint_modulus < 1 || UINT16_MAX + 1 < uint_modulus) {
+            if(uint_modulus < 1 || uint32_t(std::numeric_limits<uint16_t>::max()) + 1u < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
         case kTypeUint32:
-            if(uint_modulus < 1 || UINT32_MAX + 1 < uint_modulus) {
+            if(uint_modulus < 1 || uint64_t(std::numeric_limits<uint32_t>::max()) + 1ull < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
@@ -107,19 +102,19 @@ bool NumericType::set_modulus(double modulus) {
             m_modulus = uint_modulus;
             break;
         case kTypeInt8:
-            if(uint_modulus < 1 || INT8_MAX + 1 < uint_modulus) {
+            if(uint_modulus < 1 || uint16_t(std::numeric_limits<int8_t>::max()) + 1u < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
         case kTypeInt16:
-            if(uint_modulus < 1 || INT16_MAX + 1 < uint_modulus) {
+            if(uint_modulus < 1 || uint32_t(std::numeric_limits<int16_t>::max()) + 1u < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;
             break;
         case kTypeInt32:
-            if(uint_modulus < 1 || INT32_MAX + 1l < uint_modulus) {
+            if(uint_modulus < 1 || uint64_t(std::numeric_limits<int32_t>::max()) + 1ull < uint_modulus) {
                 return false;
             }
             m_modulus = uint_modulus;

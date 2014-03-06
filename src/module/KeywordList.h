@@ -1,5 +1,6 @@
 // Filename: KeywordList.h
 #pragma once
+#include <string>        // std::string
 #include <vector>        // std::vector
 #include <unordered_set> // std::unordered_set
 namespace bamboo { // open namespace bamboo
