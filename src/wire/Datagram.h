@@ -11,7 +11,8 @@ namespace bamboo {  // close namespace bamboo
 
 // Foward Declarations
 class DistributedType;
-class Field;
+class TypeData;
+class TypeDataHandle;
 
 // A DatagramOverflow is an exception which occurs when an add_<value> method is called which would
 // increase the size of the datagram past DGSIZE_MAX (preventing integer and buffer overflow).
@@ -283,14 +284,10 @@ class Datagram {
         return buf_start;
     }
 
-    // add_field adds a packed field value to the datagram, converting byte-order
-    // from native-endianess to wire-endianess (if necessary).
-    // Returns the number of bytes read from the buffer.
-    sizetag_t add_field(const Field* field, const std::vector<uint8_t>& packed);
-
     // add_dtype adds a packed value with the given type to the datagram, converting
     // byte-order from native-endianess to wire-endianess (if necessary).
-    // Returns the number of bytes read from the buffer.
+    void add_dtype(const TypeData& packed);
+    // Can also be called with a raw buffer, returning the number of bytes read from the packed.
     sizetag_t add_dtype(const DistributedType *dtype,
                         const std::vector<uint8_t>& packed,
                         sizetag_t offset = 0);

@@ -4,20 +4,18 @@
 #include "module/Method.h"
 #include "module/Field.h"
 #include "module/Parameter.h"
+#include "module/TypeData.h"
 using namespace std;
 namespace bamboo {  // close namespace bamboo
 
 
-// add_field adds a packed field value to the datagram, converting byte-order
-// from native-endianess to wire-endianess (if necessary).
-// Returns the number of bytes read from the packed.
-sizetag_t Datagram::add_field(const Field* field, const vector<uint8_t>& packed) {
-    return add_dtype(field->get_type(), packed);
-}
-
 // add_dtype adds a packed value with the given type to the datagram, converting
 // byte-order from native-endianess to wire-endianess (if necessary).
-// Returns the number of bytes read from the packed.
+void Datagram::add_dtype(const TypeData& packed) {
+    add_dtype(packed.type(), packed.data());
+};
+
+// Can also be called with a raw buffer, returning the number of bytes read from the packed.
 sizetag_t Datagram::add_dtype(const DistributedType *dtype,
                               const vector<uint8_t>& packed,
                               sizetag_t offset) {

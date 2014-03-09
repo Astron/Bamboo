@@ -5,41 +5,39 @@
 #include "module/Method.h"
 #include "module/Field.h"
 #include "module/Parameter.h"
+#include "module/TypeData.h"
 using namespace std;
 namespace bamboo {  // close namespace bamboo
 
 
-// read_field interprets the following data as a
-// value for the Field in native endianness.
-vector<uint8_t> DatagramIterator::read_field(const Field *field) {
-    vector<uint8_t> buffer;
-    read_field(field, buffer);
-    return buffer;
-}
-
-// read_field can also be called to read into an existing buffer.
-void DatagramIterator::read_field(const Field *field, vector<uint8_t>& buffer) {
-    read_dtype(field->get_type(), buffer);
-}
-
 // read_dtype interprets the following data as a
 // value for the DistributedType in native endianness.
-vector<uint8_t> DatagramIterator::read_dtype(const DistributedType *dtype) {
+TypeData DatagramIterator::read_dtype(const DistributedType *dtype) {
+#ifndef PLATFORM_BIG_ENDIAN
+    // We're little endian so we don't have to worry about byte-swapping the data
+    const uint8_t *start = m_dg->get_data() + m_offset;
+    skip_dtype(dtype);
+    return TypeData(dtype, start, m_dg->get_data() + m_offset);
+#else
+    // Lets go ahead and unpack that manually
     vector<uint8_t> buffer;
     read_dtype(dtype, buffer);
-    return buffer;
+    return TypeData(dtype, buffer);
+#endif
 }
 
-// read_dtype can also be called to read into an existing buffer.
-void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>& buffer) {
+// Can also provide an external buffer, and get a handle back instead.
+TypeDataHandle DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>& buffer) {
+    sizetag_t m_start = buffer.size();
 
 #ifndef PLATFORM_BIG_ENDIAN
-    // If object has fixed size, and we're little endian, we don't have to interpret it
-    if(dtype->has_fixed_size()) {
-        // If field is a fixed-sized type like uint, int, float, etc
-        // Also any other type lucky enough to be fixed size will be computed faster
-        pack_value(read_data(dtype->get_size()), buffer);
-        return;
+    if(dtype->has_fixed_size())
+    {
+        // If we're a fixed-sized type like uint, int, float, etc
+        // Also any other type lucky enough to be fixed size will be faster.
+        vector<uint8_t> data = read_data(dtype->get_size());
+        pack_value(data, buffer);
+        return TypeDataHandle(dtype, buffer, m_start, dtype->get_size());
     }
 #endif
 
@@ -161,12 +159,8 @@ void DatagramIterator::read_dtype(const DistributedType *dtype, vector<uint8_t>&
             break;
         }
     }
-}
 
-// skip_field can be used to seek past the packed field data for a Field.
-//     Throws DatagramIteratorEOF if it skips past the end of the datagram.
-void DatagramIterator::skip_field(const Field *field) {
-    skip_dtype(field->get_type());
+    return TypeDataHandle(dtype, buffer, m_start, buffer.size());
 }
 
 // skip_dtype can be used to seek past the packed data for a DistributedType.

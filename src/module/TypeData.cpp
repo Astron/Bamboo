@@ -14,9 +14,15 @@ using namespace std;
 namespace bamboo {
 
 
-TypeData::TypeData(const DistributedType *type, const std::vector<uint8_t>& data) :
-    m_type(type), m_data(data), m_start(0), m_end(0), m_elements_by_name(),
-    m_element_offsets(), m_furthest_index(0) {
+TypeData::TypeData(const DistributedType *type, const vector<uint8_t>& data) :
+    TypeData(type, data, 0, 0) {}
+
+TypeData::TypeData(const DistributedType *type, const vector<uint8_t>& data,
+         sizetag_t start, sizetag_t end) : TypeData(type, &data[start], &data[end]) {}
+
+TypeData::TypeData(const DistributedType *type, const uint8_t *start, const uint8_t *end)  :
+    m_type(type), m_data(start, end), m_elements_by_name(), m_element_offsets(), m_furthest_index(0)
+{
     // Lets catch this case early on so it doesn't cause weird crashes later.
     if(type == nullptr) {
         throw invalid_argument("Tried to construct TypeData with no type.");
@@ -31,7 +37,7 @@ TypeData::TypeData(const DistributedType *type, const std::vector<uint8_t>& data
         }
         case kTypeVararray: {
             sizetag_t offset = 0;
-            m_num_elements = read_size(data, offset);
+            m_num_elements = read_size(m_data, offset);
             m_element_offsets[0] = sizeof(sizetag_t);
             break;
         }
@@ -55,20 +61,20 @@ TypeData::TypeData(const DistributedType *type, const std::vector<uint8_t>& data
     }
 }
 
-TypeData TypeData::get_item(sizetag_t index) {
+TypeDataHandle TypeData::get_item(sizetag_t index) {
     return this->operator[](index);
 }
-TypeData TypeData::get_item(const string& element_name) {
+TypeDataHandle TypeData::get_item(const string& element_name) {
     return this->operator[](element_name);
 }
 
 
-TypeData TypeData::operator[](sizetag_t index) {
+TypeDataHandle TypeData::operator[](sizetag_t index) {
     if(index >= m_num_elements) {
         stringstream ss;
         ss << "Tried to reference TypeData[" << index << "] out of " << m_num_elements
            << " for value with type \"" << m_type->to_string() << "\".";
-        throw std::out_of_range(ss.str());
+        throw out_of_range(ss.str());
     }
 
     auto found_offset = m_element_offsets.find(index);
@@ -92,7 +98,7 @@ TypeData TypeData::operator[](sizetag_t index) {
             sizetag_t curr_index = m_furthest_index;
             sizetag_t curr_offset = m_element_offsets[curr_index];
             while(curr_index != index) {
-                TypeData& handle = read_type(etype, curr_offset);
+                TypeDataHandle handle = read_type(etype, curr_offset);
                 // Increment our loop variables
                 curr_offset = handle.m_end;
                 curr_index += 1;
@@ -123,7 +129,7 @@ TypeData TypeData::operator[](sizetag_t index) {
             sizetag_t curr_index = m_furthest_index;
             sizetag_t curr_offset = m_element_offsets[curr_index];
             while(curr_index != index) {
-                TypeData& handle = read_type(etype, curr_offset);
+                TypeDataHandle handle = read_type(etype, curr_offset);
                 // Increment our loop variables
                 curr_offset = handle.m_end;
                 curr_index += 1;
@@ -145,7 +151,7 @@ TypeData TypeData::operator[](sizetag_t index) {
             sizetag_t curr_index = m_furthest_index;
             sizetag_t curr_offset = m_element_offsets[curr_index];
             while(curr_index != index) {
-                TypeData& handle = read_type(strct->get_field(curr_index)->get_type(), curr_offset);
+                TypeDataHandle handle = read_type(strct->get_field(curr_index)->get_type(), curr_offset);
                 // Increment our loop variables
                 curr_offset = handle.m_end;
                 curr_index += 1;
@@ -170,7 +176,7 @@ TypeData TypeData::operator[](sizetag_t index) {
             sizetag_t curr_offset = m_element_offsets[curr_index];
             while(curr_index != index) {
                 param = method->get_parameter(curr_index);
-                TypeData& handle = read_type(param->get_type(), curr_offset);
+                TypeDataHandle handle = read_type(param->get_type(), curr_offset);
                 // Increment our loop variables
                 curr_offset = handle.m_end;
                 curr_index += 1;
@@ -187,13 +193,13 @@ TypeData TypeData::operator[](sizetag_t index) {
         }
     }
 }
-TypeData TypeData::operator[](const std::string& element_name) {
+TypeDataHandle TypeData::operator[](const string& element_name) {
     auto found_index = m_elements_by_name.find(element_name);
     if(found_index == m_elements_by_name.end()) {
         stringstream ss;
         ss << "TypeData[" << element_name << "] is not a valid subvalue"
            " for value with type \"" << m_type->to_string() << "\".";
-        throw std::out_of_range(ss.str());
+        throw out_of_range(ss.str());
     }
 
     sizetag_t index = found_index->second;
