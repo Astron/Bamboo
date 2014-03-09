@@ -36,8 +36,19 @@ TypeData::TypeData(const DistributedType *type, const uint8_t *start, const uint
             break;
         }
         case kTypeVararray: {
-            sizetag_t offset = 0;
-            m_num_elements = read_size(m_data, offset);
+            const ArrayType* arr = type->as_array();
+            const DistributedType* etype = arr->get_element_type();
+            if(etype->has_fixed_size()) {
+                sizetag_t offset = 0;
+                m_num_elements = read_size(m_data, offset) / etype->get_size();
+            } else {
+                sizetag_t offset = 0;
+                sizetag_t end = read_size(m_data, offset);
+                while(offset < end) {
+                    offset = read_type(etype, offset).m_end;
+                    m_num_elements += 1;
+                }
+            }
             m_element_offsets[0] = sizeof(sizetag_t);
             break;
         }
@@ -205,6 +216,128 @@ TypeDataHandle TypeData::operator[](const string& element_name) {
     sizetag_t index = found_index->second;
     return this->operator[](index);
 }
+
+TypeDataHandle TypeData::read_type(const DistributedType* type, sizetag_t offset) {
+    switch(m_type->get_subtype()) {
+        case kTypeChar: {
+            sizetag_t start = offset;
+            read_char(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeInt8: {
+            sizetag_t start = offset;
+            read_int8(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeInt16: {
+            sizetag_t start = offset;
+            read_int16(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeInt32: {
+            sizetag_t start = offset;
+            read_int32(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeInt64: {
+            sizetag_t start = offset;
+            read_int64(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeUint8: {
+            sizetag_t start = offset;
+            read_uint8(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeUint16: {
+            sizetag_t start = offset;
+            read_uint16(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeUint32: {
+            sizetag_t start = offset;
+            read_uint32(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeUint64: {
+            sizetag_t start = offset;
+            read_uint64(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeFloat32: {
+            sizetag_t start = offset;
+            read_float32(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeFloat64: {
+            sizetag_t start = offset;
+            read_float64(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset);
+        }
+        case kTypeString:
+        case kTypeBlob: {
+            return TypeDataHandle(type, m_data, offset, offset + type->get_size());
+        }
+        case kTypeArray: {
+            if(type->has_fixed_size()) {
+                return TypeDataHandle(type, m_data, offset, offset + type->get_size());
+            }
+
+            sizetag_t start = offset;
+            sizetag_t next = offset;
+            const ArrayType* arr = m_type->as_array();
+            for(unsigned int i = 0; i < arr->get_array_size(); ++i) {
+                // We're not going to validate the data-length here, any TypeData must be valid.
+                next = read_type(arr->get_element_type(), next).m_end;
+            }
+            return TypeDataHandle(type, m_data, start, next);
+        }
+        case kTypeVarstring:
+        case kTypeVararray:
+        case kTypeVarblob: {
+            sizetag_t start = offset;
+            sizetag_t size = read_size(m_data, offset);
+            return TypeDataHandle(type, m_data, start, offset + size);
+        }
+        case kTypeStruct: {
+            if(type->has_fixed_size()) {
+                return TypeDataHandle(type, m_data, offset, offset + type->get_size());
+            }
+
+            sizetag_t start = offset;
+            sizetag_t next = offset;
+            const Struct* strct = m_type->as_struct();
+            for(unsigned int i = 0; i < strct->get_num_fields(); ++i) {
+                // We're not going to validate the data-length here, any TypeData must be valid.
+                next = read_type(strct->get_field(i)->get_type(), next).m_end;
+            }
+            return TypeDataHandle(type, m_data, start, next);
+        }
+        case kTypeMethod: {
+            if(type->has_fixed_size()) {
+                return TypeDataHandle(type, m_data, offset, offset + type->get_size());
+            }
+
+            sizetag_t start = offset;
+            sizetag_t next = offset;
+            const Method* method = m_type->as_method();
+            for(unsigned int i = 0; i < method->get_num_parameters(); ++i) {
+                // We're not going to validate the data-length here, any TypeData must be valid.
+                next = read_type(method->get_parameter(i)->get_type(), next).m_end;
+            }
+            return TypeDataHandle(type, m_data, start, next);
+        }
+        case kTypeInvalid:
+        default: {
+            return TypeDataHandle(type, m_data, offset, offset);
+        }
+    }
+}
+
+
+TypeDataHandle::TypeDataHandle(const DistributedType *type, vector<uint8_t>& data,
+                               sizetag_t start, sizetag_t end) :
+    m_type(type), m_data(data), m_start(start), m_end(end) {}
 
 
 } // close namespace bamboo

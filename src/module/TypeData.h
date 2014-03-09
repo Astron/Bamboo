@@ -17,6 +17,8 @@ class TypeData {
     TypeData(const DistributedType *, const std::vector<uint8_t>&, sizetag_t start, sizetag_t end);
     TypeData(const DistributedType *, const uint8_t *start, const uint8_t *end);
 
+    // TODO: Implement implicit conversions
+    /*
     operator int8_t() const;
     operator int16_t() const;
     operator int32_t() const;
@@ -29,6 +31,7 @@ class TypeData {
     operator double() const;
     operator std::string() const;
     operator std::vector<uint8_t>() const;
+    */
 
     TypeDataHandle operator[](sizetag_t index);
     TypeDataHandle operator[](const std::string& element_name);
@@ -71,44 +74,17 @@ class TypeDataHandle {
   public:
     TypeDataHandle(const DistributedType *, std::vector<uint8_t>&, sizetag_t start, sizetag_t end);
 
-    operator int8_t() const;
-    operator int16_t() const;
-    operator int32_t() const;
-    operator int64_t() const;
-    operator uint8_t() const;
-    operator uint16_t() const;
-    operator uint32_t() const;
-    operator uint64_t() const;
-    operator float() const;
-    operator double() const;
-    operator std::string() const;
-    operator std::vector<uint8_t>() const;
-
-    TypeDataHandle operator[](sizetag_t index);
-    TypeDataHandle operator[](const std::string& element_name);
-
-    // These functions are primarily for use with bindings.
-    // In C++ code, use array subscription instead.
-    TypeDataHandle get_item(sizetag_t index);
-    TypeDataHandle get_item(const std::string& element_name);
-
     inline const DistributedType *type() const { return m_type; }
-    inline sizetag_t num_elements() const { return m_num_elements; }
     inline std::vector<uint8_t> get_data() const {
         return std::vector<uint8_t>(&m_data[m_start], &m_data[m_end]);
     }
-    //inline void set_data(std::vector<uint8_t> data);
-
 
   private:
     friend class TypeData;
 
     const DistributedType *m_type;
     std::vector<uint8_t>& m_data;
-    sizetag_t m_num_elements;
     sizetag_t m_start, m_end;
-
-    TypeDataHandle read_type(const DistributedType* type, sizetag_t offset);
 };
 
 
