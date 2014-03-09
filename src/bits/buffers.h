@@ -131,6 +131,11 @@ inline uint64_t read_uint64(const std::vector<uint8_t>& buf, sizetag_t& offset) 
     offset += sizeof(r);
     return r;
 }
+inline sizetag_t read_size(const std::vector<uint8_t>& buf, sizetag_t& offset) {
+    sizetag_t r = *(sizetag_t*)(&buf[offset]);
+    offset += sizeof(r);
+    return r;
+}
 inline float read_float32(const std::vector<uint8_t>& buf, sizetag_t& offset) {
     float r = *(float *)(&buf[offset]);
     offset += sizeof(r);

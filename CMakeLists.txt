@@ -103,7 +103,8 @@ set(MODULE_SOURCES
   src/module/Module.cpp
   src/module/Field.cpp
   src/module/MolecularField.cpp
-  src/module/Parameter.cpp)
+  src/module/Parameter.cpp
+  src/module/TypeData.cpp)
 
 set(TRAITS_SOURCES
   src/traits/default.cpp
@@ -111,8 +112,7 @@ set(TRAITS_SOURCES
   src/traits/HashGenerator.cpp
   src/traits/primes.cpp)
 
-set(OBJECTS_SOURCES
-  src/objects/ObjectData.cpp)
+set(OBJECTS_SOURCES)
 
 set(DCFILE_SOURCES
   src/dcfile/parser.cpp
@@ -148,6 +148,7 @@ if(BUILD_16BIT_SIZETAG)
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
+    ${OBJECTS_SOURCES}
     ${WIRE_SOURCES})
   install(TARGETS bamboo EXPORT bamboo DESTINATION lib/bamboo)
 endif()
@@ -159,6 +160,7 @@ if(BUILD_32BIT_SIZETAG)
     ${MODULE_SOURCES}
     ${DCFILE_SOURCES}
     ${TRAITS_SOURCES}
+    ${OBJECTS_SOURCES}
     ${WIRE_SOURCES})
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
   install(TARGETS bamboo32 EXPORT bamboo32 DESTINATION lib/bamboo)
@@ -171,6 +173,7 @@ if(BUILD_SHARED_AND_STATIC)
       ${MODULE_SOURCES}
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
+      ${OBJECTS_SOURCES}
       ${WIRE_SOURCES})
     if(NOT WIN32)
       set_target_properties(bamboo-static PROPERTIES OUTPUT_NAME bamboo)
@@ -183,6 +186,7 @@ if(BUILD_SHARED_AND_STATIC)
       ${MODULE_SOURCES}
       ${DCFILE_SOURCES}
       ${TRAITS_SOURCES}
+      ${OBJECTS_SOURCES}
       ${WIRE_SOURCES})
 
     target_compile_definitions(bamboo32-static PUBLIC BAMBOO_32BIT_SIZETAG)

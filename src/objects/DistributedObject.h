@@ -4,14 +4,14 @@ namespace bamboo {
 
 
 // Foward declarations
-class ObjectData;
+class TypeData;
 
 class DistributedObject {
   protected:
-    DistributedObject(const ObjectData&);
+    DistributedObject(const TypeData&);
   public:
     virtual ~DistributedObject() {}
-    virtual void initialize(const ObjectData&) = 0;
+    virtual void initialize(const TypeData& args) = 0;
 };
 
 
