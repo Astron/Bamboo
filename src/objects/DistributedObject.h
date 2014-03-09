@@ -8,7 +8,9 @@ class TypeData;
 
 class DistributedObject {
   protected:
-    DistributedObject(const TypeData&);
+    inline DistributedObject() {}
+    inline DistributedObject(const TypeData& args) { initialize(args); }
+
   public:
     virtual ~DistributedObject() {}
     virtual void initialize(const TypeData& args) = 0;
