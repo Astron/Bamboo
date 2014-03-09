@@ -37,14 +37,14 @@ class TypeData {
     // In C++ code, use array subscription instead.
     TypeDataHandle get_item(sizetag_t index);
     TypeDataHandle get_item(const std::string& element_name);
-    TypeDataHandle set_item(sizetag_t index, TypeData);
-    TypeDataHandle set_item(const std::string& element_name, TypeData);
+    // TODO: Implement set_{item,data}
+    //TypeDataHandle set_item(sizetag_t index, TypeData);
+    //TypeDataHandle set_item(const std::string& element_name, TypeData);
 
     inline const DistributedType *type() const { return m_type; }
     inline sizetag_t num_elements() const { return m_num_elements; }
-    inline std::vector<uint8_t> data() const {
-        return std::vector<uint8_t>(m_data);
-    }
+    inline std::vector<uint8_t> get_data() const { return std::vector<uint8_t>(m_data); }
+    //inline void set_data(std::vector<uint8_t> data){ return m_data = data; }
 
   private:
     friend class TypeDataHandle;
@@ -94,9 +94,11 @@ class TypeDataHandle {
 
     inline const DistributedType *type() const { return m_type; }
     inline sizetag_t num_elements() const { return m_num_elements; }
-    inline std::vector<uint8_t> data() const {
+    inline std::vector<uint8_t> get_data() const {
         return std::vector<uint8_t>(&m_data[m_start], &m_data[m_end]);
     }
+    //inline void set_data(std::vector<uint8_t> data);
+
 
   private:
     friend class TypeData;

@@ -12,7 +12,7 @@ namespace bamboo {  // close namespace bamboo
 // add_dtype adds a packed value with the given type to the datagram, converting
 // byte-order from native-endianess to wire-endianess (if necessary).
 void Datagram::add_dtype(const TypeData& packed) {
-    add_dtype(packed.type(), packed.data());
+    add_dtype(packed.type(), packed.get_data());
 };
 
 // Can also be called with a raw buffer, returning the number of bytes read from the packed.
