@@ -155,6 +155,15 @@ def generate(file_):
     add_method(clsArrType, 'get_array_size', retval('unsigned int'), [], is_const = True)
     add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
     add_method(clsArrType, 'get_range', retval('bamboo::NumericRange'), [], is_const = True)
+    add_method(clsMethod, 'get_num_parameters', retval('size_t'), [], is_const = True)
+    add_method(clsMethod, 'get_parameter',
+               retval('bamboo::Parameter *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsMethod, 'get_parameter_by_name',
+               retval('bamboo::Parameter *', caller_owns_return = False),
+               [param('const std::string&', 'name')]),
+    add_method(clsMethod, 'add_parameter', retval('bool'),
+               [param('bamboo::Parameter *', 'param', transfer_ownership = True)]),
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])
