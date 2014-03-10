@@ -163,7 +163,22 @@ def generate(file_):
                retval('bamboo::Parameter *', caller_owns_return = False),
                [param('const std::string&', 'name')]),
     add_method(clsMethod, 'add_parameter', retval('bool'),
-               [param('bamboo::Parameter *', 'param', transfer_ownership = True)]),
+               [param('bamboo::Parameter *', 'param', transfer_ownership = True)])
+    add_method(clsStruct, 'get_id', retval('unsigned int'), [], is_const = True)
+    add_method(clsStruct, 'get_name', retval('std::string'), [], is_const = True)
+    add_method(clsStruct, 'get_module', retval('bamboo::Module *', caller_owns_return = False), [])
+    add_method(clsStruct, 'get_num_fields', retval('size_t'), [], is_const = True)
+    add_method(clsStruct, 'get_field',
+               retval('bamboo::Field *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsStruct, 'get_field_by_id',
+               retval('bamboo::Field *', caller_owns_return = False),
+               [param('unsigned int', 'id')])
+    add_method(clsStruct, 'get_field_by_name',
+               retval('bamboo::Field *', caller_owns_return = False),
+               [param('const std::string&', 'name')])
+    add_method(clsStruct, 'add_field', retval('bool'),
+               [param('bamboo::Field *', 'field', transfer_ownership = True)])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

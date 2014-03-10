@@ -61,6 +61,16 @@ altnames = {
     'get_parameter_by_name': ['get_parameter_by_name', 'getParameterByName'],
     'add_parameter':         ['add_parameter',         'addParameter'],
 
+    # Struct
+    'get_id':            ['get_id',            'getId'],
+    'get_name':          ['get_name',          'getName'],
+    'get_module':        ['get_module',        'getModule'],
+    'get_num_fields':    ['get_num_fields',    'getNumFields'],
+    'get_field':         ['get_field',         'getField'],
+    'get_field_by_id':   ['get_field_by_id',   'getFieldById'],
+    'get_field_by_name': ['get_field_by_name', 'getFieldByName'],
+    'add_field':         ['add_field',         'addField'],
+
     # Buffer
     'read_bool':    ['read_bool',    'readBool'],
     'read_char':    ['read_char',    'readChar'],
@@ -129,6 +139,11 @@ classDocstrings = {
 'this parameter type accepts an arbitrary (or possibly fixed) number of ' +
 ' nested fields, all of which are of the same type.  '                    +
 'Strings and blobs are arrays with char and uint8 elements respectively.',
+    'Method':
+'A Method is a field for a distributed Class that typically represents a remote procedure call.',
+    'Struct':
+'A Struct provides type composition by combining multiple Fields each with their own type.  ' +
+'Structs may have both anonymous and named Fields.',
 }
 
 functionDocstrings = {
@@ -257,9 +272,27 @@ methodDocstrings = {
         'get_parameter':
 'Returns the <n>th parameter of the method.',
         'get_parameter_by_name':
-'Returns the requested parameter or nullptr if there is no such param.',
+'Returns the requested parameter or None if there is no such param.',
         'add_parameter':
-'Adds a new parameter to the method. Returns false if ' +
-'the parameter could not be added to the method.',
+'Gives ownership of the Parameter to the Method returning false if there is a name conflict.',
+    },
+
+    'Struct': {
+        'get_id':
+'Returns a unique index number associated with this struct.',
+        'get_name':
+'Returns the name of this struct.',
+        'get_module':
+'Returns the Module object that contains the struct.',
+        'get_num_fields':
+'Returns the number of fields in the struct.',
+        'get_field':
+'Returns the <n>th field of the struct.',
+        'get_field_by_id':
+'Returns the field with the index <id>, or None if no such field exists.',
+        'get_field_by_name':
+'Returns the field with <name>, or None if no such field exists.',
+        'add_field':
+'Gives ownership of the Field to the Struct returning false if there is a name conflict.',
     },
 }
