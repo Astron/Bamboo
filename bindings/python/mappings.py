@@ -49,6 +49,12 @@ altnames = {
     'set_modulus': ['set_modulus', 'setModulus'],
     'set_range':   ['set_range',   'setRange'],
 
+    # ArrayType
+    'get_element_type': ['get_element_type', 'getElementType'],
+    'get_array_size': ['get_array_size', 'getArraySize'],
+    #'has_range':   ['has_range',   'hasRange'],
+    #'get_range':   ['get_range',   'getRange'],
+
     # Buffer
     'read_bool': ['read_bool', 'readBool'],
     'read_char': ['read_char', 'readChar'],
@@ -100,104 +106,142 @@ altnames = {
     'parse_dcfile':  ['parse_dcfile'],  #parseDCFile
     'parse_dcvalue': ['parse_dcvalue'], #parseDCValue
 }
-docstrings = {
-    # Module
-    'get_num_classes':
-'Returns the number of classes in the module.',
-    'get_num_structs':
-'Returns the number of structs in the module.',
-    'get_class':
-'Returns the <n>th Class in the module.',
-    'get_struct':
-'Returns the <n>th Struct in the module.',
-    'get_class_by_id':
-'Returns the requested Class or None if there is no such class.',
-    'get_class_by_name':
-'Returns the requested Class or None if there is no such class.',
-    'get_num_types':
-'Returns the number of types in the module (classes, structs, typedefs).',
-    'get_type_by_id':
-'Returns the requested DistributedType or None if there is no such type.',
-    'get_type_by_name':
-'Returns the requested DistributedType or None if there is no such type.',
-    'get_field_by_id':
-'Returns the requested Field or None if there is no such type.',
-    'get_num_imports':
-'Returns the number of imports in the module.',
-    'get_import':
-'Returns the <n>th import in the module.',
-    'has_keyword':
-'Returns true if a keyword with the name <keyword> is declared in the module.',
-    'get_num_keywords':
-'Returns the number of keywords declared in the module.',
-    'get_keyword':
-'Returns the <n>th keyword declared in the module.',
-    'add_class':
-'Gives ownership of the Class to the Module returning false if there is a name conflict.',
-    'add_struct':
-'Gives ownership of the Struct to the Module returning false if there is a name conflict.',
-    'add_import':
-'Gives ownership of the Import to the Module, merging it with any duplicate modules.',
-    'add_typedef':
-'Creates a new alias in the module for a given type.',
-    'add_keyword':
-'Adds the keyword to the list of keywords accepted by the module.',
-    'get_divisor':
-'Retuns the divisior of the numeric, with a default value of one.',
-    'has_modulus':
-'Returns true if the numeric is constrained by a modulus.',
-    'get_modulus':
-'Returns a double precision floating-point representation of the modulus value.',
-    'has_range':
-'Returns true if the numeric is constrained by a range.',
-    'get_range':
-'Returns the NumericRange that constrains this type\'s values.',
-    'set_divisor':
-'Sets a divisor for the numeric type, typically to represent fixed point.  ' +
-'Returns false if the divisor is not valid for this type.',
-    'set_modulus':
-'Sets a modulus for the numeric type, typically to represent fixed point.  ' +
-'Returns false if the modulus is not valid for this type.',
-    'set_range':
-'Sets a range for the numeric type, typically to represent fixed point.  ' +
-'Returns false if the range is not valid for this type.',
 
-    # DistributedType
-    'get_subtype':
-'Returns the type\'s fundamental type as an integer constant.',
-    'has_fixed_size':
-'Returns true if the DistributedType has a fixed size in bytes.',
-    'get_size':
-'Returns the size of the DistributedType in bytes or 0 if it is variable.',
-    'has_alias':
-'Returns true if this type was defined the an aliased name.',
-    'as_numeric':
-'Returns this as a NumericType if it is numeric, or None otherwise.',
-    'as_array':
-'Returns this as an ArrayType if it is an array, or None otherwise.',
-    'as_struct':
-'Returns this as a Struct if it is a struct, or None otherwise.',
-    'as_method':
-'Returns this as a Method if it is a method, or None otherwise.',
-    'get_alias':
-'Returns the name used to define the type, or the empty string.',
-    'set_alias':
-'Gives this type an alternate name <alias>.',
+classDocstrings = {
+    'Module':
+'A Module represents the complete list of Distributed Class definitions that define a particular ' +
+'protocol. Typically, parsed from one or more \\".dc\\" or other bamboo protocol description files.',
+    'DistributedType':
+'A DistributedType represents any bamboo type. DistributedTypes have a defined layout of data.',
+    'NumericType':
+'A NumericType can represent any of the basic number types (ie. integers, floats, etc).  ' +
+'A NumericType may also have a range and/or modulus to limit its possible values, '        +
+'and/or a divisor representing a fixed-point numeric convention.  '                        +
+'A divisor scales up any range or modulus to constrain up to (constraint * divisor).',
+    'ArrayType':
+'An ArrayType represents an array of some other kind of object, meaning ' +
+'this parameter type accepts an arbitrary (or possibly fixed) number of ' +
+' nested fields, all of which are of the same type.  '                    +
+'Strings and blobs are arrays with char and uint8 elements respectively.',
+}
 
-    # Buffer
-
-    # dcfile/parse
-    'read_dcfile':
+functionDocstrings = {
+    'dcfile' : {
+    # parse.h
+        'read_dcfile':
 'Opens the given file or stream and parses it as a .dc file.  Classes defined in '       +
 'the file are added to a new Module object, and a pointer to that object is returned.  ' +
 'When reading from a stream, a filename is optional only used when reporting errors.',
-    'parse_dcfile':
+       'parse_dcfile':
 'Opens the given file or stream and parses it as a .dc file.  The distributed '              +
 'classes defined in the file are added to the list of classes associated with the Module.  ' +
 'When appending from a stream, a filename is optional only used to report errors.',
-    'parse_dcvalue':
+        'parse_dcvalue':
 'Reads a .dc-formatted parameter value and outputs the data in wire form matching ' +
 'the appropriate DistributedType and suitable for a default parameter value.  '     +
 'If an error occurs, the error reason is returned instead of the parsed value.',
+    },
+}
 
+methodDocstrings = {
+    'Module': {
+        'get_num_classes':
+'Returns the number of classes in the module.',
+        'get_num_structs':
+'Returns the number of structs in the module.',
+        'get_class':
+'Returns the <n>th Class in the module.',
+        'get_struct':
+'Returns the <n>th Struct in the module.',
+        'get_class_by_id':
+'Returns the requested Class or None if there is no such class.',
+        'get_class_by_name':
+'Returns the requested Class or None if there is no such class.',
+        'get_num_types':
+'Returns the number of types in the module (classes, structs, typedefs).',
+        'get_type_by_id':
+'Returns the requested DistributedType or None if there is no such type.',
+        'get_type_by_name':
+'Returns the requested DistributedType or None if there is no such type.',
+        'get_field_by_id':
+'Returns the requested Field or None if there is no such type.',
+        'get_num_imports':
+'Returns the number of imports in the module.',
+        'get_import':
+'Returns the <n>th import in the module.',
+        'has_keyword':
+'Returns true if a keyword with the name <keyword> is declared in the module.',
+        'get_num_keywords':
+'Returns the number of keywords declared in the module.',
+        'get_keyword':
+'Returns the <n>th keyword declared in the module.',
+        'add_class':
+'Gives ownership of the Class to the Module returning false if there is a name conflict.',
+        'add_struct':
+'Gives ownership of the Struct to the Module returning false if there is a name conflict.',
+        'add_import':
+'Gives ownership of the Import to the Module, merging it with any duplicate modules.',
+        'add_typedef':
+'Creates a new alias in the module for a given type.',
+        'add_keyword':
+'Adds the keyword to the list of keywords accepted by the module.'
+    },
+
+    'DistributedType': {
+        'get_subtype':
+'Returns the type\'s fundamental type as an integer constant.',
+        'has_fixed_size':
+'Returns true if the DistributedType has a fixed size in bytes.',
+        'get_size':
+'Returns the size of the DistributedType in bytes or 0 if it is variable.',
+        'has_alias':
+'Returns true if this type was defined the an aliased name.',
+        'as_numeric':
+'Returns this as a NumericType if it is numeric, or None otherwise.',
+        'as_array':
+'Returns this as an ArrayType if it is an array, or None otherwise.',
+        'as_struct':
+'Returns this as a Struct if it is a struct, or None otherwise.',
+        'as_method':
+'Returns this as a Method if it is a method, or None otherwise.',
+        'get_alias':
+'Returns the name used to define the type, or the empty string.',
+        'set_alias':
+'Gives this type an alternate name <alias>.'
+    },
+
+    'NumericType': {
+        'get_divisor':
+'Retuns the divisior of the numeric, with a default value of one.',
+       'has_modulus':
+'Returns true if the numeric is constrained by a modulus.',
+        'get_modulus':
+'Returns a double precision floating-point representation of the modulus value.',
+       'has_range':
+'Returns true if the numeric is constrained by a range.',
+        'get_range':
+'Returns the NumericRange that constrains this type\'s values.',
+        'set_divisor':
+'Sets a divisor for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the divisor is not valid for this type.',
+        'set_modulus':
+'Sets a modulus for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the modulus is not valid for this type.',
+        'set_range':
+'Sets a range for the numeric type, typically to represent fixed point.  ' +
+'Returns false if the range is not valid for this type.'
+    },
+
+    'ArrayType': {
+        'get_element_type':
+'Returns the type of the individual elements of this array.',
+        'get_array_size':
+'Returns the fixed number of elements in this array, or 0 ' +
+'if the array may contain a variable number of elements.',
+        'has_range':
+'Returns true if there is a constraint on the range of valid array sizes.  ' +
+'This is always true for fixed-size arrays.',
+        'get_range':
+'Returns the range of sizes that the array may have.'
+    },
 }

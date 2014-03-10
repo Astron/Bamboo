@@ -1,8 +1,7 @@
 #!/usr/bin/python
 from pybindgen.module import Module, SubModule
 from pybindgen import retval, param
-from mappings import altnames
-from mappings import docstrings
+from mappings import *
 
 def generate(file_):
     # Declare modules
@@ -40,10 +39,12 @@ def generate(file_):
     structBuffer = bits.add_struct('Buffer')
     indexError = bits.add_exception('out_of_range', custom_name = 'IndexError',
         foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
-    clsModule = module.add_class('Module')
-    clsDistType = module.add_class('DistributedType')
-    clsNumType = module.add_class('NumericType', parent = clsDistType)
-    clsArrType = module.add_class('ArrayType', parent = clsDistType)
+    clsModule = module.add_class('Module', docstring = classDocstrings['Module'])
+    clsDistType = module.add_class('DistributedType', docstring = classDocstrings['DistributedType'])
+    clsNumType = module.add_class('NumericType', parent = clsDistType,
+                                  docstring = classDocstrings['NumericType'])
+    clsArrType = module.add_class('ArrayType', parent = clsDistType,
+                                  docstring = classDocstrings['NumericType'])
     clsMethod = module.add_class('Method', parent = clsDistType)
     clsStruct = module.add_class('Struct', parent = clsDistType)
     clsClass = module.add_class('Class', parent = clsStruct)
@@ -150,6 +151,10 @@ def generate(file_):
     add_method(clsNumType, 'set_divisor', retval('bool'), [param('unsigned int', 'divisor')])
     add_method(clsNumType, 'set_modulus', retval('bool'), [param('double', 'modulus')])
     add_method(clsNumType, 'set_range', retval('bool'), [param('const NumericRange&', 'range')])
+    add_method(clsArrType, 'get_element_type', retval('const bamboo::DistributedType *'), [], is_const = True)
+    add_method(clsArrType, 'get_array_size', retval('unsigned int'), [], is_const = True)
+    add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
+    add_method(clsArrType, 'get_range', retval('bamboo::NumericRange'), [], is_const = True)
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])
@@ -225,11 +230,12 @@ def generate(file_):
 
 def add_method(cls, name, ret, params, **kwargs):
     names = altnames[name]
-    if name in docstrings:
-      kwargs['docstring'] = docstrings[name]
+    if cls.get_python_name() in methodDocstrings and \
+       name in methodDocstrings[cls.get_python_name()]:
+      kwargs['docstring'] = methodDocstrings[cls.get_python_name()][name]
     for n in names: cls.add_method(name, ret, params, custom_name = n, **kwargs)
 
 def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]
-    doc = docstrings[name]
+    doc = functionDocstrings[mod.get_name()][name]
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)

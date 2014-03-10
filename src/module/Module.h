@@ -21,8 +21,8 @@ struct Import {
     inline Import(const std::string& module_name);
 };
 
-// A Module represents the complete list of Distributed Class
-// descriptions as read from one or more .dc files.
+// A Module represents the complete list of Distributed Class definitions that define a particular
+// protocol. Typically, parsed from one or more ".dc" or other bamboo protocol description files.
 class Module {
   public:
     Module(); // constructor
