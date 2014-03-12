@@ -144,6 +144,9 @@ classDocstrings = {
     'Struct':
 'A Struct provides type composition by combining multiple Fields each with their own type.  ' +
 'Structs may have both anonymous and named Fields.',
+#    'MolecularField':
+#'A MolecularField is an abstract field which provides an interface that can ' +
+#'be used to access multiple other fields at the same time.',
 }
 
 functionDocstrings = {

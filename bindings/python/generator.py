@@ -50,6 +50,8 @@ def generate(file_):
     clsClass = module.add_class('Class', parent = clsStruct)
     clsParameter = module.add_class('Parameter')
     clsField = module.add_class('Field')
+    # clsMolecular should have parent = [clsStruct, clsField] but can't because pybindgen bug
+    clsMolecular = module.add_class('MolecularField', parent = clsStruct)
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
