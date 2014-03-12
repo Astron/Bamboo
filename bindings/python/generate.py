@@ -124,6 +124,7 @@ def generate(file_):
                [param('const std::string&', 'name'),
                 param('DistributedType *', 'type', transfer_ownership = False)])
     add_method(clsModule, 'add_keyword', None, [param('const std::string&', 'keyword')])
+    clsDistType.add_constructor([], visibility='protected')
     add_method(clsDistType, 'get_subtype', retval('bamboo::Subtype'), [], is_const = True)
     add_method(clsDistType, 'has_fixed_size', retval('bool'), [], is_const = True)
     add_method(clsDistType, 'get_size', retval('size_t'), [], is_const = True)
@@ -144,6 +145,7 @@ def generate(file_):
                retval('const std::string'),
                [], is_const = True)
     add_method(clsDistType, 'set_alias', None, [param('const std::string&', 'alias')])
+    clsNumType.add_constructor([param('bamboo::Subtype', 'subtype')])
     add_method(clsNumType, 'get_divisor', retval('unsigned int'), [], is_const = True)
     add_method(clsNumType, 'has_modulus', retval('bool'), [], is_const = True)
     add_method(clsNumType, 'get_modulus', retval('double'), [], is_const = True)
@@ -152,10 +154,14 @@ def generate(file_):
     add_method(clsNumType, 'set_divisor', retval('bool'), [param('unsigned int', 'divisor')])
     add_method(clsNumType, 'set_modulus', retval('bool'), [param('double', 'modulus')])
     add_method(clsNumType, 'set_range', retval('bool'), [param('const NumericRange&', 'range')])
+    clsArrType.add_constructor([
+               param('bamboo::DistributedType *', 'elementType', transfer_ownership = False),
+               param('const bamboo::NumericRange&', 'arraySize', default_value = 'bamboo::NumericRange()')])
     add_method(clsArrType, 'get_element_type', retval('const bamboo::DistributedType *'), [], is_const = True)
     add_method(clsArrType, 'get_array_size', retval('unsigned int'), [], is_const = True)
     add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
     add_method(clsArrType, 'get_range', retval('bamboo::NumericRange'), [], is_const = True)
+    clsMethod.add_constructor([])
     add_method(clsMethod, 'get_num_parameters', retval('size_t'), [], is_const = True)
     add_method(clsMethod, 'get_parameter',
                retval('bamboo::Parameter *', caller_owns_return = False),
@@ -165,6 +171,9 @@ def generate(file_):
                [param('const std::string&', 'name')]),
     add_method(clsMethod, 'add_parameter', retval('bool'),
                [param('bamboo::Parameter *', 'param', transfer_ownership = True)])
+    clsStruct.add_constructor([
+               param('bamboo::Module *', 'file', transfer_ownership = False),
+               param('const std::string&', 'name')])
     add_method(clsStruct, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsStruct, 'get_name', retval('std::string'), [], is_const = True)
     add_method(clsStruct, 'get_module', retval('bamboo::Module *', caller_owns_return = False), [])
