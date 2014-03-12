@@ -220,8 +220,54 @@ if(BUILD_PYTHON)
 
   include(${CMAKE_SOURCE_DIR}/cmake/modules/CheckPythonModule.cmake)
   check_python_module(pybindgen)
-  if(NOT PYTHON_PYBINDGEN_FOUND)
-    message(FATAL_ERROR "Building python bindings is enabled, but PyBindGen wasn't found.")
+  if(PYTHON_PYBINDGEN_FOUND)
+    if(BUILD_16BIT_SIZETAG)
+      # Generate the 16-bit bindings
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py pythonBindings.cpp
+        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+    endif()
+    if(BUILD_32BIT_SIZETAG)
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py pythonBindings32.cpp
+        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+    endif()
+
+    if(BUILD_16BIT_SIZETAG AND BUILD_32BIT_SIZETAG)
+      add_custom_target(
+        update-python-prebuilt
+        ${CMAKE_COMMAND} -E copy
+            ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+            ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+            ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp)
+    endif()
+  else()
+    if(BUILD_16BIT_SIZETAG)
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+        COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
+          ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
+    endif()
+    if(BUILD_32BIT_SIZETAG)
+      add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+        COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp
+          ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
+    endif()
   endif()
 
   # Get the python install directory
@@ -239,15 +285,18 @@ if(BUILD_PYTHON)
   if(BUILD_16BIT_SIZETAG)
     # Build the 16-bit python module
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp ${CMAKE_BINARY_DIR}/python/build/
+      OUTPUT ${CMAKE_BINARY_DIR}/python/build/
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup.py build
-      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generator.py
+      MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/pythonBindings.cpp
       IMPLICIT_DEPENDS
         Python ${CMAKE_SOURCE_DIR}/bindings/python/setup.py
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
     add_custom_target(python-bindings ALL
-      DEPENDS bamboo python-directory ${CMAKE_BINARY_DIR}/pythonBindings.cpp)
+      DEPENDS bamboo python-directory
+        ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+        ${CMAKE_BINARY_DIR}/python/build/)
 
     # Install the 16-bit python module
     install(CODE "
@@ -259,15 +308,18 @@ if(BUILD_PYTHON)
   if(BUILD_32BIT_SIZETAG)
     # Build the 32-bit python module
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp ${CMAKE_BINARY_DIR}/python/build/
+      OUTPUT ${CMAKE_BINARY_DIR}/python/build/
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py build
-      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generator.py
+      MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
       IMPLICIT_DEPENDS
         Python ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py
+        Python ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
     add_custom_target(python-bindings32 ALL
-      DEPENDS bamboo32 python-directory ${CMAKE_BINARY_DIR}/pythonBindings.cpp)
+      DEPENDS bamboo32 python-directory
+        ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+        ${CMAKE_BINARY_DIR}/python/build/)
 
     # Install the 32-bit python module
     install(CODE "

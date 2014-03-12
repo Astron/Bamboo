@@ -116,11 +116,9 @@ altnames = {
     'set_byte': ['__setitem__'],
 
     # dcfile/parse.h
-    # The camel versions of these names are temporarily disabled because of a pybindgen bug
-    # We could probably circumvent the bug with some kind of patching system for 'pythonBindings.cpp'
-    'read_dcfile':   ['read_dcfile'],   #readDCFile
-    'parse_dcfile':  ['parse_dcfile'],  #parseDCFile
-    'parse_dcvalue': ['parse_dcvalue'], #parseDCValue
+    'read_dcfile':   ['read_dcfile',   'readDCFile'],
+    'parse_dcfile':  ['parse_dcfile',  'parseDCFile'],
+    'parse_dcvalue': ['parse_dcvalue', 'parseDCValue'],
 }
 
 classDocstrings = {

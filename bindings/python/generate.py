@@ -50,8 +50,7 @@ def generate(file_):
     clsClass = module.add_class('Class', parent = clsStruct)
     clsParameter = module.add_class('Parameter')
     clsField = module.add_class('Field')
-    # clsMolecular should have parent = [clsStruct, clsField] but can't because pybindgen bug
-    clsMolecular = module.add_class('MolecularField', parent = clsStruct)
+    clsMolecular = module.add_class('MolecularField', parent = [clsField, clsStruct])
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
@@ -265,3 +264,19 @@ def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]
     doc = functionDocstrings[mod.get_name()][name]
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)
+
+if __name__ == "__main__":
+    import sys, os
+
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    buildDir = os.path.join(scriptDir, '../../build')
+
+    try:
+        os.mkdir(buildDir)
+    except OSError:
+        pass
+
+    filename = os.path.join(buildDir, sys.argv[1])
+    with open(filename, 'wt') as file_:
+        print('Generating file {}'.format(filename))
+        generate(file_)
