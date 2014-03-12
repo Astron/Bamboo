@@ -3215,13 +3215,6 @@ PyTypeObject PyBambooModule_Type = {
 
 
 
-static int
-_wrap_PyBambooDistributedType__tp_init(void)
-{
-    PyErr_SetString(PyExc_TypeError, "class 'DistributedType' cannot be constructed ()");
-    return -1;
-}
-
 
 PyObject *
 _wrap_PyBambooDistributedType_get_subtype(PyBambooDistributedType *self)
@@ -3647,7 +3640,7 @@ PyTypeObject PyBambooDistributedType_Type = {
     (descrgetfunc)NULL,    /* tp_descr_get */
     (descrsetfunc)NULL,    /* tp_descr_set */
     0,                 /* tp_dictoffset */
-    (initproc)_wrap_PyBambooDistributedType__tp_init,             /* tp_init */
+    (initproc)NULL,             /* tp_init */
     (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
     (newfunc)PyType_GenericNew,               /* tp_new */
     (freefunc)0,             /* tp_free */
@@ -3664,10 +3657,17 @@ PyTypeObject PyBambooDistributedType_Type = {
 
 
 static int
-_wrap_PyBambooNumericType__tp_init(void)
+_wrap_PyBambooNumericType__tp_init(PyBambooNumericType *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'NumericType' cannot be constructed ()");
-    return -1;
+    bamboo::Subtype subtype;
+    const char *keywords[] = {"subtype", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &subtype)) {
+        return -1;
+    }
+    self->obj = new bamboo::NumericType(subtype);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
 }
 
 
@@ -4016,10 +4016,20 @@ PyTypeObject PyBambooNumericType_Type = {
 
 
 static int
-_wrap_PyBambooArrayType__tp_init(void)
+_wrap_PyBambooArrayType__tp_init(PyBambooArrayType *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'ArrayType' cannot be constructed ()");
-    return -1;
+    PyBambooDistributedType *elementType;
+    bamboo::DistributedType *elementType_ptr;
+    PyBambooNumericRange *arraySize = NULL;
+    const char *keywords[] = {"elementType", "arraySize", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!|O!", (char **) keywords, &PyBambooDistributedType_Type, &elementType, &PyBambooNumericRange_Type, &arraySize)) {
+        return -1;
+    }
+    elementType_ptr = (elementType ? elementType->obj : NULL);
+    self->obj = new bamboo::ArrayType(elementType_ptr, (arraySize ? (*((PyBambooNumericRange *) arraySize)->obj) : bamboo::NumericRange()));
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
 }
 
 
@@ -4250,10 +4260,16 @@ PyTypeObject PyBambooArrayType_Type = {
 
 
 static int
-_wrap_PyBambooMethod__tp_init(void)
+_wrap_PyBambooMethod__tp_init(PyBambooMethod *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'Method' cannot be constructed ()");
-    return -1;
+    const char *keywords[] = {NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "", (char **) keywords)) {
+        return -1;
+    }
+    self->obj = new bamboo::Method();
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
 }
 
 
@@ -4540,10 +4556,23 @@ PyTypeObject PyBambooMethod_Type = {
 
 
 static int
-_wrap_PyBambooStruct__tp_init(void)
+_wrap_PyBambooStruct__tp_init(PyBambooStruct *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'Struct' cannot be constructed ()");
-    return -1;
+    PyBambooModule *file;
+    bamboo::Module *file_ptr;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"file", "name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooModule_Type, &file, &name, &name_len)) {
+        return -1;
+    }
+    file_ptr = (file ? file->obj : NULL);
+    name_std = std::string(name, name_len);
+    self->obj = new bamboo::Struct(file_ptr, name_std);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
 }
 
 
