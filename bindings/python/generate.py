@@ -172,7 +172,7 @@ def generate(file_):
     add_method(clsMethod, 'add_parameter', retval('bool'),
                [param('bamboo::Parameter *', 'param', transfer_ownership = True)])
     clsStruct.add_constructor([
-               param('bamboo::Module *', 'file', transfer_ownership = False),
+               param('bamboo::Module *', 'module', transfer_ownership = False),
                param('const std::string&', 'name')])
     add_method(clsStruct, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsStruct, 'get_name', retval('std::string'), [], is_const = True)
@@ -189,6 +189,26 @@ def generate(file_):
                [param('const std::string&', 'name')])
     add_method(clsStruct, 'add_field', retval('bool'),
                [param('bamboo::Field *', 'field', transfer_ownership = True)])
+    clsClass.add_constructor([
+               param('bamboo::Module *', 'module', transfer_ownership = False),
+               param('const std::string&', 'name')])
+    add_method(clsClass, 'get_num_parents', retval('size_t'), [], is_const = True)
+    add_method(clsClass, 'get_parent',
+               retval('bamboo::Class *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_num_children', retval('size_t'), [], is_const = True)
+    add_method(clsClass, 'get_child',
+               retval('bamboo::Class *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsClass, 'has_constructor', retval('bool'), [], is_const = True)
+    add_method(clsClass, 'get_constructor',
+               retval('bamboo::Field *', caller_owns_return = False), [])
+    add_method(clsClass, 'get_num_base_fields', retval('size_t'), [], is_const = True)
+    add_method(clsClass, 'get_base_field',
+               retval('bamboo::Field *', caller_owns_return = False),
+               [param('unsigned int', 'n')])
+    add_method(clsClass, 'add_parent', None,
+               [param('bamboo::Class *', 'parent', transfer_ownership = False)])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

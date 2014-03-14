@@ -4558,19 +4558,19 @@ PyTypeObject PyBambooMethod_Type = {
 static int
 _wrap_PyBambooStruct__tp_init(PyBambooStruct *self, PyObject *args, PyObject *kwargs)
 {
-    PyBambooModule *file;
-    bamboo::Module *file_ptr;
+    PyBambooModule *module;
+    bamboo::Module *module_ptr;
     const char *name;
     Py_ssize_t name_len;
     std::string name_std;
-    const char *keywords[] = {"file", "name", NULL};
+    const char *keywords[] = {"module", "name", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooModule_Type, &file, &name, &name_len)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooModule_Type, &module, &name, &name_len)) {
         return -1;
     }
-    file_ptr = (file ? file->obj : NULL);
+    module_ptr = (module ? module->obj : NULL);
     name_std = std::string(name, name_len);
-    self->obj = new bamboo::Struct(file_ptr, name_std);
+    self->obj = new bamboo::Struct(module_ptr, name_std);
     self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     return 0;
 }
@@ -5005,13 +5005,368 @@ PyTypeObject PyBambooStruct_Type = {
 
 
 static int
-_wrap_PyBambooClass__tp_init(void)
+_wrap_PyBambooClass__tp_init(PyBambooClass *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'Class' cannot be constructed ()");
-    return -1;
+    PyBambooModule *module;
+    bamboo::Module *module_ptr;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"module", "name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooModule_Type, &module, &name, &name_len)) {
+        return -1;
+    }
+    module_ptr = (module ? module->obj : NULL);
+    name_std = std::string(name, name_len);
+    self->obj = new bamboo::Class(module_ptr, name_std);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getNumBaseFields(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_base_fields();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_addParent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooClass *parent;
+    bamboo::Class *parent_ptr;
+    const char *keywords[] = {"parent", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooClass_Type, &parent)) {
+        return NULL;
+    }
+    parent_ptr = (parent ? parent->obj : NULL);
+    self->obj->add_parent(parent_ptr);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getParent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Class *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooClass *py_Class;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_parent(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
+    py_Class->obj = new bamboo::Class((*retval));
+    py_Class->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Class);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getNumChildren(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_children();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_parent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Class *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooClass *py_Class;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_parent(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
+    py_Class->obj = new bamboo::Class((*retval));
+    py_Class->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Class);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getNumParents(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_parents();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_base_field(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Field *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooField *py_Field;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_base_field(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Field = PyObject_New(PyBambooField, &PyBambooField_Type);
+    py_Field->obj = new bamboo::Field((*retval));
+    py_Field->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getConstructor(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    bamboo::Field *retval;
+    PyBambooField *py_Field;
+
+    retval = self->obj->get_constructor();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Field = PyObject_New(PyBambooField, &PyBambooField_Type);
+    py_Field->obj = new bamboo::Field((*retval));
+    py_Field->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_num_children(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_children();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_add_parent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooClass *parent;
+    bamboo::Class *parent_ptr;
+    const char *keywords[] = {"parent", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooClass_Type, &parent)) {
+        return NULL;
+    }
+    parent_ptr = (parent ? parent->obj : NULL);
+    self->obj->add_parent(parent_ptr);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getBaseField(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Field *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooField *py_Field;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_base_field(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Field = PyObject_New(PyBambooField, &PyBambooField_Type);
+    py_Field->obj = new bamboo::Field((*retval));
+    py_Field->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_num_base_fields(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_base_fields();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_num_parents(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->get_num_parents();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_getChild(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Class *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooClass *py_Class;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_child(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
+    py_Class->obj = new bamboo::Class((*retval));
+    py_Class->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Class);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_child(PyBambooClass *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bamboo::Class *retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+    PyBambooClass *py_Class;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_child(n);
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
+    py_Class->obj = new bamboo::Class((*retval));
+    py_Class->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Class);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_get_constructor(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    bamboo::Field *retval;
+    PyBambooField *py_Field;
+
+    retval = self->obj->get_constructor();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Field = PyObject_New(PyBambooField, &PyBambooField_Type);
+    py_Field->obj = new bamboo::Field((*retval));
+    py_Field->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_has_constructor(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_constructor();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooClass_hasConstructor(PyBambooClass *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_constructor();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
 }
 
 static PyMethodDef PyBambooClass_methods[] = {
+    {(char *) "getNumBaseFields", (PyCFunction) _wrap_PyBambooClass_getNumBaseFields, METH_NOARGS, "Returns the number of fields declared directly in this class." },
+    {(char *) "addParent", (PyCFunction) _wrap_PyBambooClass_addParent, METH_KEYWORDS|METH_VARARGS, "Set this class as a subclass to target parent." },
+    {(char *) "getParent", (PyCFunction) _wrap_PyBambooClass_getParent, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th parent-/super-class this class inherits from." },
+    {(char *) "getNumChildren", (PyCFunction) _wrap_PyBambooClass_getNumChildren, METH_NOARGS, "Returns the number of subclasses that inherit from this class." },
+    {(char *) "get_parent", (PyCFunction) _wrap_PyBambooClass_get_parent, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th parent-/super-class this class inherits from." },
+    {(char *) "getNumParents", (PyCFunction) _wrap_PyBambooClass_getNumParents, METH_NOARGS, "Returns the number of superclasses this class inherits from." },
+    {(char *) "get_base_field", (PyCFunction) _wrap_PyBambooClass_get_base_field, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field from the class excluding any inherited fields." },
+    {(char *) "getConstructor", (PyCFunction) _wrap_PyBambooClass_getConstructor, METH_NOARGS, "Returns the constructor method for this class if it is defined, or nullptr if the class uses the default constructor." },
+    {(char *) "get_num_children", (PyCFunction) _wrap_PyBambooClass_get_num_children, METH_NOARGS, "Returns the number of subclasses that inherit from this class." },
+    {(char *) "add_parent", (PyCFunction) _wrap_PyBambooClass_add_parent, METH_KEYWORDS|METH_VARARGS, "Set this class as a subclass to target parent." },
+    {(char *) "getBaseField", (PyCFunction) _wrap_PyBambooClass_getBaseField, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field from the class excluding any inherited fields." },
+    {(char *) "get_num_base_fields", (PyCFunction) _wrap_PyBambooClass_get_num_base_fields, METH_NOARGS, "Returns the number of fields declared directly in this class." },
+    {(char *) "get_num_parents", (PyCFunction) _wrap_PyBambooClass_get_num_parents, METH_NOARGS, "Returns the number of superclasses this class inherits from." },
+    {(char *) "getChild", (PyCFunction) _wrap_PyBambooClass_getChild, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th child-/sub-class that inherits this class." },
+    {(char *) "get_child", (PyCFunction) _wrap_PyBambooClass_get_child, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th child-/sub-class that inherits this class." },
+    {(char *) "get_constructor", (PyCFunction) _wrap_PyBambooClass_get_constructor, METH_NOARGS, "Returns the constructor method for this class if it is defined, or nullptr if the class uses the default constructor." },
+    {(char *) "has_constructor", (PyCFunction) _wrap_PyBambooClass_has_constructor, METH_NOARGS, "Returns true if this class has a constructor method, or false if it just uses the default constructor." },
+    {(char *) "hasConstructor", (PyCFunction) _wrap_PyBambooClass_hasConstructor, METH_NOARGS, "Returns true if this class has a constructor method, or false if it just uses the default constructor." },
     {NULL, NULL, 0, NULL}
 };
 

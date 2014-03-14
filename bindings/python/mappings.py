@@ -71,6 +71,17 @@ altnames = {
     'get_field_by_name': ['get_field_by_name', 'getFieldByName'],
     'add_field':         ['add_field',         'addField'],
 
+    # Class
+    'get_num_parents':     ['get_num_parents',     'getNumParents'],
+    'get_parent':          ['get_parent',          'getParent'],
+    'get_num_children':    ['get_num_children',    'getNumChildren'],
+    'get_child':           ['get_child',           'getChild'],
+    'has_constructor':     ['has_constructor',     'hasConstructor'],
+    'get_constructor':     ['get_constructor',     'getConstructor'],
+    'get_num_base_fields': ['get_num_base_fields', 'getNumBaseFields'],
+    'get_base_field':      ['get_base_field',      'getBaseField'],
+    'add_parent':          ['add_parent',          'addParent'],
+
     # Buffer
     'read_bool':    ['read_bool',    'readBool'],
     'read_char':    ['read_char',    'readChar'],
@@ -296,4 +307,27 @@ methodDocstrings = {
         'add_field':
 'Gives ownership of the Field to the Struct returning false if there is a name conflict.',
     },
+
+    'Class': {
+        'get_num_parents':
+'Returns the number of superclasses this class inherits from.',
+        'get_parent':
+'Returns the <n>th parent-/super-class this class inherits from.',
+        'get_num_children':
+'Returns the number of subclasses that inherit from this class.',
+        'get_child':
+'Returns the <n>th child-/sub-class that inherits this class.',
+        'has_constructor':
+'Returns true if this class has a constructor method, ' +
+'or false if it just uses the default constructor.',
+        'get_constructor':
+'Returns the constructor method for this class if it is defined, ' +
+'or nullptr if the class uses the default constructor.',
+        'get_num_base_fields':
+'Returns the number of fields declared directly in this class.',
+        'get_base_field':
+'Returns the <n>th field from the class excluding any inherited fields.',
+        'add_parent':
+'Set this class as a subclass to target parent.',
+    }
 }
