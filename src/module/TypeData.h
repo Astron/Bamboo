@@ -13,9 +13,33 @@ class TypeDataHandle;
 
 class TypeData {
   public:
+    TypeData(const DistributedType *);
     TypeData(const DistributedType *, const std::vector<uint8_t>&);
     TypeData(const DistributedType *, const std::vector<uint8_t>&, sizetag_t start, sizetag_t end);
     TypeData(const DistributedType *, const uint8_t *start, const uint8_t *end);
+
+    inline const DistributedType *type() const { return m_type; }
+    inline std::vector<uint8_t>& data() { return m_data; }
+    inline const std::vector<uint8_t>& data() const { return m_data; }
+    inline sizetag_t size() const { return m_data.size(); }
+
+  private:
+    friend class TypeDataHandle;
+
+    const DistributedType *m_type;
+    std::vector<uint8_t> m_data;
+    sizetag_t m_num_elements;
+    std::unordered_map<std::string, unsigned int> m_elements_by_name;
+
+    TypeDataHandle read_type(const DistributedType* type, sizetag_t offset) const;
+};
+
+
+class TypeDataHandle {
+  public:
+    TypeDataHandle(const TypeData&);
+
+    inline sizetag_t size() const { return m_data->size(); }
 
     // TODO: Implement implicit conversions
     /*
@@ -43,48 +67,25 @@ class TypeData {
     // TODO: Implement set_{item,data}
     //TypeDataHandle set_item(sizetag_t index, TypeData);
     //TypeDataHandle set_item(const std::string& element_name, TypeData);
-
-    inline const DistributedType *type() const { return m_type; }
-    inline sizetag_t num_elements() const { return m_num_elements; }
-    inline std::vector<uint8_t> get_data() const { return std::vector<uint8_t>(m_data); }
-    //inline void set_data(std::vector<uint8_t> data){ return m_data = data; }
+    inline const DistributedType *type() const { return m_data->type(); }
+    inline const std::vector<uint8_t>& data() const { return m_data->data(); }
 
   private:
-    friend class TypeDataHandle;
+    friend class TypeData;
 
-    const DistributedType *m_type;
-    std::vector<uint8_t> m_data;
-    sizetag_t m_num_elements;
-    std::unordered_map<std::string, unsigned int> m_elements_by_name;
+    TypeDataHandle(const TypeData*, sizetag_t start, sizetag_t end);
+
+    const TypeData* m_data;
+    sizetag_t m_start, m_end;
+    // m_furthest_index is really criticial for variable-sized or arrays of var-sized types,
+    // where it would otherwise require us to read every previous index in later indices.
+    sizetag_t m_furthest_index;
+
     // m_element_offsets keeps track of the starting offset of each element we've computed.
     // N.B. In a typical case (iterating through the elements just once in order), this doesn't
     //      help with performance at all.  However when accessing elements out of order, by name,
     //      or with repeated access to elements, this will typically save us a lot of headache.
     std::unordered_map<sizetag_t, sizetag_t> m_element_offsets;
-    // m_furthest_index is really criticial for variable-sized or arrays of var-sized types,
-    // where it would otherwise require us to read every previous index in later indices.
-    sizetag_t m_furthest_index;
-
-
-    TypeDataHandle read_type(const DistributedType* type, sizetag_t offset);
-};
-
-
-class TypeDataHandle {
-  public:
-    TypeDataHandle(const DistributedType *, std::vector<uint8_t>&, sizetag_t start, sizetag_t end);
-
-    inline const DistributedType *type() const { return m_type; }
-    inline std::vector<uint8_t> get_data() const {
-        return std::vector<uint8_t>(&m_data[m_start], &m_data[m_end]);
-    }
-
-  private:
-    friend class TypeData;
-
-    const DistributedType *m_type;
-    std::vector<uint8_t>& m_data;
-    sizetag_t m_start, m_end;
 };
 
 

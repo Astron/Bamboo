@@ -195,8 +195,8 @@ class DatagramIterator {
 
     // read_dtype interprets the data as a value for the DistributedType in native endianness.
     TypeData read_dtype(const DistributedType *dtype);
-    // Can also provide an external buffer, and get a handle back instead.
-    TypeDataHandle read_dtype(const DistributedType *dtype, std::vector<uint8_t>& ref);
+    // read_dtype can also unpack data into a pre-existing buffer.
+    void read_dtype(const DistributedType *dtype, std::vector<uint8_t>& ref);
 
     // skip_dtype can be used to seek past the packed data for a DistributedType.
     //     Throws DatagramIteratorEOF if it skips past the end of the datagram.

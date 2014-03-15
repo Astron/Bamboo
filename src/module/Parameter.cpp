@@ -9,11 +9,8 @@ namespace bamboo { // open namespace bamboo
 
 // constructor
 Parameter::Parameter(DistributedType *type, const string& name) :
-    m_name(name), m_type(type), m_method(nullptr), m_has_default_value(false) {
-    bool implicit_value;
-    m_default_value = create_default_value(type, implicit_value);
-    m_has_default_value = !implicit_value;
-
+    m_name(name), m_type(type), m_method(nullptr),
+    m_default_value(implicit_default(type, m_has_default_value)) {
     if(m_type == nullptr) {
         m_type = DistributedType::invalid;
     }
@@ -48,18 +45,23 @@ bool Parameter::set_type(DistributedType *type) {
     }
 
     m_type = type;
-    m_has_default_value = false;
-    m_default_value = create_default_value(type);
+    m_default_value = implicit_default(type, m_has_default_value);
 
     return true;
 }
 
 // set_default_value defines a default value for this parameter.
 //     Returns false if the value is invalid for the parameter's type.
-bool Parameter::set_default_value(const vector<uint8_t>& default_value) {
+bool Parameter::set_default_value(const TypeData& default_value) {
     // TODO: Validate default value
     m_has_default_value = true;
     m_default_value = default_value;
+    return true;
+}
+bool Parameter::set_default_value(const vector<uint8_t>& default_value) {
+    // TODO: Validate default value
+    m_has_default_value = true;
+    m_default_value = TypeData(m_type, default_value);
     return true;
 }
 

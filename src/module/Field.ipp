@@ -35,7 +35,7 @@ inline bool Field::has_default_value() const {
 
 // get_default_value returns the default value for this field.
 //     If a default value hasn't been set, returns an implicit default.
-inline const std::vector<uint8_t>& Field::get_default_value() const {
+inline TypeDataHandle Field::get_default_value() const {
     return m_default_value;
 }
 

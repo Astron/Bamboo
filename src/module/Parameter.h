@@ -2,6 +2,7 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
+#include "module/TypeData.h"
 namespace bamboo { // open namespace bamboo
 
 
@@ -28,7 +29,7 @@ class Parameter {
     inline bool has_default_value() const;
     // get_default_value returns the default value for this parameter.
     //     If a default value hasn't been set, returns an implicit default.
-    inline const std::vector<uint8_t>& get_default_value() const;
+    inline TypeDataHandle get_default_value() const;
 
     // set_name sets the name of this parameter.  Returns false if a parameter with
     //     the same name already exists in the containing method.
@@ -40,6 +41,7 @@ class Parameter {
 
     // set_default_value defines a default value for this parameter.
     //     Returns false if the value is invalid for the parameter's type.
+    bool set_default_value(const TypeData& default_value);
     bool set_default_value(const std::vector<uint8_t>& default_value);
 
   private:
@@ -53,7 +55,7 @@ class Parameter {
     Method *m_method;
 
     bool m_has_default_value; // is true if an explicity default has been set
-    std::vector<uint8_t> m_default_value; // the binary data of the default value encoded in a string
+    TypeData m_default_value; // the binary data of the default value encoded in a string
 };
 
 

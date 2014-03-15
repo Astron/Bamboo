@@ -8,11 +8,8 @@ namespace bamboo { // open namespace
 
 // constructor
 Field::Field(DistributedType *type, const string& name) :
-    m_struct(nullptr), m_id(0), m_name(name), m_type(type), m_has_default_value(false) {
-    bool implicit_value;
-    m_default_value = create_default_value(type, implicit_value);
-    m_has_default_value = !implicit_value;
-
+    m_struct(nullptr), m_id(0), m_name(name), m_type(type),
+    m_default_value(implicit_default(type, m_has_default_value)) {
     if(m_type == nullptr) {
         m_type = DistributedType::invalid;
     }
@@ -46,16 +43,21 @@ bool Field::set_name(const string& name) {
 // set_type sets the distributed type of the field and clear's the default value.
 void Field::set_type(DistributedType *type) {
     m_type = type;
-    m_has_default_value = false;
-    m_default_value = create_default_value(type);
+    m_default_value = implicit_default(type, m_has_default_value);
 }
 
 // set_default_value establishes a default value for this field.
 //     Returns false if the value is invalid for the field.
-bool Field::set_default_value(const vector<uint8_t>& default_value) {
+bool Field::set_default_value(const TypeData& default_value) {
     // TODO: Validate default value
     m_has_default_value = true;
     m_default_value = default_value;
+    return true;
+}
+bool Field::set_default_value(const vector<uint8_t>& default_value) {
+    // TODO: Validate default value
+    m_has_default_value = true;
+    m_default_value = TypeData(m_type, default_value);
     return true;
 }
 

@@ -20,16 +20,13 @@ TypeData DatagramIterator::read_dtype(const DistributedType *dtype) {
     return TypeData(dtype, start, m_dg->get_data() + m_offset);
 #else
     // Lets go ahead and unpack that manually
-    vector<uint8_t> buffer;
-    read_dtype(dtype, buffer);
-    return TypeData(dtype, buffer);
+    DataType data(dtype);
+    read_dtype(dtype, data.data());
+    return data;
 #endif
 }
 
-// Can also provide an external buffer, and get a handle back instead.
-TypeDataHandle DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>& buffer) {
-    sizetag_t m_start = buffer.size();
-
+void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>& buffer) {
 #ifndef PLATFORM_BIG_ENDIAN
     if(dtype->has_fixed_size())
     {
@@ -37,7 +34,6 @@ TypeDataHandle DatagramIterator::read_dtype(const DistributedType* dtype, vector
         // Also any other type lucky enough to be fixed size will be faster.
         vector<uint8_t> data = read_data(dtype->get_size());
         pack_value(data, buffer);
-        return TypeDataHandle(dtype, buffer, m_start, dtype->get_size());
     }
 #endif
 
@@ -159,8 +155,6 @@ TypeDataHandle DatagramIterator::read_dtype(const DistributedType* dtype, vector
             break;
         }
     }
-
-    return TypeDataHandle(dtype, buffer, m_start, buffer.size());
 }
 
 // skip_dtype can be used to seek past the packed data for a DistributedType.

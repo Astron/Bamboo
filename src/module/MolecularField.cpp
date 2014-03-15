@@ -2,11 +2,12 @@
 #include "MolecularField.h"
 #include "bits/buffers.h"
 #include "module/Class.h"
+using namespace std;
 namespace bamboo { // open namespace bamboo
 
 
 // constructor
-MolecularField::MolecularField(Class *cls, const std::string& name) :
+MolecularField::MolecularField(Class *cls, const string& name) :
     Field(cls, name), Struct(cls->get_module()) {
     Field::m_type = this;
 }
@@ -60,13 +61,15 @@ bool MolecularField::add_field(Field *field) {
             m_has_default_value = true;
         }
 
-        pack_value(field->get_default_value(), m_default_value);
+        vector<uint8_t> data(m_default_value.data());
+        pack_value(field->get_default_value().data(), data);
+        m_default_value = TypeData(this, data);
     }
 
     return true;
 }
 
-bool MolecularField::set_default_value(const std::string&) {
+bool MolecularField::set_default_value(const string&) {
     // MolecularField default values are implict from their
     // atomic components and cannot be defined manually.
     return false;
