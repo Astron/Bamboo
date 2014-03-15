@@ -243,6 +243,9 @@ def generate(file_):
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
     add_method(clsField, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
     add_method(clsField, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
+    clsMolecular.add_constructor([
+               param('bamboo::Class *', 'cls', transfer_ownership = False),
+               param('const std::string&', 'name')])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

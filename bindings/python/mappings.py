@@ -183,9 +183,9 @@ classDocstrings = {
 'A Parameter is a single argument/parameter of a Method.',
     'Field':
 'A Field is a member of a class or struct.',
-#    'MolecularField':
-#'A MolecularField is an abstract field which provides an interface that can ' +
-#'be used to access multiple other fields at the same time.',
+    'MolecularField':
+'A MolecularField is an abstract field which provides an interface that can ' +
+'be used to access multiple other fields at the same time.',
 }
 
 functionDocstrings = {

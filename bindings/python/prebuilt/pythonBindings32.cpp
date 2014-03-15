@@ -6541,10 +6541,23 @@ PyTypeObject PyBambooField_Type = {
 
 
 static int
-_wrap_PyBambooMolecularField__tp_init(void)
+_wrap_PyBambooMolecularField__tp_init(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'MolecularField' cannot be constructed ()");
-    return -1;
+    PyBambooClass *cls;
+    bamboo::Class *cls_ptr;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"cls", "name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooClass_Type, &cls, &name, &name_len)) {
+        return -1;
+    }
+    cls_ptr = (cls ? cls->obj : NULL);
+    name_std = std::string(name, name_len);
+    self->obj = new bamboo::MolecularField(cls_ptr, name_std);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
 }
 
 PyObject *
