@@ -227,6 +227,22 @@ def generate(file_):
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
     add_method(clsParam, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
     add_method(clsParam, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
+    clsField.add_constructor([
+               param('bamboo::DistributedType *', 'type', transfer_ownership = False),
+               param('const std::string&', 'name', default_value = '""')])
+    add_method(clsField, 'get_id', retval('unsigned int'), [], is_const = True)
+    add_method(clsField, 'get_name', retval('std::string'), [], is_const = False)
+    add_method(clsField, 'get_type',
+               retval('bamboo::DistributedType *', caller_owns_return = False), [])
+    add_method(clsField, 'get_struct',
+               retval('bamboo::Struct *', caller_owns_return = False), [])
+    add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
+    add_method(clsField, 'get_default_value', retval('TypeDataHandle'), [], is_const = True)
+    add_method(clsField, 'set_name', retval('bool'), [param('const std::string&', 'name')])
+    add_method(clsField, 'set_type', retval('bool'),
+               [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
+    add_method(clsField, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
+    add_method(clsField, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

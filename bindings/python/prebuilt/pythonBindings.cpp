@@ -6002,13 +6002,444 @@ PyTypeObject PyBambooParameter_Type = {
 
 
 static int
-_wrap_PyBambooField__tp_init(void)
+_wrap_PyBambooField__tp_init(PyBambooField *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'Field' cannot be constructed ()");
-    return -1;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"type", "name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooDistributedType_Type, &type, &name, &name_len)) {
+        return -1;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    name_std = std::string(name, name_len);
+    self->obj = new bamboo::Field(type_ptr, name_std);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+
+PyObject *
+_wrap_PyBambooField_set_name(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_setName(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_getDefaultValue(PyBambooField *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_getStruct(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bamboo::Struct *retval;
+    PyBambooStruct *py_Struct;
+
+    retval = self->obj->get_struct();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
+    py_Struct->obj = new bamboo::Struct((*retval));
+    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Struct);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_hasDefaultValue(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_default_value();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_get_struct(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bamboo::Struct *retval;
+    PyBambooStruct *py_Struct;
+
+    retval = self->obj->get_struct();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
+    py_Struct->obj = new bamboo::Struct((*retval));
+    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Struct);
+    return py_retval;
+}
+
+
+
+PyObject *
+_wrap_PyBambooField_setDefaultValue__0(PyBambooField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooField_setDefaultValue__1(PyBambooField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooField_setDefaultValue(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooField_setDefaultValue__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooField_setDefaultValue__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
+PyObject *
+_wrap_PyBambooField_getName(PyBambooField *self)
+{
+    PyObject *py_retval;
+    std::string retval;
+
+    retval = self->obj->get_name();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_getType(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_get_default_value(PyBambooField *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_get_name(PyBambooField *self)
+{
+    PyObject *py_retval;
+    std::string retval;
+
+    retval = self->obj->get_name();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_set_type(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_has_default_value(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_default_value();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_get_id(PyBambooField *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->get_id();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_get_type(PyBambooField *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooField_getId(PyBambooField *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->get_id();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+
+PyObject *
+_wrap_PyBambooField_set_default_value__0(PyBambooField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooField_set_default_value__1(PyBambooField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooField_set_default_value(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooField_set_default_value__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooField_set_default_value__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
+PyObject *
+_wrap_PyBambooField_setType(PyBambooField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
 }
 
 static PyMethodDef PyBambooField_methods[] = {
+    {(char *) "set_name", (PyCFunction) _wrap_PyBambooField_set_name, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
+    {(char *) "setName", (PyCFunction) _wrap_PyBambooField_setName, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
+    {(char *) "getDefaultValue", (PyCFunction) _wrap_PyBambooField_getDefaultValue, METH_NOARGS, "Returns the default value for this field.  If a default value hasn't been set, returns an implicit default." },
+    {(char *) "getStruct", (PyCFunction) _wrap_PyBambooField_getStruct, METH_NOARGS, "Returns the Struct that contains this field." },
+    {(char *) "hasDefaultValue", (PyCFunction) _wrap_PyBambooField_hasDefaultValue, METH_NOARGS, "Returns true if a default value was defined for this field." },
+    {(char *) "get_struct", (PyCFunction) _wrap_PyBambooField_get_struct, METH_NOARGS, "Returns the Struct that contains this field." },
+    {(char *) "setDefaultValue", (PyCFunction) _wrap_PyBambooField_setDefaultValue, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "getName", (PyCFunction) _wrap_PyBambooField_getName, METH_NOARGS, "Returns the field's name.  An unnamed field returns the empty string." },
+    {(char *) "getType", (PyCFunction) _wrap_PyBambooField_getType, METH_NOARGS, "Returns the DistributedType of the field." },
+    {(char *) "get_default_value", (PyCFunction) _wrap_PyBambooField_get_default_value, METH_NOARGS, "Returns the default value for this field.  If a default value hasn't been set, returns an implicit default." },
+    {(char *) "get_name", (PyCFunction) _wrap_PyBambooField_get_name, METH_NOARGS, "Returns the field's name.  An unnamed field returns the empty string." },
+    {(char *) "set_type", (PyCFunction) _wrap_PyBambooField_set_type, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
+    {(char *) "has_default_value", (PyCFunction) _wrap_PyBambooField_has_default_value, METH_NOARGS, "Returns true if a default value was defined for this field." },
+    {(char *) "get_id", (PyCFunction) _wrap_PyBambooField_get_id, METH_NOARGS, "Returns a unique index number associated with this field." },
+    {(char *) "get_type", (PyCFunction) _wrap_PyBambooField_get_type, METH_NOARGS, "Returns the DistributedType of the field." },
+    {(char *) "getId", (PyCFunction) _wrap_PyBambooField_getId, METH_NOARGS, "Returns a unique index number associated with this field." },
+    {(char *) "set_default_value", (PyCFunction) _wrap_PyBambooField_set_default_value, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "setType", (PyCFunction) _wrap_PyBambooField_setType, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {NULL, NULL, 0, NULL}
 };
 
@@ -6155,6 +6586,25 @@ _wrap_PyBambooMolecularField_as_array(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_getStruct(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Struct *retval;
+    PyBambooStruct *py_Struct;
+
+    retval = self->obj->get_struct();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
+    py_Struct->obj = new bamboo::Struct((*retval));
+    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Struct);
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_as_method(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -6204,6 +6654,62 @@ _wrap_PyBambooMolecularField_getSize(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_get_type(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_get_module(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Module *retval;
+    PyBambooModule *py_Module;
+
+    retval = self->obj->get_module();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
+    py_Module->obj = new bamboo::Module((*retval));
+    py_Module->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Module);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_setType(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_get_alias(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -6215,45 +6721,38 @@ _wrap_PyBambooMolecularField_get_alias(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_addField(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+_wrap_PyBambooMolecularField_hasDefaultValue(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
     bool retval;
-    PyBambooField *field;
-    bamboo::Field *field_ptr;
-    const char *keywords[] = {"field", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
-        return NULL;
-    }
-    field_ptr = (field ? field->obj : NULL);
-    retval = self->obj->add_field(field_ptr);
-    if (field) {
-        field->obj = NULL;
-    }
+    retval = self->obj->has_default_value();
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_getName(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_hasFixedSize(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
-    std::string retval;
+    bool retval;
 
-    retval = self->obj->get_name();
-    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    retval = self->obj->has_fixed_size();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_getId(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_get_default_value(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
-    unsigned int retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
 
-    retval = self->obj->get_id();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
     return py_retval;
 }
 
@@ -6289,6 +6788,17 @@ _wrap_PyBambooMolecularField_get_field_by_id(PyBambooMolecularField *self, PyObj
     py_Field->obj = new bamboo::Field((*retval));
     py_Field->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_has_alias(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_alias();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -6415,12 +6925,34 @@ _wrap_PyBambooMolecularField_getFieldByName(PyBambooMolecularField *self, PyObje
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_hasFixedSize(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_getDefaultValue(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_setName(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
     bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
 
-    retval = self->obj->has_fixed_size();
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
@@ -6441,6 +6973,131 @@ _wrap_PyBambooMolecularField_asArray(PyBambooMolecularField *self)
     py_ArrayType->obj = new bamboo::ArrayType((*retval));
     py_ArrayType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_retval = Py_BuildValue((char *) "N", py_ArrayType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooMolecularField_setDefaultValue__0(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_setDefaultValue__1(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooMolecularField_setDefaultValue(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooMolecularField_setDefaultValue__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooMolecularField_setDefaultValue__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_getType(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_get_struct(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Struct *retval;
+    PyBambooStruct *py_Struct;
+
+    retval = self->obj->get_struct();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
+    py_Struct->obj = new bamboo::Struct((*retval));
+    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Struct);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_set_type(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -6473,17 +7130,6 @@ _wrap_PyBambooMolecularField_add_field(PyBambooMolecularField *self, PyObject *a
         field->obj = NULL;
     }
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_get_id(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    unsigned int retval;
-
-    retval = self->obj->get_id();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
     return py_retval;
 }
 
@@ -6569,6 +7215,25 @@ _wrap_PyBambooMolecularField_asNumeric(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_set_name(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_hasAlias(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -6604,13 +7269,23 @@ _wrap_PyBambooMolecularField_getField(PyBambooMolecularField *self, PyObject *ar
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_get_name(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_addField(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    std::string retval;
+    bool retval;
+    PyBambooField *field;
+    bamboo::Field *field_ptr;
+    const char *keywords[] = {"field", NULL};
 
-    retval = self->obj->get_name();
-    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
+        return NULL;
+    }
+    field_ptr = (field ? field->obj : NULL);
+    retval = self->obj->add_field(field_ptr);
+    if (field) {
+        field->obj = NULL;
+    }
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -6637,33 +7312,83 @@ _wrap_PyBambooMolecularField_getSubtype(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_get_module(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Module *retval;
-    PyBambooModule *py_Module;
-
-    retval = self->obj->get_module();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
-    py_Module->obj = new bamboo::Module((*retval));
-    py_Module->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_retval = Py_BuildValue((char *) "N", py_Module);
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_has_alias(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_has_default_value(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
     bool retval;
 
-    retval = self->obj->has_alias();
+    retval = self->obj->has_default_value();
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooMolecularField_set_default_value__0(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_set_default_value__1(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooMolecularField_set_default_value(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooMolecularField_set_default_value__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooMolecularField_set_default_value__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
 }
 
 PyObject *
@@ -6715,15 +7440,20 @@ _wrap_PyBambooMolecularField_set_alias(PyBambooMolecularField *self, PyObject *a
 static PyMethodDef PyBambooMolecularField_methods[] = {
     {(char *) "as_struct", (PyCFunction) _wrap_PyBambooMolecularField_as_struct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
     {(char *) "as_array", (PyCFunction) _wrap_PyBambooMolecularField_as_array, METH_NOARGS, "Returns this as an ArrayType if it is an array, or None otherwise." },
+    {(char *) "getStruct", (PyCFunction) _wrap_PyBambooMolecularField_getStruct, METH_NOARGS, "Returns the Struct that contains this field." },
     {(char *) "as_method", (PyCFunction) _wrap_PyBambooMolecularField_as_method, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "as_numeric", (PyCFunction) _wrap_PyBambooMolecularField_as_numeric, METH_NOARGS, "Returns this as a NumericType if it is numeric, or None otherwise." },
     {(char *) "getSize", (PyCFunction) _wrap_PyBambooMolecularField_getSize, METH_NOARGS, "Returns the size of the DistributedType in bytes or 0 if it is variable." },
+    {(char *) "get_type", (PyCFunction) _wrap_PyBambooMolecularField_get_type, METH_NOARGS, "Returns the DistributedType of the field." },
+    {(char *) "get_module", (PyCFunction) _wrap_PyBambooMolecularField_get_module, METH_NOARGS, "Returns the Module object that contains the struct." },
+    {(char *) "setType", (PyCFunction) _wrap_PyBambooMolecularField_setType, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {(char *) "get_alias", (PyCFunction) _wrap_PyBambooMolecularField_get_alias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
-    {(char *) "addField", (PyCFunction) _wrap_PyBambooMolecularField_addField, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Field to the Struct returning false if there is a name conflict." },
-    {(char *) "getName", (PyCFunction) _wrap_PyBambooMolecularField_getName, METH_NOARGS, "Returns the name of this struct." },
-    {(char *) "getId", (PyCFunction) _wrap_PyBambooMolecularField_getId, METH_NOARGS, "Returns a unique index number associated with this struct." },
+    {(char *) "hasDefaultValue", (PyCFunction) _wrap_PyBambooMolecularField_hasDefaultValue, METH_NOARGS, "Returns true if a default value was defined for this field." },
+    {(char *) "hasFixedSize", (PyCFunction) _wrap_PyBambooMolecularField_hasFixedSize, METH_NOARGS, "Returns true if the DistributedType has a fixed size in bytes." },
+    {(char *) "get_default_value", (PyCFunction) _wrap_PyBambooMolecularField_get_default_value, METH_NOARGS, "Returns the default value for this field.  If a default value hasn't been set, returns an implicit default." },
     {(char *) "get_size", (PyCFunction) _wrap_PyBambooMolecularField_get_size, METH_NOARGS, "Returns the size of the DistributedType in bytes or 0 if it is variable." },
     {(char *) "get_field_by_id", (PyCFunction) _wrap_PyBambooMolecularField_get_field_by_id, METH_KEYWORDS|METH_VARARGS, "Returns the field with the index <id>, or None if no such field exists." },
+    {(char *) "has_alias", (PyCFunction) _wrap_PyBambooMolecularField_has_alias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
     {(char *) "has_fixed_size", (PyCFunction) _wrap_PyBambooMolecularField_has_fixed_size, METH_NOARGS, "Returns true if the DistributedType has a fixed size in bytes." },
     {(char *) "get_field", (PyCFunction) _wrap_PyBambooMolecularField_get_field, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
     {(char *) "get_num_fields", (PyCFunction) _wrap_PyBambooMolecularField_get_num_fields, METH_NOARGS, "Returns the number of fields in the struct." },
@@ -6731,22 +7461,27 @@ static PyMethodDef PyBambooMolecularField_methods[] = {
     {(char *) "get_subtype", (PyCFunction) _wrap_PyBambooMolecularField_get_subtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
     {(char *) "asMethod", (PyCFunction) _wrap_PyBambooMolecularField_asMethod, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "getFieldByName", (PyCFunction) _wrap_PyBambooMolecularField_getFieldByName, METH_KEYWORDS|METH_VARARGS, "Returns the field with <name>, or None if no such field exists." },
-    {(char *) "hasFixedSize", (PyCFunction) _wrap_PyBambooMolecularField_hasFixedSize, METH_NOARGS, "Returns true if the DistributedType has a fixed size in bytes." },
+    {(char *) "getDefaultValue", (PyCFunction) _wrap_PyBambooMolecularField_getDefaultValue, METH_NOARGS, "Returns the default value for this field.  If a default value hasn't been set, returns an implicit default." },
+    {(char *) "setName", (PyCFunction) _wrap_PyBambooMolecularField_setName, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
     {(char *) "asArray", (PyCFunction) _wrap_PyBambooMolecularField_asArray, METH_NOARGS, "Returns this as an ArrayType if it is an array, or None otherwise." },
+    {(char *) "setDefaultValue", (PyCFunction) _wrap_PyBambooMolecularField_setDefaultValue, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "getType", (PyCFunction) _wrap_PyBambooMolecularField_getType, METH_NOARGS, "Returns the DistributedType of the field." },
+    {(char *) "get_struct", (PyCFunction) _wrap_PyBambooMolecularField_get_struct, METH_NOARGS, "Returns the Struct that contains this field." },
+    {(char *) "set_type", (PyCFunction) _wrap_PyBambooMolecularField_set_type, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {(char *) "getAlias", (PyCFunction) _wrap_PyBambooMolecularField_getAlias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
     {(char *) "add_field", (PyCFunction) _wrap_PyBambooMolecularField_add_field, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Field to the Struct returning false if there is a name conflict." },
-    {(char *) "get_id", (PyCFunction) _wrap_PyBambooMolecularField_get_id, METH_NOARGS, "Returns a unique index number associated with this struct." },
     {(char *) "getFieldById", (PyCFunction) _wrap_PyBambooMolecularField_getFieldById, METH_KEYWORDS|METH_VARARGS, "Returns the field with the index <id>, or None if no such field exists." },
     {(char *) "getModule", (PyCFunction) _wrap_PyBambooMolecularField_getModule, METH_NOARGS, "Returns the Module object that contains the struct." },
     {(char *) "setAlias", (PyCFunction) _wrap_PyBambooMolecularField_setAlias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
     {(char *) "asNumeric", (PyCFunction) _wrap_PyBambooMolecularField_asNumeric, METH_NOARGS, "Returns this as a NumericType if it is numeric, or None otherwise." },
+    {(char *) "set_name", (PyCFunction) _wrap_PyBambooMolecularField_set_name, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
     {(char *) "hasAlias", (PyCFunction) _wrap_PyBambooMolecularField_hasAlias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
     {(char *) "getField", (PyCFunction) _wrap_PyBambooMolecularField_getField, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
-    {(char *) "get_name", (PyCFunction) _wrap_PyBambooMolecularField_get_name, METH_NOARGS, "Returns the name of this struct." },
+    {(char *) "addField", (PyCFunction) _wrap_PyBambooMolecularField_addField, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Field to the Struct returning false if there is a name conflict." },
     {(char *) "getNumFields", (PyCFunction) _wrap_PyBambooMolecularField_getNumFields, METH_NOARGS, "Returns the number of fields in the struct." },
     {(char *) "getSubtype", (PyCFunction) _wrap_PyBambooMolecularField_getSubtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
-    {(char *) "get_module", (PyCFunction) _wrap_PyBambooMolecularField_get_module, METH_NOARGS, "Returns the Module object that contains the struct." },
-    {(char *) "has_alias", (PyCFunction) _wrap_PyBambooMolecularField_has_alias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
+    {(char *) "has_default_value", (PyCFunction) _wrap_PyBambooMolecularField_has_default_value, METH_NOARGS, "Returns true if a default value was defined for this field." },
+    {(char *) "set_default_value", (PyCFunction) _wrap_PyBambooMolecularField_set_default_value, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "get_field_by_name", (PyCFunction) _wrap_PyBambooMolecularField_get_field_by_name, METH_KEYWORDS|METH_VARARGS, "Returns the field with <name>, or None if no such field exists." },
     {(char *) "set_alias", (PyCFunction) _wrap_PyBambooMolecularField_set_alias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
     {NULL, NULL, 0, NULL}

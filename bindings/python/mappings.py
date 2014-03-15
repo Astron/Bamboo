@@ -83,7 +83,7 @@ altnames = {
     'add_parent':          ['add_parent',          'addParent'],
 
     # Parameter
-    #'get_name': ['get_name', 'getName'],
+    #'get_name':         ['get_name',          'getName'],
     'get_type':          ['get_type',          'getType'],
     'get_method':        ['get_method',        'getMethod'],
     'has_default_value': ['has_default_value', 'hasDefaultValue'],
@@ -91,6 +91,17 @@ altnames = {
     'set_name':          ['set_name',          'setName'],
     'set_type':          ['set_type',          'setType'],
     'set_default_value': ['set_default_value', 'setDefaultValue'],
+
+    # Field
+    #'get_id':            ['get_id',            'getId'],
+    #'get_name':          ['get_name',          'getName'],
+    #'get_type':          ['get_type',          'getType'],
+    #'get_struct':        ['get_struct',        'getStruct'],
+    #'has_default_value': ['has_default_value', 'hasDefaultValue'],
+    #'get_default_value': ['get_default_value', 'getDefaultValue'],
+    #'set_name':          ['set_name',          'setName'],
+    #'set_type':          ['set_type',          'setType'],
+    #'set_default_value': ['set_default_value', 'setDefaultValue'],
 
     # Buffer
     'read_bool':    ['read_bool',    'readBool'],
@@ -170,6 +181,8 @@ classDocstrings = {
 'Unlike other structs, classes cannot have anonymous fields.',
     'Parameter':
 'A Parameter is a single argument/parameter of a Method.',
+    'Field':
+'A Field is a member of a class or struct.',
 #    'MolecularField':
 #'A MolecularField is an abstract field which provides an interface that can ' +
 #'be used to access multiple other fields at the same time.',
@@ -369,5 +382,30 @@ methodDocstrings = {
         'set_default_value':
 'Defines a default value for this parameter.  ' +
 'Returns false if the value is invalid for the parameter\'s type.',
+    },
+
+    'Field': {
+        'get_id':
+'Returns a unique index number associated with this field.',
+        'get_name':
+'Returns the field\'s name.  An unnamed field returns the empty string.',
+        'get_type':
+'Returns the DistributedType of the field.',
+        'get_struct':
+'Returns the Struct that contains this field.',
+        'has_default_value':
+'Returns true if a default value was defined for this field.',
+        'get_default_value':
+'Returns the default value for this field.  ' +
+'If a default value hasn\'t been set, returns an implicit default.',
+        'set_name':
+'Sets the name of this field.  Returns false if a field with ' +
+'the same name already exists in the containing method.',
+        'set_type':
+'Sets the DistributedType of the field and clear\'s the default value.  ' +
+'Returns false if a field cannot represent <type>.',
+        'set_default_value':
+'Defines a default value for this field.  ' +
+'Returns false if the value is invalid for the field\'s type.',
     },
 }
