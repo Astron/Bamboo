@@ -90,6 +90,7 @@ typedef enum _PyBindGenWrapperFlags {
 #include "module/NumericType.h"
 #include "module/Parameter.h"
 #include "module/Struct.h"
+#include "module/TypeData.h"
 #include "traits/hashes.h"
 #include "dcfile/format.h"
 #include "dcfile/parse.h"
@@ -212,6 +213,26 @@ typedef struct {
 
 
 extern PyTypeObject PyBambooMolecularField_Type;
+
+
+typedef struct {
+    PyObject_HEAD
+    bamboo::TypeData *obj;
+    PyBindGenWrapperFlags flags:8;
+} PyBambooTypeData;
+
+
+extern PyTypeObject PyBambooTypeData_Type;
+
+
+typedef struct {
+    PyObject_HEAD
+    bamboo::TypeDataHandle *obj;
+    PyBindGenWrapperFlags flags:8;
+} PyBambooTypeDataHandle;
+
+
+extern PyTypeObject PyBambooTypeDataHandle_Type;
 
 
 typedef struct {
@@ -5468,13 +5489,418 @@ PyTypeObject PyBambooClass_Type = {
 
 
 static int
-_wrap_PyBambooParameter__tp_init(void)
+_wrap_PyBambooParameter__tp_init(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'Parameter' cannot be constructed ()");
-    return -1;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"type", "name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!s#", (char **) keywords, &PyBambooDistributedType_Type, &type, &name, &name_len)) {
+        return -1;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    name_std = std::string(name, name_len);
+    self->obj = new bamboo::Parameter(type_ptr, name_std);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_set_name(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_getDefaultValue(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_setName(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+        return NULL;
+    }
+    name_std = std::string(name, name_len);
+    retval = self->obj->set_name(name_std);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_hasDefaultValue(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_default_value();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+
+PyObject *
+_wrap_PyBambooParameter_setDefaultValue__0(PyBambooParameter *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooParameter_setDefaultValue__1(PyBambooParameter *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooParameter_setDefaultValue(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooParameter_setDefaultValue__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooParameter_setDefaultValue__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_getName(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    std::string retval;
+
+    retval = self->obj->get_name();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_getType(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_get_default_value(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    TypeDataHandle retval = self->obj->get_default_value();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_get_name(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    std::string retval;
+
+    retval = self->obj->get_name();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_set_type(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_has_default_value(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->has_default_value();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_get_type(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->get_type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_getMethod(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bamboo::Method *retval;
+    PyBambooMethod *py_Method;
+
+    retval = self->obj->get_method();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
+    py_Method->obj = new bamboo::Method((*retval));
+    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Method);
+    return py_retval;
+}
+
+
+
+PyObject *
+_wrap_PyBambooParameter_set_default_value__0(PyBambooParameter *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooTypeData *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooTypeData_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooTypeData *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooParameter_set_default_value__1(PyBambooParameter *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooBuffer *value;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &value)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+    retval = self->obj->set_default_value(*((PyBambooBuffer *) value)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject * _wrap_PyBambooParameter_set_default_value(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooParameter_set_default_value__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooParameter_set_default_value__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_get_method(PyBambooParameter *self)
+{
+    PyObject *py_retval;
+    bamboo::Method *retval;
+    PyBambooMethod *py_Method;
+
+    retval = self->obj->get_method();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
+    py_Method->obj = new bamboo::Method((*retval));
+    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_Method);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooParameter_setType(PyBambooParameter *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        return NULL;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    retval = self->obj->set_type(type_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
 }
 
 static PyMethodDef PyBambooParameter_methods[] = {
+    {(char *) "set_name", (PyCFunction) _wrap_PyBambooParameter_set_name, METH_KEYWORDS|METH_VARARGS, "Sets the name of this parameter.  Returns false if a parameter with the same name already exists in the containing method." },
+    {(char *) "getDefaultValue", (PyCFunction) _wrap_PyBambooParameter_getDefaultValue, METH_NOARGS, "Returns the default value for this parameter.  If a default value hasn't been set, returns an implicit default." },
+    {(char *) "setName", (PyCFunction) _wrap_PyBambooParameter_setName, METH_KEYWORDS|METH_VARARGS, "Sets the name of this parameter.  Returns false if a parameter with the same name already exists in the containing method." },
+    {(char *) "hasDefaultValue", (PyCFunction) _wrap_PyBambooParameter_hasDefaultValue, METH_NOARGS, "Returns true if a default value was defined for this parameter." },
+    {(char *) "setDefaultValue", (PyCFunction) _wrap_PyBambooParameter_setDefaultValue, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "getName", (PyCFunction) _wrap_PyBambooParameter_getName, METH_NOARGS, "Returns the parameter's name.  An unnamed parameter returns the empty string." },
+    {(char *) "getType", (PyCFunction) _wrap_PyBambooParameter_getType, METH_NOARGS, "Returns the DistributedType of the Parameter." },
+    {(char *) "get_default_value", (PyCFunction) _wrap_PyBambooParameter_get_default_value, METH_NOARGS, "Returns the default value for this parameter.  If a default value hasn't been set, returns an implicit default." },
+    {(char *) "get_name", (PyCFunction) _wrap_PyBambooParameter_get_name, METH_NOARGS, "Returns the parameter's name.  An unnamed parameter returns the empty string." },
+    {(char *) "set_type", (PyCFunction) _wrap_PyBambooParameter_set_type, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the parameter and clear's the default value.  Returns false if a parameter cannot represent <type>." },
+    {(char *) "has_default_value", (PyCFunction) _wrap_PyBambooParameter_has_default_value, METH_NOARGS, "Returns true if a default value was defined for this parameter." },
+    {(char *) "get_type", (PyCFunction) _wrap_PyBambooParameter_get_type, METH_NOARGS, "Returns the DistributedType of the Parameter." },
+    {(char *) "getMethod", (PyCFunction) _wrap_PyBambooParameter_getMethod, METH_NOARGS, "Returns the Method that contains the Parameter." },
+    {(char *) "set_default_value", (PyCFunction) _wrap_PyBambooParameter_set_default_value, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "get_method", (PyCFunction) _wrap_PyBambooParameter_get_method, METH_NOARGS, "Returns the Method that contains the Parameter." },
+    {(char *) "setType", (PyCFunction) _wrap_PyBambooParameter_setType, METH_KEYWORDS|METH_VARARGS, "Sets the DistributedType of the parameter and clear's the default value.  Returns false if a parameter cannot represent <type>." },
     {NULL, NULL, 0, NULL}
 };
 
@@ -6408,6 +6834,222 @@ PyTypeObject PyBambooMolecularField_Type = {
     (descrsetfunc)NULL,    /* tp_descr_set */
     0,                 /* tp_dictoffset */
     (initproc)_wrap_PyBambooMolecularField__tp_init,             /* tp_init */
+    (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
+    (newfunc)PyType_GenericNew,               /* tp_new */
+    (freefunc)0,             /* tp_free */
+    (inquiry)NULL,             /* tp_is_gc */
+    NULL,                              /* tp_bases */
+    NULL,                              /* tp_mro */
+    NULL,                              /* tp_cache */
+    NULL,                              /* tp_subclasses */
+    NULL,                              /* tp_weaklist */
+    (destructor) NULL                  /* tp_del */
+};
+
+
+
+
+static int
+_wrap_PyBambooTypeData__tp_init(void)
+{
+    PyErr_SetString(PyExc_TypeError, "class 'TypeData' cannot be constructed ()");
+    return -1;
+}
+
+static PyMethodDef PyBambooTypeData_methods[] = {
+    {NULL, NULL, 0, NULL}
+};
+
+static void
+_wrap_PyBambooTypeData__tp_dealloc(PyBambooTypeData *self)
+{
+        bamboo::TypeData *tmp = self->obj;
+        self->obj = NULL;
+        if (!(self->flags&PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED)) {
+            delete tmp;
+        }
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject*
+_wrap_PyBambooTypeData__tp_richcompare (PyBambooTypeData *PYBINDGEN_UNUSED(self), PyBambooTypeData *other, int opid)
+{
+
+    if (!PyObject_IsInstance((PyObject*) other, (PyObject*) &PyBambooTypeData_Type)) {
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    }
+    switch (opid)
+    {
+    case Py_LT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_LE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_EQ:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_NE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    } /* closes switch (opid) */
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+}
+
+PyTypeObject PyBambooTypeData_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    (char *) "bamboo.module.TypeData",            /* tp_name */
+    sizeof(PyBambooTypeData),                  /* tp_basicsize */
+    0,                                 /* tp_itemsize */
+    /* methods */
+    (destructor)_wrap_PyBambooTypeData__tp_dealloc,        /* tp_dealloc */
+    (printfunc)0,                      /* tp_print */
+    (getattrfunc)NULL,       /* tp_getattr */
+    (setattrfunc)NULL,       /* tp_setattr */
+    (cmpfunc)NULL,           /* tp_compare */
+    (reprfunc)NULL,             /* tp_repr */
+    (PyNumberMethods*)NULL,     /* tp_as_number */
+    (PySequenceMethods*)NULL, /* tp_as_sequence */
+    (PyMappingMethods*)NULL,   /* tp_as_mapping */
+    (hashfunc)NULL,             /* tp_hash */
+    (ternaryfunc)NULL,          /* tp_call */
+    (reprfunc)NULL,              /* tp_str */
+    (getattrofunc)NULL,     /* tp_getattro */
+    (setattrofunc)NULL,     /* tp_setattro */
+    (PyBufferProcs*)NULL,  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                      /* tp_flags */
+    NULL,                        /* Documentation string */
+    (traverseproc)NULL,     /* tp_traverse */
+    (inquiry)NULL,             /* tp_clear */
+    (richcmpfunc)_wrap_PyBambooTypeData__tp_richcompare,   /* tp_richcompare */
+    0,             /* tp_weaklistoffset */
+    (getiterfunc)NULL,          /* tp_iter */
+    (iternextfunc)NULL,     /* tp_iternext */
+    (struct PyMethodDef*)PyBambooTypeData_methods, /* tp_methods */
+    (struct PyMemberDef*)0,              /* tp_members */
+    0,                     /* tp_getset */
+    NULL,                              /* tp_base */
+    NULL,                              /* tp_dict */
+    (descrgetfunc)NULL,    /* tp_descr_get */
+    (descrsetfunc)NULL,    /* tp_descr_set */
+    0,                 /* tp_dictoffset */
+    (initproc)_wrap_PyBambooTypeData__tp_init,             /* tp_init */
+    (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
+    (newfunc)PyType_GenericNew,               /* tp_new */
+    (freefunc)0,             /* tp_free */
+    (inquiry)NULL,             /* tp_is_gc */
+    NULL,                              /* tp_bases */
+    NULL,                              /* tp_mro */
+    NULL,                              /* tp_cache */
+    NULL,                              /* tp_subclasses */
+    NULL,                              /* tp_weaklist */
+    (destructor) NULL                  /* tp_del */
+};
+
+
+
+
+static int
+_wrap_PyBambooTypeDataHandle__tp_init(void)
+{
+    PyErr_SetString(PyExc_TypeError, "class 'TypeDataHandle' cannot be constructed ()");
+    return -1;
+}
+
+static PyMethodDef PyBambooTypeDataHandle_methods[] = {
+    {NULL, NULL, 0, NULL}
+};
+
+static void
+_wrap_PyBambooTypeDataHandle__tp_dealloc(PyBambooTypeDataHandle *self)
+{
+        bamboo::TypeDataHandle *tmp = self->obj;
+        self->obj = NULL;
+        if (!(self->flags&PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED)) {
+            delete tmp;
+        }
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject*
+_wrap_PyBambooTypeDataHandle__tp_richcompare (PyBambooTypeDataHandle *PYBINDGEN_UNUSED(self), PyBambooTypeDataHandle *other, int opid)
+{
+
+    if (!PyObject_IsInstance((PyObject*) other, (PyObject*) &PyBambooTypeDataHandle_Type)) {
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    }
+    switch (opid)
+    {
+    case Py_LT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_LE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_EQ:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_NE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    } /* closes switch (opid) */
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+}
+
+PyTypeObject PyBambooTypeDataHandle_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    (char *) "bamboo.module.TypeDataHandle",            /* tp_name */
+    sizeof(PyBambooTypeDataHandle),                  /* tp_basicsize */
+    0,                                 /* tp_itemsize */
+    /* methods */
+    (destructor)_wrap_PyBambooTypeDataHandle__tp_dealloc,        /* tp_dealloc */
+    (printfunc)0,                      /* tp_print */
+    (getattrfunc)NULL,       /* tp_getattr */
+    (setattrfunc)NULL,       /* tp_setattr */
+    (cmpfunc)NULL,           /* tp_compare */
+    (reprfunc)NULL,             /* tp_repr */
+    (PyNumberMethods*)NULL,     /* tp_as_number */
+    (PySequenceMethods*)NULL, /* tp_as_sequence */
+    (PyMappingMethods*)NULL,   /* tp_as_mapping */
+    (hashfunc)NULL,             /* tp_hash */
+    (ternaryfunc)NULL,          /* tp_call */
+    (reprfunc)NULL,              /* tp_str */
+    (getattrofunc)NULL,     /* tp_getattro */
+    (setattrofunc)NULL,     /* tp_setattro */
+    (PyBufferProcs*)NULL,  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                      /* tp_flags */
+    NULL,                        /* Documentation string */
+    (traverseproc)NULL,     /* tp_traverse */
+    (inquiry)NULL,             /* tp_clear */
+    (richcmpfunc)_wrap_PyBambooTypeDataHandle__tp_richcompare,   /* tp_richcompare */
+    0,             /* tp_weaklistoffset */
+    (getiterfunc)NULL,          /* tp_iter */
+    (iternextfunc)NULL,     /* tp_iternext */
+    (struct PyMethodDef*)PyBambooTypeDataHandle_methods, /* tp_methods */
+    (struct PyMemberDef*)0,              /* tp_members */
+    0,                     /* tp_getset */
+    NULL,                              /* tp_base */
+    NULL,                              /* tp_dict */
+    (descrgetfunc)NULL,    /* tp_descr_get */
+    (descrsetfunc)NULL,    /* tp_descr_set */
+    0,                 /* tp_dictoffset */
+    (initproc)_wrap_PyBambooTypeDataHandle__tp_init,             /* tp_init */
     (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
     (newfunc)PyType_GenericNew,               /* tp_new */
     (freefunc)0,             /* tp_free */
@@ -7505,6 +8147,16 @@ initbamboo_module(void)
         return NULL;
     }
     PyModule_AddObject(m, (char *) "MolecularField", (PyObject *) &PyBambooMolecularField_Type);
+    /* Register the 'bamboo::TypeData' class */
+    if (PyType_Ready(&PyBambooTypeData_Type)) {
+        return NULL;
+    }
+    PyModule_AddObject(m, (char *) "TypeData", (PyObject *) &PyBambooTypeData_Type);
+    /* Register the 'bamboo::TypeDataHandle' class */
+    if (PyType_Ready(&PyBambooTypeDataHandle_Type)) {
+        return NULL;
+    }
+    PyModule_AddObject(m, (char *) "TypeDataHandle", (PyObject *) &PyBambooTypeDataHandle_Type);
     /* Register the 'bamboo::Import' class */
     if (PyType_Ready(&PyBambooImport_Type)) {
         return NULL;

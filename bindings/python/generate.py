@@ -28,6 +28,7 @@ def generate(file_):
     module.add_include('"module/NumericType.h"')
     module.add_include('"module/Parameter.h"')
     module.add_include('"module/Struct.h"')
+    module.add_include('"module/TypeData.h"')
     traits.add_include('"traits/hashes.h"')
     dcfile.add_include('"dcfile/format.h"')
     dcfile.add_include('"dcfile/parse.h"')
@@ -48,9 +49,11 @@ def generate(file_):
     clsMethod = module.add_class('Method', parent = clsDistType)
     clsStruct = module.add_class('Struct', parent = clsDistType)
     clsClass = module.add_class('Class', parent = clsStruct)
-    clsParameter = module.add_class('Parameter')
+    clsParam = module.add_class('Parameter')
     clsField = module.add_class('Field')
     clsMolecular = module.add_class('MolecularField', parent = [clsField, clsStruct])
+    clsTypeData = module.add_class('TypeData')
+    clsTDHandle = module.add_class('TypeDataHandle')
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
@@ -209,6 +212,21 @@ def generate(file_):
                [param('unsigned int', 'n')])
     add_method(clsClass, 'add_parent', None,
                [param('bamboo::Class *', 'parent', transfer_ownership = False)])
+    clsParam.add_constructor([
+               param('bamboo::DistributedType *', 'type', transfer_ownership = False),
+               param('const std::string&', 'name', default_value = '""')])
+    add_method(clsParam, 'get_name', retval('std::string'), [], is_const = False)
+    add_method(clsParam, 'get_type',
+               retval('bamboo::DistributedType *', caller_owns_return = False), [])
+    add_method(clsParam, 'get_method',
+               retval('bamboo::Method *', caller_owns_return = False), [])
+    add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
+    add_method(clsParam, 'get_default_value', retval('TypeDataHandle'), [], is_const = True)
+    add_method(clsParam, 'set_name', retval('bool'), [param('const std::string&', 'name')])
+    add_method(clsParam, 'set_type', retval('bool'),
+               [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
+    add_method(clsParam, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
+    add_method(clsParam, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

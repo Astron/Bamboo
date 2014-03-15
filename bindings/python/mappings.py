@@ -82,6 +82,16 @@ altnames = {
     'get_base_field':      ['get_base_field',      'getBaseField'],
     'add_parent':          ['add_parent',          'addParent'],
 
+    # Parameter
+    #'get_name': ['get_name', 'getName'],
+    'get_type':          ['get_type',          'getType'],
+    'get_method':        ['get_method',        'getMethod'],
+    'has_default_value': ['has_default_value', 'hasDefaultValue'],
+    'get_default_value': ['get_default_value', 'getDefaultValue'],
+    'set_name':          ['set_name',          'setName'],
+    'set_type':          ['set_type',          'setType'],
+    'set_default_value': ['set_default_value', 'setDefaultValue'],
+
     # Buffer
     'read_bool':    ['read_bool',    'readBool'],
     'read_char':    ['read_char',    'readChar'],
@@ -153,6 +163,13 @@ classDocstrings = {
     'Struct':
 'A Struct provides type composition by combining multiple Fields each with their own type.  ' +
 'Structs may have both anonymous and named Fields.',
+    'Class':
+'A Class is a special type of struct that have a couple advanced object-oriented features; ' +
+'Classes can inherit from other classes (ie. have super-/sub-classes), '                     +
+'Classes can have methods including a special constructor method, '                          +
+'Unlike other structs, classes cannot have anonymous fields.',
+    'Parameter':
+'A Parameter is a single argument/parameter of a Method.',
 #    'MolecularField':
 #'A MolecularField is an abstract field which provides an interface that can ' +
 #'be used to access multiple other fields at the same time.',
@@ -329,5 +346,28 @@ methodDocstrings = {
 'Returns the <n>th field from the class excluding any inherited fields.',
         'add_parent':
 'Set this class as a subclass to target parent.',
-    }
+    },
+
+    'Parameter': {
+        'get_name':
+'Returns the parameter\'s name.  An unnamed parameter returns the empty string.',
+        'get_type':
+'Returns the DistributedType of the Parameter.',
+        'get_method':
+'Returns the Method that contains the Parameter.',
+        'has_default_value':
+'Returns true if a default value was defined for this parameter.',
+        'get_default_value':
+'Returns the default value for this parameter.  ' +
+'If a default value hasn\'t been set, returns an implicit default.',
+        'set_name':
+'Sets the name of this parameter.  Returns false if a parameter with ' +
+'the same name already exists in the containing method.',
+        'set_type':
+'Sets the DistributedType of the parameter and clear\'s the default value.  ' +
+'Returns false if a parameter cannot represent <type>.',
+        'set_default_value':
+'Defines a default value for this parameter.  ' +
+'Returns false if the value is invalid for the parameter\'s type.',
+    },
 }
