@@ -4,6 +4,8 @@ altnames = {
     'seek': ['seek'],
     'tell': ['tell'],
     'size': ['size'],
+    'type': ['type'],
+    'data': ['data'],
 
     # Module
     'get_num_classes':   ['get_num_classes',   'getNumClasses'],
@@ -103,6 +105,12 @@ altnames = {
     #'set_type':          ['set_type',          'setType'],
     #'set_default_value': ['set_default_value', 'setDefaultValue'],
 
+    # TypeData
+    #'type':   ['type'],
+    #'data':   ['data'],
+    #'size':   ['size'],
+    'handle': ['handle'],
+
     # Buffer
     'read_bool':    ['read_bool',    'readBool'],
     'read_char':    ['read_char',    'readChar'],
@@ -186,6 +194,8 @@ classDocstrings = {
     'MolecularField':
 'A MolecularField is an abstract field which provides an interface that can ' +
 'be used to access multiple other fields at the same time.',
+    'TypeData':
+'A TypeData object represents a data-value that is valid for a particular type.',
 }
 
 functionDocstrings = {
@@ -407,5 +417,18 @@ methodDocstrings = {
         'set_default_value':
 'Defines a default value for this field.  ' +
 'Returns false if the value is invalid for the field\'s type.',
+    },
+
+    'TypeData': {
+        'type':
+'Returns the DistributedType this value is a representation of.',
+        'data':
+'Returns a buffer containing the raw byte data of the type.',
+        'size':
+'Returns the number of subvalues represented by the data.  '              +
+'For example, with a string or integer size() returns one; while, with an ' +
+'array, size() returns the number of elements in the array value.',
+        'handle':
+'Returns a TypeDataHandle that allows you to read the data semantically.',
     },
 }

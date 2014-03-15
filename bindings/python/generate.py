@@ -246,6 +246,19 @@ def generate(file_):
     clsMolecular.add_constructor([
                param('bamboo::Class *', 'cls', transfer_ownership = False),
                param('const std::string&', 'name')])
+    clsTypeData.add_constructor([param('const bamboo::DistributedType *', 'type')])
+    clsTypeData.add_constructor([
+               param('const bamboo::DistributedType *', 'type'),
+               param('const bamboo::Buffer&', 'data')])
+    clsTypeData.add_constructor([
+               param('const bamboo::DistributedType *', 'type'),
+               param('const bamboo::Buffer&', 'data'),
+               param('unsigned int', 'start'),
+               param('unsigned int', 'end')])
+    add_method(clsTypeData, 'type', retval('const bamboo::DistributedType *'), [], is_const = True)
+    add_method(clsTypeData, 'data', retval('bamboo::Buffer'), [], is_const = True)
+    add_method(clsTypeData, 'size', retval('unsigned int'), [], is_const = True)
+    add_method(clsTypeData, 'handle', retval('bamboo::TypeDataHandle'), [], is_const = True)
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

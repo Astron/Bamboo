@@ -11,6 +11,7 @@ namespace bamboo {
 class DistributedType;
 class TypeDataHandle;
 
+// A TypeData object represents a data-value that is valid for a particular type.
 class TypeData {
   public:
     TypeData(const DistributedType *);
@@ -18,10 +19,17 @@ class TypeData {
     TypeData(const DistributedType *, const std::vector<uint8_t>&, sizetag_t start, sizetag_t end);
     TypeData(const DistributedType *, const uint8_t *start, const uint8_t *end);
 
+    // type returns the DistributedType this value is a representation of.
     inline const DistributedType *type() const { return m_type; }
+    // data returns a buffer containing the raw byte data of the type.
     inline std::vector<uint8_t>& data() { return m_data; }
     inline const std::vector<uint8_t>& data() const { return m_data; }
-    inline sizetag_t size() const { return m_data.size(); }
+    // size returns the number of subvalues represented by the data.
+    //     For example, with a string or integer size() returns one; while, with an
+    //     array, size() returns the number of elements in the array value.
+    inline sizetag_t size() const { return m_num_elements; }
+    // handle returns a TypeDataHandle that allows you to read the data semantically.
+    TypeDataHandle handle() const;
 
   private:
     friend class TypeDataHandle;

@@ -7597,14 +7597,176 @@ PyTypeObject PyBambooMolecularField_Type = {
 
 
 
+
 static int
-_wrap_PyBambooTypeData__tp_init(void)
+_wrap_PyBambooTypeData__tp_init__0(PyBambooTypeData *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
 {
-    PyErr_SetString(PyExc_TypeError, "class 'TypeData' cannot be constructed ()");
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    const char *keywords[] = {"type", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooDistributedType_Type, &type)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    self->obj = new bamboo::TypeData(type_ptr);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+static int
+_wrap_PyBambooTypeData__tp_init__1(PyBambooTypeData *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    PyBambooBuffer *data;
+    const char *keywords[] = {"type", "data", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!O!", (char **) keywords, &PyBambooDistributedType_Type, &type, &PyBambooBuffer_Type, &data)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    self->obj = new bamboo::TypeData(type_ptr, *((PyBambooBuffer *) data)->obj);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+static int
+_wrap_PyBambooTypeData__tp_init__2(PyBambooTypeData *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyBambooDistributedType *type;
+    bamboo::DistributedType *type_ptr;
+    PyBambooBuffer *data;
+    unsigned int start;
+    unsigned int end;
+    const char *keywords[] = {"type", "data", "start", "end", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!O!II", (char **) keywords, &PyBambooDistributedType_Type, &type, &PyBambooBuffer_Type, &data, &start, &end)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    type_ptr = (type ? type->obj : NULL);
+    self->obj = new bamboo::TypeData(type_ptr, *((PyBambooBuffer *) data)->obj, start, end);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+int _wrap_PyBambooTypeData__tp_init(PyBambooTypeData *self, PyObject *args, PyObject *kwargs)
+{
+    int retval;
+    PyObject *error_list;
+    PyObject *exceptions[3] = {0,};
+    retval = _wrap_PyBambooTypeData__tp_init__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooTypeData__tp_init__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    retval = _wrap_PyBambooTypeData__tp_init__2(self, args, kwargs, &exceptions[2]);
+    if (!exceptions[2]) {
+        Py_DECREF(exceptions[0]);
+        Py_DECREF(exceptions[1]);
+        return retval;
+    }
+    error_list = PyList_New(3);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyList_SET_ITEM(error_list, 2, PyObject_Str(exceptions[2]));
+    Py_DECREF(exceptions[2]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
     return -1;
 }
 
+
+PyObject *
+_wrap_PyBambooTypeData_handle(PyBambooTypeData *self)
+{
+    PyObject *py_retval;
+    PyBambooTypeDataHandle *py_TypeDataHandle;
+
+    bamboo::TypeDataHandle retval = self->obj->handle();
+    py_TypeDataHandle = PyObject_New(PyBambooTypeDataHandle, &PyBambooTypeDataHandle_Type);
+    py_TypeDataHandle->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_TypeDataHandle->obj = new bamboo::TypeDataHandle(retval);
+    py_retval = Py_BuildValue((char *) "N", py_TypeDataHandle);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooTypeData_data(PyBambooTypeData *self)
+{
+    PyObject *py_retval;
+    PyBambooBuffer *py_Buffer;
+
+    bamboo::Buffer retval = self->obj->data();
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooTypeData_type(PyBambooTypeData *self)
+{
+    PyObject *py_retval;
+    bamboo::DistributedType const *retval;
+    PyBambooDistributedType *py_DistributedType;
+
+    retval = self->obj->type();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_DistributedType = PyObject_New(PyBambooDistributedType, &PyBambooDistributedType_Type);
+    py_DistributedType->obj = new bamboo::DistributedType((*retval));
+    py_DistributedType->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_retval = Py_BuildValue((char *) "N", py_DistributedType);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooTypeData_size(PyBambooTypeData *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
 static PyMethodDef PyBambooTypeData_methods[] = {
+    {(char *) "handle", (PyCFunction) _wrap_PyBambooTypeData_handle, METH_NOARGS, "Returns a TypeDataHandle that allows you to read the data semantically." },
+    {(char *) "data", (PyCFunction) _wrap_PyBambooTypeData_data, METH_NOARGS, "Returns a buffer containing the raw byte data of the type." },
+    {(char *) "type", (PyCFunction) _wrap_PyBambooTypeData_type, METH_NOARGS, "Returns the DistributedType this value is a representation of." },
+    {(char *) "size", (PyCFunction) _wrap_PyBambooTypeData_size, METH_NOARGS, "Returns the number of subvalues represented by the data.  For example, with a string or integer size() returns one; while, with an array, size() returns the number of elements in the array value." },
     {NULL, NULL, 0, NULL}
 };
 

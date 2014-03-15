@@ -63,10 +63,12 @@ TypeData::TypeData(const DistributedType *type, const uint8_t *start, const uint
             break;
         }
         default: {
-            m_num_elements = 0;
+            m_num_elements = 1;
         }
     }
 }
+
+TypeDataHandle TypeData::handle() const { return TypeDataHandle(this, 0, m_data.size()); }
 
 TypeDataHandle TypeData::read_type(const DistributedType* type, sizetag_t offset) const {
     switch(m_type->get_subtype()) {
