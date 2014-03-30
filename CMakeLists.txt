@@ -52,6 +52,19 @@ option(GENERATE_PARSER
   "Uses bison and flex to generate parser files automatically.
   Uses prebuilt files when disabled."
   ${GENRATE_PARSER_DEFAULT})
+
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  set(LINE_DIRECTIVES_DEFAULT On)
+else()
+  set(LINE_DIRECTIVES_DEFAULT Off)
+endif()
+
+option(PARSER_LINE_DIRECTIVES
+  "Causes bison and flex file to have #line directives if included.
+  Useful for debugging but should not be commited to the git tree..
+  "
+  ${LINE_DIRECTIVES_DEFAULT})
+
 if(GENERATE_PARSER)
   if(NOT FLEX_FOUND)
     message(FATAL_ERROR
@@ -66,10 +79,15 @@ if(GENERATE_PARSER)
       "Generating parser files is enabled, but bison-version < 3")
   endif()
 
+  if(NOT PARSER_LINE_DIRECTIVES)
+    set(BISON_ARGS "--no-lines")
+    set(FLEX_ARGS "--noline")
+  endif()
+
   if(BISON_FOUND)
     add_custom_command(
       SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
-      COMMAND ${BISON_EXECUTABLE}
+      COMMAND ${BISON_EXECUTABLE} ${BISON_ARGS}
       ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser-defs.h
            -o ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
            ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
@@ -81,7 +99,7 @@ if(GENERATE_PARSER)
   if(FLEX_FOUND)
     add_custom_command(
       SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
-      COMMAND ${FLEX_EXECUTABLE}
+      COMMAND ${FLEX_EXECUTABLE} ${FLEX_ARGS}
       ARGS -o${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
            ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
       COMMENT "Generating dcfile/lexer.cpp"

@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
-# define YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
+#pragma once
+
 /* Debug traces.  */
 #ifndef DCDEBUG
 # if defined YYDEBUG
@@ -89,5 +89,3 @@ extern int dcdebug;
 extern DCSTYPE dclval;
 
 int dcparse (void);
-
-#endif /* !YY_DC_MEDIA_STORAGE_DEVEL_GIT_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED  */
