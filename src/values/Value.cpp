@@ -19,7 +19,7 @@ using namespace std;
 namespace bamboo {
 
 
-Value Value::from_type(const DistributedType* type) {
+Value Value::from_type(const DistributedType *type) {
     if(type == nullptr) { throw invalid_argument("can't create value for invalid type."); }
     switch(type->get_subtype()) {
         case kTypeChar:
@@ -72,7 +72,7 @@ Value Value::from_type(const DistributedType* type) {
     }
 }
 
-Value Value::from_type(const DistributedType* type, bool& is_derived) {
+Value Value::from_type(const DistributedType *type, bool& is_derived) {
     if(type == nullptr) { throw invalid_argument("can't create value for invalid type."); }
 
     is_derived = false;
@@ -145,12 +145,13 @@ Value Value::from_type(const DistributedType* type, bool& is_derived) {
     }
 }
 
-Value Value::from_packed(const DistributedType* type, const vector<uint8_t>& buf) {
+Value Value::from_packed(const DistributedType *type, const vector<uint8_t>& buf) {
     sizetag_t offset = 0;
     return from_packed(type, buf, offset);
 }
 
-Value Value::from_packed(const DistributedType* type, const vector<uint8_t>& buf, sizetag_t& offset) {
+Value Value::from_packed(const DistributedType *type, const vector<uint8_t>& buf,
+                         sizetag_t& offset) {
     if(type == nullptr) { throw invalid_argument("can't create value for invalid type."); }
     switch(type->get_subtype()) {
         case kTypeChar:
@@ -279,7 +280,7 @@ Value Value::from_packed(const DistributedType* type, const vector<uint8_t>& buf
             return Value(r);
         }
         case kTypeMethod: {
-            const Method* method = type->as_method();
+            const Method *method = type->as_method();
             MethodValue *r = new MethodValue(method);
             size_t num_params = method->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {

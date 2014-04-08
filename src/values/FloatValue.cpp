@@ -14,29 +14,29 @@ FloatValue::FloatValue(double num) { m_float = num; }
 // pack provides the packed data for the value in native endianness.
 //     Throws: bad_cast
 vector<uint8_t> FloatValue::pack(const DistributedType *type) const {
-	switch(type->get_subtype()) {
-		case kTypeFloat32:
-			return as_buffer(float(m_float));
-		case kTypeFloat64:
-			return as_buffer(double(m_float));
-		default:
-			throw bad_cast();
-	}
+    switch(type->get_subtype()) {
+        case kTypeFloat32:
+            return as_buffer(float(m_float));
+        case kTypeFloat64:
+            return as_buffer(double(m_float));
+        default:
+            throw bad_cast();
+    }
 }
 void FloatValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
-	switch(type->get_subtype()) {
-		case kTypeFloat32: {
-			pack_value(float(m_float), buf);
-			break;
-		}
-		case kTypeFloat64: {
-			pack_value(double(m_float), buf);
-			break;
-		}
-		default: {
-			throw bad_cast();
-		}
-	}
+    switch(type->get_subtype()) {
+        case kTypeFloat32: {
+            pack_value(float(m_float), buf);
+            break;
+        }
+        case kTypeFloat64: {
+            pack_value(double(m_float), buf);
+            break;
+        }
+        default: {
+            throw bad_cast();
+        }
+    }
 }
 
 float FloatValue::as_float32() const {

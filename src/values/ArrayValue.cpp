@@ -13,30 +13,30 @@ ArrayValue::ArrayValue() : m_elements() {}
 
 // FIXME: it should be possible to make the pack functions a whole bunch more efficient
 vector<uint8_t> ArrayValue::pack(const DistributedType *type) const {
-	const ArrayType *arr = type->as_array();
-	if(arr == nullptr) {
-		throw bad_cast();
-	}
+    const ArrayType *arr = type->as_array();
+    if(arr == nullptr) {
+        throw bad_cast();
+    }
 
-	vector<uint8_t> value;
-	for(auto it = m_elements.begin(); it != m_elements.end(); ++it) {
-		it->pack(arr->get_element_type(), value);
-	}
+    vector<uint8_t> value;
+    for(auto it = m_elements.begin(); it != m_elements.end(); ++it) {
+        it->pack(arr->get_element_type(), value);
+    }
 
-	if(arr->has_fixed_size()) {
-			return value;
-	} else {
-		vector<uint8_t> buf = as_buffer(sizetag_t(value.size()));
-		pack_value(value, buf);
-		return buf;
-	}
+    if(arr->has_fixed_size()) {
+        return value;
+    } else {
+        vector<uint8_t> buf = as_buffer(sizetag_t(value.size()));
+        pack_value(value, buf);
+        return buf;
+    }
 }
 void ArrayValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
-	return pack_value(pack(type), buf);
+    return pack_value(pack(type), buf);
 }
 
 sizetag_t ArrayValue::size() const {
-	return m_elements.size();
+    return m_elements.size();
 }
 
 Value ArrayValue::get_item(sizetag_t index) { return m_elements[index]; }

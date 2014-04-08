@@ -16,7 +16,7 @@ class Value;
 // A DatagramOverflow is an exception which occurs when an add_<value> method is called which would
 // increase the size of the datagram past DGSIZE_MAX (preventing integer and buffer overflow).
 class DatagramOverflow : public std::runtime_error {
-public:
+  public:
     DatagramOverflow(const std::string& what) : std::runtime_error(what) { }
 };
 
@@ -53,7 +53,7 @@ class Datagram {
     void check_read_length(const std::vector<uint8_t>& buffer, sizetag_t offset, sizetag_t len) {
         if(offset + len >= buffer.size()) {
             std::string error("Datagram could not add data from provided buffer;"
-                             " reached end of buffer.");
+                              " reached end of buffer.");
             throw BufferEOF(error);
         }
     }
@@ -74,8 +74,7 @@ class Datagram {
     Datagram(const Datagram& dg) :
         buf(new uint8_t[dg.size()]),
         buf_cap(dg.size()),
-        buf_offset(dg.size())
-    {
+        buf_offset(dg.size()) {
         memcpy(buf, dg.buf, dg.size());
     }
 
@@ -89,8 +88,7 @@ class Datagram {
     Datagram(const uint8_t *data, sizetag_t length) :
         buf(new uint8_t[length]),
         buf_cap(length),
-        buf_offset(length)
-    {
+        buf_offset(length) {
         memcpy(buf, data, length);
     }
 
@@ -99,8 +97,7 @@ class Datagram {
     Datagram(const std::vector<uint8_t>& data) :
         buf(new uint8_t[data.size()]),
         buf_cap(data.size()),
-        buf_offset(data.size())
-    {
+        buf_offset(data.size()) {
         memcpy(buf, &data[0], data.size());
     }
 
@@ -109,8 +106,7 @@ class Datagram {
     Datagram(const std::string& data) :
         buf(new uint8_t[data.length()]),
         buf_cap(data.length()),
-        buf_offset(data.length())
-    {
+        buf_offset(data.length()) {
         memcpy(buf, data.c_str(), data.length());
     }
 

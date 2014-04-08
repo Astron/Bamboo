@@ -11,17 +11,17 @@ class Struct;
 
 class StructValue : public ValueInterface {
   private:
-    const Struct* m_struct;
+    const Struct *m_struct;
     std::unordered_map<sizetag_t, Value> m_fields;
 
   public:
-    StructValue(const Struct*);
+    StructValue(const Struct *);
     virtual ~StructValue() {}
 
     // pack provides the packed data for the value in native endianness.
     //     Throws: bad_cast
-    virtual std::vector<uint8_t> pack(const DistributedType*) const;
-    virtual void pack(const DistributedType*, std::vector<uint8_t>& buf) const;
+    virtual std::vector<uint8_t> pack(const DistributedType *) const;
+    virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const;
 
     // size returns the size (the number of items) in a value.
     //     Size may be called on an array, string, blob, struct, or function value.

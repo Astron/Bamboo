@@ -7,7 +7,7 @@ namespace bamboo { // open namespace bamboo
 
 // A HashGenerator generates an arbitrary hash number from a sequence of ints.
 class HashGenerator {
-public:
+  public:
     HashGenerator();
 
     // add_int adds another integer to the hash so far.
@@ -18,7 +18,7 @@ public:
 
     uint32_t get_hash() const;
 
-private:
+  private:
     uint32_t m_hash;
     unsigned int m_index;
 };

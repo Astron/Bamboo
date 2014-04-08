@@ -11,17 +11,17 @@ class Method;
 
 class MethodValue : public ValueInterface {
   private:
-    const Method* m_method;
+    const Method *m_method;
     std::unordered_map<sizetag_t, Value> m_params;
 
   public:
-    MethodValue(const Method*);
+    MethodValue(const Method *);
     virtual ~MethodValue() {}
 
     // pack provides the packed data for the value in native endianness.
     //     Throws: bad_cast
-    virtual std::vector<uint8_t> pack(const DistributedType*) const;
-    virtual void pack(const DistributedType*, std::vector<uint8_t>& buf) const;
+    virtual std::vector<uint8_t> pack(const DistributedType *) const;
+    virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const;
 
     // size returns the size (the number of items) in a value.
     //     Size may be called on an array, string, blob, struct, or function value.

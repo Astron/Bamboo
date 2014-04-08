@@ -12,12 +12,13 @@ namespace bamboo {
 //     efficiently with a clean API for a library-user.
 class Value {
   private:
-    static Value from_packed(const DistributedType*, const std::vector<uint8_t>& buf, sizetag_t& offset);
+    static Value from_packed(const DistributedType *, const std::vector<uint8_t>& buf,
+                             sizetag_t& offset);
 
     std::shared_ptr<ValueInterface> m_value;
 
   public:
-    Value(ValueInterface* value) : m_value(value) {}
+    Value(ValueInterface *value) : m_value(value) {}
 
     // named constructors
     static Value from_type(const DistributedType *);
@@ -30,10 +31,10 @@ class Value {
     */
 
     // pack provides the packed data for the value in native endianness.
-    inline std::vector<uint8_t> pack(const DistributedType* type) const {
+    inline std::vector<uint8_t> pack(const DistributedType *type) const {
         return m_value->pack(type);
     }
-    inline void pack(const DistributedType* type, std::vector<uint8_t>& buf) const {
+    inline void pack(const DistributedType *type, std::vector<uint8_t>& buf) const {
         m_value->pack(type, buf);
     }
 
@@ -57,7 +58,7 @@ class Value {
     inline sizetag_t size() const { return m_value->size(); }
 
     // [] -- array subscription may be used to access the items in the value
-    // TODO: Some voodoo magic with these to provide 
+    // TODO: Some voodoo magic with these to provide
     inline Value operator[](sizetag_t index) { return get_item(index); }
     inline const Value operator[](sizetag_t index) const { return get_item(index); }
     inline Value operator[](const std::string& item) { return get_item(item); }

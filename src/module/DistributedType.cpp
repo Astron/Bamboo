@@ -73,8 +73,8 @@ const Method *DistributedType::as_method() const { return nullptr; }
 
 // to_string returns a short string representation suitable for debug/development output.
 std::string DistributedType::to_string() const {
-	if(has_alias()) { return get_alias(); }
-	else { return format_subtype(m_subtype); }
+    if(has_alias()) { return get_alias(); }
+    else { return format_subtype(m_subtype); }
 }
 
 

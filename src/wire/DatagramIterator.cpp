@@ -20,7 +20,7 @@ Value DatagramIterator::read_value(const DistributedType *type) {
     return Value::from_packed(type, packed);
 }
 
-vector<uint8_t> DatagramIterator::read_packed(const DistributedType* type) {
+vector<uint8_t> DatagramIterator::read_packed(const DistributedType *type) {
 #ifndef PLATFORM_BIG_ENDIAN
     // We're little endian so we don't have to worry about byte-swapping the data
     const uint8_t *start = m_dg->get_data() + m_offset;
@@ -35,10 +35,9 @@ vector<uint8_t> DatagramIterator::read_packed(const DistributedType* type) {
 
 }
 
-void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>& buffer) {
+void DatagramIterator::read_packed(const DistributedType *dtype, vector<uint8_t>& buffer) {
 #ifndef PLATFORM_BIG_ENDIAN
-    if(dtype->has_fixed_size())
-    {
+    if(dtype->has_fixed_size()) {
         // If we're a fixed-sized type like uint, int, float, etc
         // Also any other type lucky enough to be fixed size will be faster.
         vector<uint8_t> data = read_data(dtype->get_size());
@@ -85,8 +84,7 @@ void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>
         case kTypeBlob:
             pack_value(read_data(dtype->get_size()), buffer);
             break;
-        case kTypeArray:
-        {
+        case kTypeArray: {
             const ArrayType *arr = dtype->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
@@ -103,25 +101,23 @@ void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>
             if(m_offset > array_end) {
                 stringstream error;
                 error << "Datagram iterator tried to read array data, but array data"
-                         " exceeded the expected array length of " << len << ".\n";
+                      " exceeded the expected array length of " << len << ".\n";
                 throw DatagramIteratorEOF(error.str());
             }
             break;
         }
         case kTypeVarstring:
-        case kTypeVarblob:
-        {
+        case kTypeVarblob: {
             sizetag_t len = read_size();
             pack_value(len, buffer);
             pack_value(read_data(len), buffer);
             break;
         }
-        case kTypeVararray:
-        {
+        case kTypeVararray: {
             sizetag_t len = read_size();
             pack_value(len, buffer);
 
-            const ArrayType* arr = dtype->as_array();
+            const ArrayType *arr = dtype->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
                 pack_value(read_data(len), buffer);
@@ -136,13 +132,12 @@ void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>
             if(m_offset > array_end) {
                 stringstream error;
                 error << "Datagram iterator tried to read array data, but array data"
-                         " exceeded the expected array length of " << len << ".\n";
+                      " exceeded the expected array length of " << len << ".\n";
                 throw DatagramIteratorEOF(error.str());
             }
             break;
         }
-        case kTypeStruct:
-        {
+        case kTypeStruct: {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
@@ -150,8 +145,7 @@ void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>
             }
             break;
         }
-        case kTypeMethod:
-        {
+        case kTypeMethod: {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
@@ -159,8 +153,7 @@ void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>
             }
             break;
         }
-        case kTypeInvalid:
-        {
+        case kTypeInvalid: {
             break;
         }
     }
@@ -201,8 +194,7 @@ void DatagramIterator::skip_type(const DistributedType *dtype) {
             }
             break;
         }
-        default:
-        {
+        default: {
             // This case should be impossible, but a default is required by compilers
             break;
         }

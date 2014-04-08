@@ -13,43 +13,43 @@ BlobValue::BlobValue(sizetag_t length) { m_blob = vector<uint8_t>(length, uint8_
 BlobValue::BlobValue(const vector<uint8_t>& blob) { m_blob = blob; }
 
 vector<uint8_t> BlobValue::pack(const DistributedType *type) const {
-	switch(type->get_subtype()) {
-		case kTypeBlob: {
-			return m_blob;
-		}
-		case kTypeVarblob: {
-			vector<uint8_t> ret = as_buffer(sizetag_t(m_blob.size()));
-			pack_value(m_blob, ret);
-			return ret;
-		}
-		default: {
-			throw bad_cast();
-		}
-	}
+    switch(type->get_subtype()) {
+        case kTypeBlob: {
+            return m_blob;
+        }
+        case kTypeVarblob: {
+            vector<uint8_t> ret = as_buffer(sizetag_t(m_blob.size()));
+            pack_value(m_blob, ret);
+            return ret;
+        }
+        default: {
+            throw bad_cast();
+        }
+    }
 }
-void BlobValue::pack(const DistributedType* type, vector<uint8_t>& buf) const {
-	switch(type->get_subtype()) {
-		case kTypeBlob: {
-			pack_value(m_blob, buf);
-			break;
-		}
-		case kTypeVarblob: {
-			pack_value(sizetag_t(m_blob.size()), buf);
-			pack_value(m_blob, buf);
-			break;
-		}
-		default: {
-			throw bad_cast();
-		}
-	}
+void BlobValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
+    switch(type->get_subtype()) {
+        case kTypeBlob: {
+            pack_value(m_blob, buf);
+            break;
+        }
+        case kTypeVarblob: {
+            pack_value(sizetag_t(m_blob.size()), buf);
+            pack_value(m_blob, buf);
+            break;
+        }
+        default: {
+            throw bad_cast();
+        }
+    }
 }
 
 vector<uint8_t> BlobValue::as_blob() const {
-	return m_blob;
+    return m_blob;
 }
 
 sizetag_t BlobValue::size() const {
-	return m_blob.size();
+    return m_blob.size();
 }
 
 Value BlobValue::get_item(sizetag_t index) { return Value(new IntValue(m_blob[index])); }

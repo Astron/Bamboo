@@ -44,7 +44,7 @@ inline std::vector<uint8_t> as_buffer(double r) {
     return std::vector<uint8_t>((uint8_t *)&r, (uint8_t *)(&r + 1));
 }
 inline std::vector<uint8_t> as_buffer(const std::string& r) {
-	return std::vector<uint8_t>(r.begin(), r.end());
+    return std::vector<uint8_t>(r.begin(), r.end());
 }
 
 
@@ -82,10 +82,10 @@ inline void pack_value(double r, std::vector<uint8_t>& buf) {
     buf.insert(buf.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
 }
 inline void pack_value(const std::string& r, std::vector<uint8_t>& buf) {
-	buf.insert(buf.end(), r.begin(), r.end());
+    buf.insert(buf.end(), r.begin(), r.end());
 }
 inline void pack_value(const std::vector<uint8_t>& r, std::vector<uint8_t>& buf) {
-	buf.insert(buf.end(), r.begin(), r.end());
+    buf.insert(buf.end(), r.begin(), r.end());
 }
 
 
@@ -132,7 +132,7 @@ inline uint64_t read_uint64(const std::vector<uint8_t>& buf, sizetag_t& offset) 
     return r;
 }
 inline sizetag_t read_size(const std::vector<uint8_t>& buf, sizetag_t& offset) {
-    sizetag_t r = *(sizetag_t*)(&buf[offset]);
+    sizetag_t r = *(sizetag_t *)(&buf[offset]);
     offset += sizeof(r);
     return r;
 }
@@ -146,12 +146,14 @@ inline double read_float64(const std::vector<uint8_t>& buf, sizetag_t& offset) {
     offset += sizeof(r);
     return r;
 }
-inline std::string read_string(const std::vector<uint8_t>& buf, sizetag_t length, sizetag_t& offset) {
-    std::string r = std::string((char*)&buf[offset], (char*)&buf[offset] + length);
+inline std::string read_string(const std::vector<uint8_t>& buf, sizetag_t length,
+                               sizetag_t& offset) {
+    std::string r = std::string((char *)&buf[offset], (char *)&buf[offset] + length);
     offset += length;
     return r;
 }
-inline std::vector<uint8_t> read_blob(const std::vector<uint8_t>& buf, sizetag_t length, sizetag_t& offset) {
+inline std::vector<uint8_t> read_blob(const std::vector<uint8_t>& buf, sizetag_t length,
+                                      sizetag_t& offset) {
     std::vector<uint8_t> r = std::vector<uint8_t>(&buf[offset], &buf[offset] + length);
     offset += length;
     return r;

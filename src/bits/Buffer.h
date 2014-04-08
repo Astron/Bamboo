@@ -20,8 +20,8 @@ struct Buffer {
         offset = 0;
         return *this;
     }
-    operator std::vector<uint8_t>&() { return data; }
-    operator const std::vector<uint8_t>&() const { return data; }
+    operator std::vector<uint8_t>& () { return data; }
+    operator const std::vector<uint8_t>& () const { return data; }
 
     Buffer copy() const { return Buffer(*this); }
     void seek(sizetag_t index) { offset = index; }
@@ -37,7 +37,7 @@ struct Buffer {
         if(index >= data.size()) { throw std::out_of_range("Buffer index out of range."); }
         return data[index];
     }
-    void set_byte(sizetag_t index, uint8_t byte){
+    void set_byte(sizetag_t index, uint8_t byte) {
         if(index >= data.size()) { throw std::out_of_range("Buffer index out of range."); }
         data[index] = byte;
     }

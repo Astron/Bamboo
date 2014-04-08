@@ -16,8 +16,8 @@ class FloatValue : public ValueInterface {
 
     // pack provides the packed data for the value in native endianness.
     //     Throws: bad_cast
-    virtual std::vector<uint8_t> pack(const DistributedType*) const;
-    virtual void pack(const DistributedType*, std::vector<uint8_t>& buf) const;
+    virtual std::vector<uint8_t> pack(const DistributedType *) const;
+    virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const;
 
     virtual float as_float32() const;
     virtual double as_float64() const;

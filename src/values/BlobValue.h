@@ -15,8 +15,8 @@ class BlobValue : public ValueInterface {
 
     // pack provides the packed data for the value in native endianness.
     //     Throws: bad_cast
-    virtual std::vector<uint8_t> pack(const DistributedType*) const;
-    virtual void pack(const DistributedType*, std::vector<uint8_t>& buf) const;
+    virtual std::vector<uint8_t> pack(const DistributedType *) const;
+    virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const;
 
     virtual std::vector<uint8_t> as_blob() const;
 

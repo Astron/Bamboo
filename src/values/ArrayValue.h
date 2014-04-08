@@ -14,8 +14,8 @@ class ArrayValue : public ValueInterface {
 
     // pack provides the packed data for the value in native endianness.
     //     Throws: bad_cast
-    virtual std::vector<uint8_t> pack(const DistributedType*) const;
-    virtual void pack(const DistributedType*, std::vector<uint8_t>& buf) const;
+    virtual std::vector<uint8_t> pack(const DistributedType *) const;
+    virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const;
 
     // size returns the size (the number of items) in a value.
     //     Size may be called on an array, string, blob, struct, or function value.

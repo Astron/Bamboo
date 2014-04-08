@@ -13,10 +13,10 @@ class DatagramIteratorEOF : public std::runtime_error {
 // A DatagramIterator lets you step trough a datagram by reading a single value at a time.
 class DatagramIterator {
   protected:
-    const Datagram* m_dg;
+    const Datagram *m_dg;
     sizetag_t m_offset;
 
-    DatagramIterator(const Datagram* dg, sizetag_t offset = 0) : m_dg(dg), m_offset(offset) {
+    DatagramIterator(const Datagram *dg, sizetag_t offset = 0) : m_dg(dg), m_offset(offset) {
         check_read_length(0);
     }
 
@@ -52,89 +52,80 @@ class DatagramIterator {
 
     // read_int8 reads a byte from the datagram,
     // returning a signed 8-bit integer.
-    int8_t read_int8()
-    {
+    int8_t read_int8() {
         check_read_length(1);
-        int8_t r = *(int8_t*)(m_dg->get_data() + m_offset);
+        int8_t r = *(int8_t *)(m_dg->get_data() + m_offset);
         m_offset += 1;
         return r;
     }
 
     // read_int16 reads 2 bytes from the datagram,
     // returning a signed 16-bit integer in native endianness.
-    int16_t read_int16()
-    {
+    int16_t read_int16() {
         check_read_length(2);
-        int16_t r = *(int16_t*)(m_dg->get_data() + m_offset);
+        int16_t r = *(int16_t *)(m_dg->get_data() + m_offset);
         m_offset += 2;
         return swap_le(r);
     }
 
     // read_int32 reads 4 bytes from the datagram,
     // returning a signed 32-bit integer in native endianness.
-    int32_t read_int32()
-    {
+    int32_t read_int32() {
         check_read_length(4);
-        int32_t r = *(int32_t*)(m_dg->get_data() + m_offset);
+        int32_t r = *(int32_t *)(m_dg->get_data() + m_offset);
         m_offset += 4;
         return swap_le(r);
     }
 
     // read_int64 reads 8 bytes from the datagram,
     // returning a signed 64-bit integer in native endianness.
-    int64_t read_int64()
-    {
+    int64_t read_int64() {
         check_read_length(8);
-        int64_t r = *(int64_t*)(m_dg->get_data() + m_offset);
+        int64_t r = *(int64_t *)(m_dg->get_data() + m_offset);
         m_offset += 8;
         return swap_le(r);
     }
 
     // read_uint8 reads a byte from the datagram,
     // returning an unsigned 8-bit integer.
-    uint8_t read_uint8()
-    {
+    uint8_t read_uint8() {
         check_read_length(1);
-        uint8_t r = *(uint8_t*)(m_dg->get_data() + m_offset);
+        uint8_t r = *(uint8_t *)(m_dg->get_data() + m_offset);
         m_offset += 1;
         return r;
     }
 
     // read_uint16 reads 2 bytes from the datagram,
     // returning an unsigned 16-bit integer in native endianness.
-    uint16_t read_uint16()
-    {
+    uint16_t read_uint16() {
         check_read_length(2);
-        uint16_t r = *(uint16_t*)(m_dg->get_data() + m_offset);
+        uint16_t r = *(uint16_t *)(m_dg->get_data() + m_offset);
         m_offset += 2;
         return swap_le(r);
     }
 
     // read_uint32 reads 4 bytes from the datagram,
     // returning an unsigned 32-bit integer in native endianness.
-    uint32_t read_uint32()
-    {
+    uint32_t read_uint32() {
         check_read_length(4);
-        uint32_t r = *(uint32_t*)(m_dg->get_data() + m_offset);
+        uint32_t r = *(uint32_t *)(m_dg->get_data() + m_offset);
         m_offset += 4;
         return swap_le(r);
     }
 
     // read_uint64 reads 8 bytes from the datagram,
     // returning an unsigned 64-bit integer in native endianness.
-    uint64_t read_uint64()
-    {
+    uint64_t read_uint64() {
         check_read_length(8);
-        uint64_t r = *(uint64_t*)(m_dg->get_data() + m_offset);
+        uint64_t r = *(uint64_t *)(m_dg->get_data() + m_offset);
         m_offset += 8;
         return swap_le(r);
     }
 
     // read_size reads a sizetag_t from the datagram.
-    sizetag_t read_size()
-    {
+    sizetag_t read_size() {
         check_read_length(sizeof(sizetag_t));
-        sizetag_t r = *(sizetag_t*)(m_dg->get_data() + m_offset);
+        sizetag_t r = *(sizetag_t *)(m_dg->get_data() + m_offset);
         m_offset += sizeof(sizetag_t);
         return swap_le(r);
     }
