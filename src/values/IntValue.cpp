@@ -3,8 +3,8 @@
 #include <limits>    // numeric_limits
 #include <stdexcept> // invalid_argument
 #include <typeinfo>  // bad_cast
-#include "bits/buffers.h"
-#include "module/DistributedType.h"
+#include "../bits/buffers.h"
+#include "../module/DistributedType.h"
 using namespace std;
 namespace bamboo {
 

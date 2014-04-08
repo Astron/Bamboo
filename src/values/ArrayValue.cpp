@@ -1,10 +1,10 @@
 // Filename: ArrayValue.cpp
 #include "ArrayValue.h"
 #include <stdexcept> // invalid_argument
-#include "bits/buffers.h"
-#include "values/Value.h"
-#include "values/IntValue.h"
-#include "module/ArrayType.h"
+#include "../bits/buffers.h"
+#include "../values/Value.h"
+#include "../values/IntValue.h"
+#include "../module/ArrayType.h"
 using namespace std;
 namespace bamboo {
 

@@ -1,5 +1,5 @@
 // Filename: write.cpp
-#include "module/DistributedType.h"
+#include "../module/DistributedType.h"
 
 #include "write.h"
 using namespace std;

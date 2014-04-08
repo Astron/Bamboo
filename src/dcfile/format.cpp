@@ -1,12 +1,12 @@
 // Filename: format.cpp
 #include <cctype>  // std::isprint()
 #include <sstream> // std::ostringstream
-#include "module/DistributedType.h"
-#include "module/ArrayType.h"
-#include "module/Struct.h"
-#include "module/Field.h"
-#include "module/Method.h"
-#include "module/Parameter.h"
+#include "../module/DistributedType.h"
+#include "../module/ArrayType.h"
+#include "../module/Struct.h"
+#include "../module/Field.h"
+#include "../module/Method.h"
+#include "../module/Parameter.h"
 
 #include "format.h"
 using namespace std;

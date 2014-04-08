@@ -2,7 +2,7 @@
 #include "ValueInterface.h"
 #include <stdexcept> // out_of_range
 #include <typeinfo>  // bad_cast
-#include "values/Value.h"
+#include "../values/Value.h"
 using namespace std;
 namespace bamboo {
 

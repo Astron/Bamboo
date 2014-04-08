@@ -1,8 +1,8 @@
 // Filename: MethodValue.cpp
 #include "MethodValue.h"
 #include <stdexcept> // out_of_range, invalid_argument
-#include "module/Method.h"
-#include "module/Parameter.h"
+#include "../module/Method.h"
+#include "../module/Parameter.h"
 using namespace std;
 namespace bamboo {
 

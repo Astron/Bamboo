@@ -1,8 +1,8 @@
 // Filename: StructValue.cpp
 #include "StructValue.h"
 #include <stdexcept> // out_of_range, invalid_argument
-#include "module/Struct.h"
-#include "module/Field.h"
+#include "../module/Struct.h"
+#include "../module/Field.h"
 using namespace std;
 namespace bamboo {
 

@@ -1,6 +1,6 @@
 // Filename: Method.cpp
 #include "Method.h"
-#include "module/Parameter.h"
+#include "../module/Parameter.h"
 using namespace std;
 namespace bamboo { // open namespace
 

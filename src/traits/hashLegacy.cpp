@@ -4,14 +4,14 @@
 
 #include <set>      // std::set
 #include <iostream> // std::cerr
-#include "module/Module.h"
-#include "module/Class.h"
-#include "module/Method.h"
-#include "module/Parameter.h"
-#include "module/MolecularField.h"
-#include "module/NumericRange.h"
-#include "module/ArrayType.h"
-#include "module/NumericType.h"
+#include "../module/Module.h"
+#include "../module/Class.h"
+#include "../module/Method.h"
+#include "../module/Parameter.h"
+#include "../module/MolecularField.h"
+#include "../module/NumericRange.h"
+#include "../module/ArrayType.h"
+#include "../module/NumericType.h"
 
 using namespace std;
 namespace bamboo { // open namespace bamboo

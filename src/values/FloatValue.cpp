@@ -1,8 +1,8 @@
 // Filename: FloatValue.cpp
 #include "FloatValue.h"
 #include <stdexcept> // invalid_argument
-#include "bits/buffers.h"
-#include "module/DistributedType.h"
+#include "../bits/buffers.h"
+#include "../module/DistributedType.h"
 using namespace std;
 namespace bamboo {
 

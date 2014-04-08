@@ -1,10 +1,10 @@
 // Filename: BlobValue.cpp
 #include "BlobValue.h"
 #include <stdexcept> // invalid_argument
-#include "bits/buffers.h"
-#include "values/Value.h"
-#include "values/IntValue.h"
-#include "module/DistributedType.h"
+#include "../bits/buffers.h"
+#include "../values/Value.h"
+#include "../values/IntValue.h"
+#include "../module/DistributedType.h"
 using namespace std;
 namespace bamboo {
 

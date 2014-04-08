@@ -557,10 +557,10 @@ char *dctext;
 	#include <iostream>
 	#include <unistd.h>
 
-	#include "dcfile/token.h"
-	#include "dcfile/parser-defs.h"
-	#include "dcfile/write.h" // for indent
-	#include "module/Module.h"
+	#include "../dcfile/token.h"
+	#include "../dcfile/parser-defs.h"
+	#include "../dcfile/write.h" // for indent
+	#include "../module/Module.h"
 	using namespace bamboo;
 
 	static int yyinput(void); // declared by flex.

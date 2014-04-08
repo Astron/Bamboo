@@ -2,7 +2,7 @@
 #pragma once
 #include "ValueInterface.h"
 #include <unordered_map>
-#include "values/Value.h"
+#include "../values/Value.h"
 namespace bamboo {
 
 

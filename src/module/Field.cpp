@@ -1,8 +1,8 @@
 // Filename: Field.cpp
 #include "Field.h"
-#include "module/Module.h"
-#include "module/Struct.h"
-#include "values/Value.h"
+#include "../module/Module.h"
+#include "../module/Struct.h"
+#include "../values/Value.h"
 using namespace std;
 namespace bamboo { // open namespace
 

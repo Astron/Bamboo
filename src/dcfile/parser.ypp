@@ -12,21 +12,21 @@
 	#include <fstream>  // std::ifstream
 	#include <sstream>  // std::stringstream
 
-	#include "dcfile/token.h"
-	#include "dcfile/parser-defs.h"
-	#include "dcfile/write.h"           // format_type(Subtype);
-	#include "module/Module.h"
-	#include "module/DistributedType.h"
-	#include "module/NumericRange.h"
-	#include "module/NumericType.h"
-	#include "module/ArrayType.h"
-	#include "module/Struct.h"
-	#include "module/Class.h"
-	#include "module/Field.h"
-	#include "module/Method.h"
-	#include "module/Parameter.h"
-	#include "module/MolecularField.h"
-	#include "bits/buffers.h"
+	#include "../dcfile/token.h"
+	#include "../dcfile/parser-defs.h"
+	#include "../dcfile/write.h"           // format_type(Subtype);
+	#include "../module/Module.h"
+	#include "../module/DistributedType.h"
+	#include "../module/NumericRange.h"
+	#include "../module/NumericType.h"
+	#include "../module/ArrayType.h"
+	#include "../module/Struct.h"
+	#include "../module/Class.h"
+	#include "../module/Field.h"
+	#include "../module/Method.h"
+	#include "../module/Parameter.h"
+	#include "../module/MolecularField.h"
+	#include "../bits/buffers.h"
 
 	//#define yylex dclex
 	//#define yyparse dcparse

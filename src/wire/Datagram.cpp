@@ -1,10 +1,10 @@
 #include "Datagram.h"
-#include "values/Value.h"
-#include "module/ArrayType.h"
-#include "module/Struct.h"
-#include "module/Method.h"
-#include "module/Field.h"
-#include "module/Parameter.h"
+#include "../values/Value.h"
+#include "../module/ArrayType.h"
+#include "../module/Struct.h"
+#include "../module/Method.h"
+#include "../module/Field.h"
+#include "../module/Parameter.h"
 using namespace std;
 namespace bamboo {  // close namespace bamboo
 

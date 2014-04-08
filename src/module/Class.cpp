@@ -1,7 +1,7 @@
 // Filename: Class.cpp
 #include "Class.h"
-#include "module/Module.h"
-#include "module/Field.h"
+#include "../module/Module.h"
+#include "../module/Field.h"
 using namespace std;
 namespace bamboo { // open namespace
 

@@ -1,7 +1,7 @@
 // Filename: Field.h
 #pragma once
-#include "module/KeywordList.h"
-#include "values/Value.h"
+#include "../module/KeywordList.h"
+#include "../values/Value.h"
 namespace bamboo { // open namespace
 
 // Foward declarations

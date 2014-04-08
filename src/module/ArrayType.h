@@ -1,8 +1,8 @@
 // Filename: ArrayType.h
 #pragma once
 #include <stddef.h> // for size_t
-#include "module/DistributedType.h"
-#include "module/NumericRange.h"
+#include "../module/DistributedType.h"
+#include "../module/NumericRange.h"
 namespace bamboo { // open namespace
 
 

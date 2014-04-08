@@ -1,8 +1,8 @@
 // Filename: Module.cpp
 #include "Module.h"
-#include "module/DistributedType.h"
-#include "module/Class.h"
-#include "module/Field.h"
+#include "../module/DistributedType.h"
+#include "../module/Class.h"
+#include "../module/Field.h"
 namespace bamboo { // open namespace
 
 

@@ -1,8 +1,8 @@
 // Filename: Parameter.cpp
 #include "Parameter.h"
-#include "module/Struct.h"
-#include "module/Method.h"
-#include "values/Value.h"
+#include "../module/Struct.h"
+#include "../module/Method.h"
+#include "../values/Value.h"
 using namespace std;
 namespace bamboo { // open namespace bamboo
 

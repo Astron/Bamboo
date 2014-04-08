@@ -2,7 +2,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "bits/sizetag.h"
+#include "../bits/sizetag.h"
 namespace bamboo {
 
 

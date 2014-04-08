@@ -2,8 +2,8 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
-#include "module/DistributedType.h"
-#include "module/NumericRange.h"
+#include "../module/DistributedType.h"
+#include "../module/NumericRange.h"
 namespace bamboo { // open namespace bamboo
 
 

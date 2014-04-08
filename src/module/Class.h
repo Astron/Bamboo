@@ -1,7 +1,7 @@
 // Filename: Class.h
 #pragma once
 #include <unordered_map>
-#include "module/Struct.h"
+#include "../module/Struct.h"
 namespace bamboo { // open namespace
 
 

@@ -1,6 +1,6 @@
 // Filename: HashGenerator.cpp
 #include "HashGenerator.h"
-#include "traits/primes.h"
+#include "../traits/primes.h"
 namespace bamboo { // open namespace bamboo
 
 
