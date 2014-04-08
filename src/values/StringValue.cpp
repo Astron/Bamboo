@@ -1,6 +1,6 @@
 // Filename: StringValue.cpp
 #include "StringValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // invalid_argument
 #include "bits/buffers.h"
 #include "values/Value.h"
 #include "values/IntValue.h"
@@ -22,7 +22,7 @@ vector<uint8_t> StringValue::pack(const DistributedType *type) const {
             return ret;
         }
         default: {
-            throw bad_cast();
+            throw invalid_argument("can't pack string value as non-string type.");
         }
     }
 }
@@ -38,7 +38,7 @@ void StringValue::pack(const DistributedType *type, vector<uint8_t>& buf) const 
             break;
         }
         default: {
-            throw bad_cast();
+            throw invalid_argument("can't pack string value as non-string type.");
         }
     }
 }

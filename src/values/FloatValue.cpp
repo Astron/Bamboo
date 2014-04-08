@@ -1,6 +1,6 @@
 // Filename: FloatValue.cpp
 #include "FloatValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // invalid_argument
 #include "bits/buffers.h"
 #include "module/DistributedType.h"
 using namespace std;
@@ -20,7 +20,7 @@ vector<uint8_t> FloatValue::pack(const DistributedType *type) const {
         case kTypeFloat64:
             return as_buffer(double(m_float));
         default:
-            throw bad_cast();
+            throw invalid_argument("can't pack floating-point value as non-float type.");
     }
 }
 void FloatValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
@@ -34,7 +34,7 @@ void FloatValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
             break;
         }
         default: {
-            throw bad_cast();
+            throw invalid_argument("can't pack floating-point value as non-float type.");
         }
     }
 }

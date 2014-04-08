@@ -1,6 +1,6 @@
 // Filename: BlobValue.cpp
 #include "BlobValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // invalid_argument
 #include "bits/buffers.h"
 #include "values/Value.h"
 #include "values/IntValue.h"
@@ -23,7 +23,7 @@ vector<uint8_t> BlobValue::pack(const DistributedType *type) const {
             return ret;
         }
         default: {
-            throw bad_cast();
+            throw invalid_argument("can't pack blob value as non-blob type.");
         }
     }
 }
@@ -39,7 +39,7 @@ void BlobValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
             break;
         }
         default: {
-            throw bad_cast();
+            throw invalid_argument("can't pack blob value as non-blob type.");
         }
     }
 }

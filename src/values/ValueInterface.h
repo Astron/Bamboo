@@ -20,7 +20,7 @@ class ValueInterface {
     */
 
     // pack provides the packed data for the value in native endianness.
-    //     Throws: bad_cast
+    //     Throws: invalid_argument
     virtual std::vector<uint8_t> pack(const DistributedType *) const = 0;
     virtual void pack(const DistributedType *, std::vector<uint8_t>& buf) const = 0;
 

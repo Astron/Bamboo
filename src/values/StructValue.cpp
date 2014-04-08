@@ -1,6 +1,6 @@
 // Filename: StructValue.cpp
 #include "StructValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // out_of_range, invalid_argument
 #include "module/Struct.h"
 #include "module/Field.h"
 using namespace std;
@@ -17,7 +17,11 @@ vector<uint8_t> StructValue::pack(const DistributedType *type) const {
 void StructValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
     const Struct *str = type->as_struct();
     if(str != m_struct) {
-        throw bad_cast();
+        if(str == nullptr) {
+            throw invalid_argument("can't pack struct value as non-struct type.");
+        } else {
+            throw invalid_argument("can't pack struct value as unexpected struct type.");
+        }
     }
 
     size_t num_fields = m_struct->get_num_fields();

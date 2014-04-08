@@ -1,6 +1,6 @@
 // Filename: ArrayValue.cpp
 #include "ArrayValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // invalid_argument
 #include "bits/buffers.h"
 #include "values/Value.h"
 #include "values/IntValue.h"
@@ -15,7 +15,7 @@ ArrayValue::ArrayValue() : m_elements() {}
 vector<uint8_t> ArrayValue::pack(const DistributedType *type) const {
     const ArrayType *arr = type->as_array();
     if(arr == nullptr) {
-        throw bad_cast();
+        throw invalid_argument("can't pack array value as non-array type.");
     }
 
     vector<uint8_t> value;

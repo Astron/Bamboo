@@ -1,6 +1,6 @@
 // Filename: MethodValue.cpp
 #include "MethodValue.h"
-#include <typeinfo> // bad_cast
+#include <stdexcept> // out_of_range, invalid_argument
 #include "module/Method.h"
 #include "module/Parameter.h"
 using namespace std;
@@ -17,7 +17,11 @@ vector<uint8_t> MethodValue::pack(const DistributedType *type) const {
 void MethodValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
     const Method *method = type->as_method();
     if(method != m_method) {
-        throw bad_cast();
+        if(method == nullptr) {
+            throw invalid_argument("can't pack method value as non-method type.");
+        } else {
+            throw invalid_argument("can't pack method value as unexpected method type.");
+        }
     }
 
     size_t num_params = m_method->get_num_parameters();

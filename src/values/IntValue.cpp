@@ -1,7 +1,8 @@
 // Filename: IntValue.cpp
 #include "IntValue.h"
-#include <limits>   // numeric_limits
-#include <typeinfo> // bad_cast
+#include <limits>    // numeric_limits
+#include <stdexcept> // invalid_argument
+#include <typeinfo>  // bad_cast
 #include "bits/buffers.h"
 #include "module/DistributedType.h"
 using namespace std;
@@ -31,7 +32,7 @@ IntValue::IntValue(uint64_t num) { m_unsigned = num; }
 //     Throws: bad_cast
 vector<uint8_t> IntValue::pack(const DistributedType *type) const {
     if(type->get_subtype() > kTypeChar) {
-        throw bad_cast();
+        throw invalid_argument("can't pack integer value as non-integer type.");
     }
 
     switch(type->get_size()) {
@@ -44,12 +45,12 @@ vector<uint8_t> IntValue::pack(const DistributedType *type) const {
         case sizeof(uint64_t):
             return as_buffer(uint64_t(m_unsigned));
         default:
-            throw bad_cast();
+            throw invalid_argument("integer type has an invalid bytesize.");
     }
 }
 void IntValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
     if(type->get_subtype() > kTypeChar) {
-        throw bad_cast();
+        throw invalid_argument("can't pack integer value as non-integer type.");
     }
 
     switch(type->get_size()) {
@@ -62,7 +63,7 @@ void IntValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
         case sizeof(uint64_t):
             pack_value(uint64_t(m_unsigned), buf);
         default:
-            throw bad_cast();
+            throw invalid_argument("integer type has an invalid bytesize.");
     }
 }
 
