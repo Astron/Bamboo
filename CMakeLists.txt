@@ -361,6 +361,9 @@ endif()
 install(DIRECTORY src/
   DESTINATION include/bamboo
   FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY src/
+  DESTINATION include/bamboo
+  FILES_MATCHING PATTERN "*.ipp")
 
 # Generate CMake Find module
 install(EXPORT bamboo
