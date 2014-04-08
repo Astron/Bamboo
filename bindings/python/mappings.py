@@ -7,6 +7,14 @@ altnames = {
     'type': ['type'],
     'data': ['data'],
 
+    # Value
+    'from_type':   ['from_type',   'fromType'],
+    'from_packed': ['from_packed', 'fromPacked'],
+    'pack':        ['pack'],
+    # These methods are for python array subscription
+    'get_item': ['__getitem__'],
+    'set_item': ['__setitem__'],
+
     # Module
     'get_num_classes':   ['get_num_classes',   'getNumClasses'],
     'get_num_structs':   ['get_num_structs',   'getNumStructs'],
@@ -188,6 +196,10 @@ classDocstrings = {
     'MolecularField':
 'A MolecularField is an abstract field which provides an interface that can ' +
 'be used to access multiple other fields at the same time.',
+    'Value':
+'A Value is a local representation of data.  '                                +
+'The library uses the Value class to do some magic for us that allows us to ' +
+'manipulate dynamically-typed data similar freely in a loosely-typed language.',
 }
 
 functionDocstrings = {
@@ -209,6 +221,19 @@ functionDocstrings = {
 }
 
 methodDocstrings = {
+    'Value': {
+        'from_type':
+'Returns the default Value for the provided type.',
+        'from_packed':
+'Returns the Value for the provided type unpacked from a buffer.',
+        'pack':
+'Returns a buffer containing the Value in packed representation for the provided type.',
+        'size':
+'Returns the size (the number of items) in a value.  ' +
+'Size may be called on an array, string, blob, struct, or function value.',
+
+    },
+
     'Module': {
         'get_num_classes':
 'Returns the number of classes in the module.',

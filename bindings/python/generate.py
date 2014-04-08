@@ -41,7 +41,11 @@ def generate(file_):
     structBuffer = bits.add_struct('Buffer')
     indexError = bits.add_exception('out_of_range', custom_name = 'IndexError',
         foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
-    clsValue = values.add_class('Value')
+    typeError = bits.add_exception('invalid_argument', custom_name = 'TypeError',
+        foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
+    conversionError = bits.add_exception('bad_cast', custom_name = 'ConversionError',
+        foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()');
+    clsValue = values.add_class('Value', docstring = classDocstrings['Value'])
     clsModule = module.add_class('Module', docstring = classDocstrings['Module'])
     clsDistType = module.add_class('DistributedType', docstring = classDocstrings['DistributedType'])
     clsNumType = module.add_class('NumericType', parent = clsDistType,
@@ -86,6 +90,24 @@ def generate(file_):
     structNumericRange.add_instance_attribute('max', 'Number')
 
     # Declare functions/methods
+    add_method(clsValue, 'from_type', retval('bamboo::Value'),
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)],
+               is_static = True, throw = [typeError])
+    add_method(clsValue, 'from_packed', retval('bamboo::Value'),
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False),
+                param('const Buffer&', 'packed')], is_static = True, throw = [typeError])
+    add_method(clsValue, 'pack', retval('bamboo::Buffer'),
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)],
+               is_const = True, throw = [typeError])
+    add_method(clsValue, 'size', retval('unsigned int'), [], is_const = True)
+    add_method(clsValue, 'get_item', retval('bamboo::Value'),
+               [param('unsigned int', 'index')], throw = [indexError])
+    add_method(clsValue, 'get_item', retval('bamboo::Value'),
+               [param('const std::string&', 'item')], throw = [indexError])
+    add_method(clsValue, 'set_item', None,
+               [param('unsigned int', 'index'), param('const Value', 'value')], throw = [indexError])
+    add_method(clsValue, 'set_item', None,
+               [param('const std::string&', 'item'), param('const Value', 'value')], throw = [indexError])
     clsModule.add_constructor([])
     add_method(clsModule, 'get_num_classes', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_num_structs', retval('size_t'), [], is_const = True)
