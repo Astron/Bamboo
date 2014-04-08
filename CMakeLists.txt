@@ -108,8 +108,22 @@ if(GENERATE_PARSER)
   endif(FLEX_FOUND)
 endif()
 
+# no dependencies
 set(BITS_SOURCES src/bits/bits.cpp)
 
+# depends: bits
+set(VALUES_SOURCES
+  src/values/Value.cpp
+  src/values/ValueInterface.cpp
+  src/values/IntValue.cpp
+  src/values/FloatValue.cpp
+  src/values/StringValue.cpp
+  src/values/BlobValue.cpp
+  src/values/ArrayValue.cpp
+  src/values/StructValue.cpp
+  src/values/MethodValue.cpp)
+
+# depends: bits, values
 set(MODULE_SOURCES
   src/module/DistributedType.cpp
   src/module/NumericType.cpp
@@ -121,26 +135,37 @@ set(MODULE_SOURCES
   src/module/Module.cpp
   src/module/Field.cpp
   src/module/MolecularField.cpp
-  src/module/Parameter.cpp
-  src/module/TypeData.cpp)
+  src/module/Parameter.cpp)
 
+# depends: module
 set(TRAITS_SOURCES
-  src/traits/default.cpp
   src/traits/hashLegacy.cpp
   src/traits/HashGenerator.cpp
   src/traits/primes.cpp)
 
+# depends: module
 set(OBJECTS_SOURCES)
 
+# depends: bits, module
 set(DCFILE_SOURCES
   src/dcfile/parser.cpp
   src/dcfile/lexer.cpp
   src/dcfile/write.cpp
   src/dcfile/format.cpp)
 
+# depends: bits, module
 set(WIRE_SOURCES
   src/wire/Datagram.cpp
   src/wire/DatagramIterator.cpp)
+
+set(BAMBOO_SOURCES
+  ${BITS_SOURCES}
+  ${VALUES_SOURCES}
+  ${MODULE_SOURCES}
+  ${DCFILE_SOURCES}
+  ${TRAITS_SOURCES}
+  ${OBJECTS_SOURCES}
+  ${WIRE_SOURCES})
 
 option(BUILD_SHARED_LIBS "Builds shared libraries instead of static libraries.")
 option(BUILD_SHARED_AND_STATIC "Build both shared and static libraries.")
@@ -161,51 +186,27 @@ endif()
 
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 if(BUILD_16BIT_SIZETAG)
-  add_library(bamboo ${LIBRARY_TYPE}
-    ${BITS_SOURCES}
-    ${MODULE_SOURCES}
-    ${DCFILE_SOURCES}
-    ${TRAITS_SOURCES}
-    ${OBJECTS_SOURCES}
-    ${WIRE_SOURCES})
+  add_library(bamboo ${LIBRARY_TYPE} ${BAMBOO_SOURCES})
   install(TARGETS bamboo EXPORT bamboo DESTINATION lib/bamboo)
 endif()
 
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 if(BUILD_32BIT_SIZETAG)
-  add_library(bamboo32 ${LIBRARY_TYPE}
-    ${BITS_SOURCES}
-    ${MODULE_SOURCES}
-    ${DCFILE_SOURCES}
-    ${TRAITS_SOURCES}
-    ${OBJECTS_SOURCES}
-    ${WIRE_SOURCES})
+  add_library(bamboo32 ${LIBRARY_TYPE} ${BAMBOO_SOURCES})
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
   install(TARGETS bamboo32 EXPORT bamboo32 DESTINATION lib/bamboo)
 endif()
 
 if(BUILD_SHARED_AND_STATIC)
   if(BUILD_16BIT_SIZETAG)
-    add_library(bamboo-static STATIC
-      ${BITS_SOURCES}
-      ${MODULE_SOURCES}
-      ${DCFILE_SOURCES}
-      ${TRAITS_SOURCES}
-      ${OBJECTS_SOURCES}
-      ${WIRE_SOURCES})
+    add_library(bamboo-static STATIC ${BAMBOO_SOURCES})
     if(NOT WIN32)
       set_target_properties(bamboo-static PROPERTIES OUTPUT_NAME bamboo)
     endif()
     install(TARGETS bamboo-static DESTINATION lib/bamboo)
   endif()
   if(BUILD_32BIT_SIZETAG)
-    add_library(bamboo32-static STATIC
-      ${BITS_SOURCES}
-      ${MODULE_SOURCES}
-      ${DCFILE_SOURCES}
-      ${TRAITS_SOURCES}
-      ${OBJECTS_SOURCES}
-      ${WIRE_SOURCES})
+    add_library(bamboo32-static STATIC ${BAMBOO_SOURCES})
 
     target_compile_definitions(bamboo32-static PUBLIC BAMBOO_32BIT_SIZETAG)
     if(NOT WIN32)
@@ -243,7 +244,8 @@ if(BUILD_PYTHON)
       # Generate the 16-bit bindings
       add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py pythonBindings.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+                ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
         MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
@@ -251,7 +253,8 @@ if(BUILD_PYTHON)
     if(BUILD_32BIT_SIZETAG)
       add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py pythonBindings32.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
+                ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
         MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
@@ -261,10 +264,10 @@ if(BUILD_PYTHON)
       add_custom_target(
         update-python-prebuilt
         ${CMAKE_COMMAND} -E copy
-            ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+            ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
             ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+            ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
             ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp)
     endif()
   else()
@@ -273,7 +276,7 @@ if(BUILD_PYTHON)
         OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
           ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
-          ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+          ${CMAKE_BINARY_DIR}/python/.pythonBindings.cpp
         MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
     endif()
@@ -282,7 +285,7 @@ if(BUILD_PYTHON)
         OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
           ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp
-          ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+          ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
         MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
     endif()

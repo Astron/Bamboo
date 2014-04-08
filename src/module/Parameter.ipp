@@ -30,7 +30,7 @@ inline bool Parameter::has_default_value() const {
 
 // get_default_value returns the default value for this parameter.
 //     If a default value hasn't been set, returns an implicit default.
-inline TypeDataHandle Parameter::get_default_value() const {
+inline const Value Parameter::get_default_value() const {
     return m_default_value;
 }
 

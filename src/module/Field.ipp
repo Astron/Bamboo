@@ -35,7 +35,7 @@ inline bool Field::has_default_value() const {
 
 // get_default_value returns the default value for this field.
 //     If a default value hasn't been set, returns an implicit default.
-inline TypeDataHandle Field::get_default_value() const {
+inline const Value Field::get_default_value() const {
     return m_default_value;
 }
 

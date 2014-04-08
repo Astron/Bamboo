@@ -193,14 +193,17 @@ class DatagramIterator {
         return read_data(m_dg->size() - m_offset);
     }
 
-    // read_dtype interprets the data as a value for the DistributedType in native endianness.
-    TypeData read_dtype(const DistributedType *dtype);
-    // read_dtype can also unpack data into a pre-existing buffer.
-    void read_dtype(const DistributedType *dtype, std::vector<uint8_t>& ref);
+    // read_value interprets the data as a value for the DistributedType in native endianness.
+    Value read_value(const DistributedType *);
 
-    // skip_dtype can be used to seek past the packed data for a DistributedType.
+    // read_packed returns a vector containing the native-endian data corresponding to the type.
+    std::vector<uint8_t> read_packed(const DistributedType *);
+    // read_packed can also endian-swap packed data into a pre-existing buffer.
+    void read_packed(const DistributedType *, std::vector<uint8_t>&);
+
+    // skip_type can be used to seek past the packed data for a DistributedType.
     //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
-    void skip_dtype(const DistributedType *dtype);
+    void skip_type(const DistributedType *);
 
     // tell returns the current message offset in std::vector<uint8_t>
     sizetag_t tell() const {

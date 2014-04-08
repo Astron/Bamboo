@@ -146,6 +146,16 @@ inline double read_float64(const std::vector<uint8_t>& buf, sizetag_t& offset) {
     offset += sizeof(r);
     return r;
 }
+inline std::string read_string(const std::vector<uint8_t>& buf, sizetag_t length, sizetag_t& offset) {
+    std::string r = std::string((char*)&buf[offset], (char*)&buf[offset] + length);
+    offset += length;
+    return r;
+}
+inline std::vector<uint8_t> read_blob(const std::vector<uint8_t>& buf, sizetag_t length, sizetag_t& offset) {
+    std::vector<uint8_t> r = std::vector<uint8_t>(&buf[offset], &buf[offset] + length);
+    offset += length;
+    return r;
+}
 
 
 } // close namespace bamboo

@@ -28,7 +28,8 @@ class MolecularField : public Field, public Struct {
 
     // set_default_value defines a default value for this field.
     //     For a molecular field, this always returns false (molecular defaults are implict).
-    virtual bool set_default_value(const std::string& default_value);
+    virtual bool set_default_value(const Value default_value);
+    virtual bool set_default_value(const std::vector<uint8_t>& default_value);
 
   protected:
     using Field::set_id;

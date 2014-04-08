@@ -61,15 +61,22 @@ bool MolecularField::add_field(Field *field) {
             m_has_default_value = true;
         }
 
-        vector<uint8_t> data(m_default_value.data());
-        pack_value(field->get_default_value().data(), data);
-        m_default_value = TypeData(this, data);
+        m_default_value.set_item(m_fields.size() - 1, field->get_default_value());
     }
 
     return true;
 }
 
-bool MolecularField::set_default_value(const string&) {
+
+
+// set_default_value defines a default value for this field.
+//     Returns false if the value is invalid for the field's type.
+bool MolecularField::set_default_value(const Value) {
+    // MolecularField default values are implict from their
+    // atomic components and cannot be defined manually.
+    return false;
+}
+bool MolecularField::set_default_value(const std::vector<uint8_t>&) {
     // MolecularField default values are implict from their
     // atomic components and cannot be defined manually.
     return false;

@@ -1,25 +1,31 @@
 #include "Datagram.h"
+#include "values/Value.h"
 #include "module/ArrayType.h"
 #include "module/Struct.h"
 #include "module/Method.h"
 #include "module/Field.h"
 #include "module/Parameter.h"
-#include "module/TypeData.h"
 using namespace std;
 namespace bamboo {  // close namespace bamboo
 
 
-// add_dtype adds a packed value with the given type to the datagram, converting
+// add_value adds a Value with the given type to the datagram, converting
 // byte-order from native-endianess to wire-endianess (if necessary).
-void Datagram::add_dtype(const TypeData& packed) {
-    add_dtype(packed.type(), packed.data());
+void Datagram::add_value(const DistributedType *type, const Value value) {
+    vector<uint8_t> packed = value.pack(type);
+
+#ifdef PLATFORM_BIG_ENDIAN
+    add_packed(type, packed); // endian-swap all values
+#else
+    add_data(packed);
+#endif
 };
 
-// Can also be called with a raw buffer, returning the number of bytes read from the packed.
-sizetag_t Datagram::add_dtype(const DistributedType *dtype,
-                              const vector<uint8_t>& packed,
-                              sizetag_t offset) {
-    switch(dtype->get_subtype()) {
+// add_packed adds data from a packed value, returning the number of bytes read from the buffer.
+sizetag_t Datagram::add_packed(const DistributedType *type,
+                               const vector<uint8_t>& packed,
+                               sizetag_t offset) {
+    switch(type->get_subtype()) {
         case kTypeChar:
         {
             check_read_length(packed, offset, sizeof(char));
@@ -111,7 +117,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
         case kTypeString:
         case kTypeBlob:
         {
-            sizetag_t len = dtype->get_size();
+            sizetag_t len = type->get_size();
             check_read_length(packed, offset, len);
             add_blob(&packed[offset], len);
             offset += len;
@@ -119,10 +125,10 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
         }
         case kTypeArray:
         {
-            sizetag_t len = dtype->get_size();
+            sizetag_t len = type->get_size();
             check_read_length(packed, offset, len);
 
-            const ArrayType *arr = dtype->as_array();
+            const ArrayType *arr = type->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
                 add_blob(&packed[offset], len);
@@ -133,7 +139,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             // Copy elements from the array till we reach the expected size
             sizetag_t array_end = offset + len;
             while(offset < array_end) {
-                offset = add_dtype(arr->get_element_type(), packed, offset);
+                offset = add_packed(arr->get_element_type(), packed, offset);
             }
             if(offset > array_end) {
                 stringstream error;
@@ -162,7 +168,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             offset += sizeof(sizetag_t);
             check_read_length(packed, offset, len);
 
-            const ArrayType *arr = dtype->as_array();
+            const ArrayType *arr = type->as_array();
             if(arr->get_element_type()->get_size() == 1) {
                 // If the element size is 1, we don't have to worry about endianness
                 add_blob(&packed[offset], len);
@@ -175,7 +181,7 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
             // Copy elements from the array till we reach the expected size
             sizetag_t array_end = offset + len;
             while(offset < array_end) {
-                offset = add_dtype(arr->get_element_type(), packed, offset);
+                offset = add_packed(arr->get_element_type(), packed, offset);
             }
             if(offset > array_end) {
                 stringstream error;
@@ -187,19 +193,19 @@ sizetag_t Datagram::add_dtype(const DistributedType *dtype,
         }
         case kTypeStruct:
         {
-            const Struct *dstruct = dtype->as_struct();
+            const Struct *dstruct = type->as_struct();
             size_t num_fields = dstruct->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
-                offset = add_dtype(dstruct->get_field(i)->get_type(), packed, offset);
+                offset = add_packed(dstruct->get_field(i)->get_type(), packed, offset);
             }
             return offset;
         }
         case kTypeMethod:
         {
-            const Method *dmethod = dtype->as_method();
+            const Method *dmethod = type->as_method();
             size_t num_params = dmethod->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
-                offset = add_dtype(dmethod->get_parameter(i)->get_type(), packed, offset);
+                offset = add_packed(dmethod->get_parameter(i)->get_type(), packed, offset);
             }
             return offset;
         }

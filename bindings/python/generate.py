@@ -7,15 +7,17 @@ def generate(file_):
     # Declare modules
     bamboo = Module('bamboo', cpp_namespace="::bamboo")
     bits = SubModule('bits', bamboo)
+    values = SubModule('values', bamboo)
     module = SubModule('module', bamboo)
     traits = SubModule('traits', bamboo)
     dcfile = SubModule('dcfile', bamboo)
     wire = SubModule('wire', bamboo)
 
     # Declare includes
-    traits.add_include('"bits/byteorder.h"')
-    traits.add_include('"bits/sizetag.h"')
-    traits.add_include('"bits/Buffer.h"')
+    bits.add_include('"bits/byteorder.h"')
+    bits.add_include('"bits/sizetag.h"')
+    bits.add_include('"bits/Buffer.h"')
+    values.add_include('"values/Value.h"')
     module.add_include('"module/ArrayType.h"')
     module.add_include('"module/Class.h"')
     module.add_include('"module/DistributedType.h"')
@@ -28,7 +30,6 @@ def generate(file_):
     module.add_include('"module/NumericType.h"')
     module.add_include('"module/Parameter.h"')
     module.add_include('"module/Struct.h"')
-    module.add_include('"module/TypeData.h"')
     traits.add_include('"traits/hashes.h"')
     dcfile.add_include('"dcfile/format.h"')
     dcfile.add_include('"dcfile/parse.h"')
@@ -40,20 +41,22 @@ def generate(file_):
     structBuffer = bits.add_struct('Buffer')
     indexError = bits.add_exception('out_of_range', custom_name = 'IndexError',
         foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
+    clsValue = values.add_class('Value')
     clsModule = module.add_class('Module', docstring = classDocstrings['Module'])
     clsDistType = module.add_class('DistributedType', docstring = classDocstrings['DistributedType'])
     clsNumType = module.add_class('NumericType', parent = clsDistType,
                                   docstring = classDocstrings['NumericType'])
     clsArrType = module.add_class('ArrayType', parent = clsDistType,
-                                  docstring = classDocstrings['NumericType'])
-    clsMethod = module.add_class('Method', parent = clsDistType)
-    clsStruct = module.add_class('Struct', parent = clsDistType)
-    clsClass = module.add_class('Class', parent = clsStruct)
-    clsParam = module.add_class('Parameter')
-    clsField = module.add_class('Field')
+                                  docstring = classDocstrings['ArrayType'])
+    clsMethod = module.add_class('Method', parent = clsDistType,
+                                  docstring = classDocstrings['Method'])
+    clsStruct = module.add_class('Struct', parent = clsDistType,
+                                  docstring = classDocstrings['Struct'])
+    clsClass = module.add_class('Class', parent = clsStruct,
+                                  docstring = classDocstrings['Class'])
+    clsParam = module.add_class('Parameter', docstring = classDocstrings['Parameter'])
+    clsField = module.add_class('Field', docstring = classDocstrings['Field'])
     clsMolecular = module.add_class('MolecularField', parent = [clsField, clsStruct])
-    clsTypeData = module.add_class('TypeData')
-    clsTDHandle = module.add_class('TypeDataHandle')
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
@@ -221,11 +224,11 @@ def generate(file_):
     add_method(clsParam, 'get_method',
                retval('bamboo::Method *', caller_owns_return = False), [])
     add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
-    add_method(clsParam, 'get_default_value', retval('TypeDataHandle'), [], is_const = True)
+    add_method(clsParam, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsParam, 'set_name', retval('bool'), [param('const std::string&', 'name')])
     add_method(clsParam, 'set_type', retval('bool'),
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
-    add_method(clsParam, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
+    add_method(clsParam, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
     add_method(clsParam, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
     clsField.add_constructor([
                param('bamboo::DistributedType *', 'type', transfer_ownership = False),
@@ -237,28 +240,15 @@ def generate(file_):
     add_method(clsField, 'get_struct',
                retval('bamboo::Struct *', caller_owns_return = False), [])
     add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
-    add_method(clsField, 'get_default_value', retval('TypeDataHandle'), [], is_const = True)
+    add_method(clsField, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsField, 'set_name', retval('bool'), [param('const std::string&', 'name')])
-    add_method(clsField, 'set_type', retval('bool'),
+    add_method(clsField, 'set_type', None,
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
-    add_method(clsField, 'set_default_value', retval('bool'), [param('const TypeData&', 'value')])
+    add_method(clsField, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
     add_method(clsField, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
     clsMolecular.add_constructor([
                param('bamboo::Class *', 'cls', transfer_ownership = False),
                param('const std::string&', 'name')])
-    clsTypeData.add_constructor([param('const bamboo::DistributedType *', 'type')])
-    clsTypeData.add_constructor([
-               param('const bamboo::DistributedType *', 'type'),
-               param('const bamboo::Buffer&', 'data')])
-    clsTypeData.add_constructor([
-               param('const bamboo::DistributedType *', 'type'),
-               param('const bamboo::Buffer&', 'data'),
-               param('unsigned int', 'start'),
-               param('unsigned int', 'end')])
-    add_method(clsTypeData, 'type', retval('const bamboo::DistributedType *'), [], is_const = True)
-    add_method(clsTypeData, 'data', retval('bamboo::Buffer'), [], is_const = True)
-    add_method(clsTypeData, 'size', retval('unsigned int'), [], is_const = True)
-    add_method(clsTypeData, 'handle', retval('bamboo::TypeDataHandle'), [], is_const = True)
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

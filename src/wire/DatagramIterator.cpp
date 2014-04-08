@@ -1,32 +1,41 @@
 #include "DatagramIterator.h"
 #include "bits/buffers.h"
+#include "values/Value.h"
 #include "module/ArrayType.h"
 #include "module/Struct.h"
 #include "module/Method.h"
 #include "module/Field.h"
 #include "module/Parameter.h"
-#include "module/TypeData.h"
 using namespace std;
 namespace bamboo {  // close namespace bamboo
 
 
-// read_dtype interprets the following data as a
+// read_value interprets the following data as a
 // value for the DistributedType in native endianness.
-TypeData DatagramIterator::read_dtype(const DistributedType *dtype) {
+Value DatagramIterator::read_value(const DistributedType *type) {
+    // Note: We can probably make this a lot more efficient by constructing the value manually
+    //       from the wire-endian data instead of unpacking it into native endianess first.
+    //       Though that would probably cause some code duplication with Value::from_packed.
+    vector<uint8_t> packed = read_packed(type);
+    return Value::from_packed(type, packed);
+}
+
+vector<uint8_t> DatagramIterator::read_packed(const DistributedType* type) {
 #ifndef PLATFORM_BIG_ENDIAN
     // We're little endian so we don't have to worry about byte-swapping the data
     const uint8_t *start = m_dg->get_data() + m_offset;
-    skip_dtype(dtype);
-    return TypeData(dtype, start, m_dg->get_data() + m_offset);
+    skip_type(type); // note: this will advanced m_offset
+    return vector<uint8_t>(start, m_dg->get_data() + m_offset);
 #else
     // Lets go ahead and unpack that manually
-    DataType data(dtype);
-    read_dtype(dtype, data.data());
-    return data;
+    vector<uint8_t> buf;
+    read_packed(type, buf);
+    return buf;
 #endif
+
 }
 
-void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>& buffer) {
+void DatagramIterator::read_packed(const DistributedType* dtype, vector<uint8_t>& buffer) {
 #ifndef PLATFORM_BIG_ENDIAN
     if(dtype->has_fixed_size())
     {
@@ -89,7 +98,7 @@ void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>&
             sizetag_t len = dtype->get_size();
             sizetag_t array_end = m_offset + len;
             while(m_offset < array_end) {
-                read_dtype(arr->get_element_type(), buffer);
+                read_packed(arr->get_element_type(), buffer);
             }
             if(m_offset > array_end) {
                 stringstream error;
@@ -122,7 +131,7 @@ void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>&
             // Read elements from the array till we reach the expected size
             sizetag_t array_end = m_offset + len;
             while(m_offset < array_end) {
-                read_dtype(arr->get_element_type(), buffer);
+                read_packed(arr->get_element_type(), buffer);
             }
             if(m_offset > array_end) {
                 stringstream error;
@@ -137,7 +146,7 @@ void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>&
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
-                read_dtype(dstruct->get_field(i)->get_type(), buffer);
+                read_packed(dstruct->get_field(i)->get_type(), buffer);
             }
             break;
         }
@@ -146,7 +155,7 @@ void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>&
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
-                read_dtype(dmethod->get_parameter(i)->get_type(), buffer);
+                read_packed(dmethod->get_parameter(i)->get_type(), buffer);
             }
             break;
         }
@@ -157,9 +166,9 @@ void DatagramIterator::read_dtype(const DistributedType* dtype, vector<uint8_t>&
     }
 }
 
-// skip_dtype can be used to seek past the packed data for a DistributedType.
+// skip_type can be used to seek past the packed data for a DistributedType.
 //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
-void DatagramIterator::skip_dtype(const DistributedType *dtype) {
+void DatagramIterator::skip_type(const DistributedType *dtype) {
     if(dtype->has_fixed_size()) {
         sizetag_t length = dtype->get_size();
         check_read_length(length);
@@ -180,7 +189,7 @@ void DatagramIterator::skip_dtype(const DistributedType *dtype) {
             const Struct *dstruct = dtype->as_struct();
             size_t num_fields = dstruct->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
-                skip_dtype(dstruct->get_field(i)->get_type());
+                skip_type(dstruct->get_field(i)->get_type());
             }
             break;
         }
@@ -188,7 +197,7 @@ void DatagramIterator::skip_dtype(const DistributedType *dtype) {
             const Method *dmethod = dtype->as_method();
             size_t num_params = dmethod->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
-                skip_dtype(dmethod->get_parameter(i)->get_type());
+                skip_type(dmethod->get_parameter(i)->get_type());
             }
             break;
         }
