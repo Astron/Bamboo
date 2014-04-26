@@ -13,4 +13,4 @@ if(NOT TARGET bamboo32 AND NOT BAMBOO32_BINARY_DIR)
 endif()
 
 # These are IMPORTED targets created by Bamboo32Targets.cmake
-set(BAMBOO32_LIBRARIES bamboo)
+set(BAMBOO32_LIBRARIES bamboo32)
