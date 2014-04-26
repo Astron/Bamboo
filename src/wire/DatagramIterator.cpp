@@ -42,6 +42,7 @@ void DatagramIterator::read_packed(const DistributedType *dtype, vector<uint8_t>
         // Also any other type lucky enough to be fixed size will be faster.
         vector<uint8_t> data = read_data(dtype->get_size());
         pack_value(data, buffer);
+        return;
     }
 #endif
 
