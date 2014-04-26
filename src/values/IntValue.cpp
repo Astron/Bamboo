@@ -56,12 +56,16 @@ void IntValue::pack(const DistributedType *type, vector<uint8_t>& buf) const {
     switch(type->get_size()) {
         case sizeof(uint8_t):
             pack_value(uint8_t(m_unsigned), buf);
+            break;
         case sizeof(uint16_t):
             pack_value(uint16_t(m_unsigned), buf);
+            break;
         case sizeof(uint32_t):
             pack_value(uint32_t(m_unsigned), buf);
+            break;
         case sizeof(uint64_t):
             pack_value(uint64_t(m_unsigned), buf);
+            break;
         default:
             throw invalid_argument("integer type has an invalid bytesize.");
     }
