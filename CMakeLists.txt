@@ -390,6 +390,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     endif()
   endfunction()
 
+  # Library links
   if(BUILD_SHARED_AND_STATIC)
     generate_library_links(".so")
     generate_library_links(".a")
@@ -397,5 +398,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     generate_library_links(".so")
   else()
     generate_library_links(".a")
+  endif()
+
+  # Folder links
+  if(BUILD_32BIT_SIZETAG)
+    set(BAMBOO_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib/bamboo")
+    set(BAMBOO_LIB32_DIR "${CMAKE_INSTALL_PREFIX}/lib/bamboo32")
+    install(CODE "
+      message(STATUS \"Generating: Symlink ${BAMBOO_LIB32_DIR}\")
+      execute_process(COMMAND ln -sf \"${BAMBOO_LIB_DIR}\" \"${BAMBOO_LIB32_DIR}\")")
   endif()
 endif()
