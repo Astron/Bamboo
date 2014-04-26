@@ -187,20 +187,18 @@ endif()
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
 if(BUILD_16BIT_SIZETAG)
   add_library(bamboo ${LIBRARY_TYPE} ${BAMBOO_SOURCES})
-  install(TARGETS bamboo EXPORT bamboo DESTINATION lib/bamboo)
-  export(TARGETS bamboo FILE "${PROJECT_BINARY_DIR}/BambooTargets.cmake")
-  install(FILES "${CMAKE_SOURCE_DIR}/cmake/BambooConfig.cmake" DESTINATION lib/bamboo)
-  install(FILES "${CMAKE_BINARY_DIR}/BambooTargets.cmake" DESTINATION lib/bamboo)
+  install(TARGETS bamboo DESTINATION lib/bamboo EXPORT bamboo-targets)
+  install(EXPORT bamboo-targets DESTINATION lib/bamboo)
+  install(FILES "${CMAKE_SOURCE_DIR}/cmake/bamboo-config.cmake" DESTINATION lib/bamboo)
 endif()
 
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
 if(BUILD_32BIT_SIZETAG)
   add_library(bamboo32 ${LIBRARY_TYPE} ${BAMBOO_SOURCES})
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
-  install(TARGETS bamboo32 EXPORT bamboo32 DESTINATION lib/bamboo)
-  export(TARGETS bamboo32 FILE "${PROJECT_BINARY_DIR}/Bamboo32Targets.cmake")
-  install(FILES "${CMAKE_SOURCE_DIR}/cmake/Bamboo32Config.cmake" DESTINATION lib/bamboo)
-  install(FILES "${CMAKE_BINARY_DIR}/Bamboo32Targets.cmake" DESTINATION lib/bamboo)
+  install(TARGETS bamboo32 DESTINATION lib/bamboo EXPORT bamboo32-targets)
+  install(EXPORT bamboo32-targets DESTINATION lib/bamboo)
+  install(FILES "${CMAKE_SOURCE_DIR}/cmake/bamboo32-config.cmake" DESTINATION lib/bamboo)
 endif()
 
 if(BUILD_SHARED_AND_STATIC)
@@ -364,11 +362,6 @@ install(DIRECTORY src/
 install(DIRECTORY src/
   DESTINATION include/bamboo
   FILES_MATCHING PATTERN "*.ipp")
-
-# Generate CMake Find module
-install(EXPORT bamboo
-  NAMESPACE bamboo_
-  DESTINATION lib/bamboo)
 
 # Create symlinks on linux
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
