@@ -39,11 +39,11 @@ static inline uint64_t swap_le_64(uint64_t x) {
 #define swap_le(var) \
 ( \
     (sizeof(var) == 8) ? \
-        swap_le_64(var) : \
+        bamboo::swap_le_64(var) : \
     (sizeof(var) == 4) ? \
-        swap_le_32(var) : \
+        bamboo::swap_le_32(var) : \
     (sizeof(var) == 2) ? \
-        swap_le_16(var) : \
+        bamboo::swap_le_16(var) : \
     var \
 )
 
