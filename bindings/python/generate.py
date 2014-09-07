@@ -39,27 +39,37 @@ def generate(file_):
 
     # Declare classes
     structBuffer = bits.add_struct('Buffer')
-    indexError = bits.add_exception('out_of_range', custom_name = 'IndexError',
-        foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
-    typeError = bits.add_exception('invalid_argument', custom_name = 'TypeError',
-        foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()')
-    conversionError = bits.add_exception('bad_cast', custom_name = 'ConversionError',
-        foreign_cpp_namespace = 'std', message_rvalue = 'exc.what()');
+    indexError = bits.add_exception('out_of_range',
+        custom_name = 'IndexError',
+        foreign_cpp_namespace = 'std',
+        message_rvalue = 'exc.what()')
+    typeError = bits.add_exception('invalid_argument',
+        custom_name = 'TypeError',
+        foreign_cpp_namespace = 'std',
+        message_rvalue = 'exc.what()')
+    conversionError = bits.add_exception('bad_cast',
+        custom_name = 'ConversionError',
+        foreign_cpp_namespace = 'std',
+        message_rvalue = 'exc.what()');
     clsValue = values.add_class('Value', docstring = classDocstrings['Value'])
-    clsModule = module.add_class('Module', docstring = classDocstrings['Module'])
-    clsDistType = module.add_class('DistributedType', docstring = classDocstrings['DistributedType'])
-    clsNumType = module.add_class('NumericType', parent = clsDistType,
-                                  docstring = classDocstrings['NumericType'])
+    clsModule = module.add_class('Module',
+        docstring = classDocstrings['Module'])
+    clsDistType = module.add_class('DistributedType',
+        docstring = classDocstrings['DistributedType'])
+    clsNumType = module.add_class('NumericType',parent = clsDistType,
+        docstring = classDocstrings['NumericType'])
     clsArrType = module.add_class('ArrayType', parent = clsDistType,
-                                  docstring = classDocstrings['ArrayType'])
+        docstring = classDocstrings['ArrayType'])
     clsMethod = module.add_class('Method', parent = clsDistType,
-                                  docstring = classDocstrings['Method'])
+        docstring = classDocstrings['Method'])
     clsStruct = module.add_class('Struct', parent = clsDistType,
-                                  docstring = classDocstrings['Struct'])
+        docstring = classDocstrings['Struct'])
     clsClass = module.add_class('Class', parent = clsStruct,
-                                  docstring = classDocstrings['Class'])
-    clsParam = module.add_class('Parameter', docstring = classDocstrings['Parameter'])
-    clsField = module.add_class('Field', docstring = classDocstrings['Field'])
+        docstring = classDocstrings['Class'])
+    clsParam = module.add_class('Parameter',
+        docstring = classDocstrings['Parameter'])
+    clsField = module.add_class('Field',
+        docstring = classDocstrings['Field'])
     clsMolecular = module.add_class('MolecularField', parent = [clsField, clsStruct])
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
@@ -78,18 +88,22 @@ def generate(file_):
     module.add_container('std::vector<std::string>', 'std::string', 'vector')
 
     # Declare member variables
+    structImport.add_copy_constructor()
     structImport.add_constructor([param('const std::string &', 'moduleName')])
     structImport.add_instance_attribute('module', 'std::string')
     structImport.add_instance_attribute('symbols', 'std::vector<std::string>')
+    structNumber.add_copy_constructor()
     structNumber.add_instance_attribute('type', 'Type')
     structNumber.add_instance_attribute('integer', 'int64_t')
     structNumber.add_instance_attribute('uinteger', 'uint64_t')
     structNumber.add_instance_attribute('floating', 'double')
+    structNumericRange.add_copy_constructor()
     structNumericRange.add_instance_attribute('type', 'Type')
     structNumericRange.add_instance_attribute('min', 'Number')
     structNumericRange.add_instance_attribute('max', 'Number')
 
     # Declare functions/methods
+    clsValue.add_copy_constructor()
     add_method(clsValue, 'from_type', retval('bamboo::Value'),
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)],
                is_static = True, throw = [typeError])
@@ -113,29 +127,29 @@ def generate(file_):
     add_method(clsModule, 'get_num_structs', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_num_types', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_class',
-               retval('bamboo::Class *', caller_owns_return = False),
+               retval_child('bamboo::Class *'),
                [param('unsigned int', 'n')])
     add_method(clsModule, 'get_struct',
-               retval('bamboo::Struct *', caller_owns_return = False),
+               retval_child('bamboo::Struct *'),
                [param('unsigned int', 'n')])
     add_method(clsModule, 'get_class_by_id',
-               retval('bamboo::Class *', caller_owns_return = False),
+               retval_child('bamboo::Class *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'get_class_by_name',
-               retval('bamboo::Class *', caller_owns_return = False),
+               retval_child('bamboo::Class *'),
                [param('const std::string&', 'name')])
     add_method(clsModule, 'get_type_by_id',
-               retval('bamboo::DistributedType *', caller_owns_return = False),
+               retval_child('bamboo::DistributedType *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'get_type_by_name',
-               retval('bamboo::DistributedType *', caller_owns_return = False),
+               retval_child('bamboo::DistributedType *'),
                [param('const std::string&', 'name')])
     add_method(clsModule, 'get_field_by_id',
-               retval('bamboo::Field *', caller_owns_return = False),
+               retval_child('bamboo::Field *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'get_num_imports', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_import',
-               retval('bamboo::Import *', caller_owns_return = False),
+               retval_child('bamboo::Import *'),
                [param('unsigned int', 'n')])
     add_method(clsModule, 'has_keyword', retval('bool'),
                [param('const std::string&', 'keyword')], is_const = True)
@@ -157,21 +171,11 @@ def generate(file_):
     add_method(clsDistType, 'has_fixed_size', retval('bool'), [], is_const = True)
     add_method(clsDistType, 'get_size', retval('size_t'), [], is_const = True)
     add_method(clsDistType, 'has_alias', retval('bool'), [], is_const = True)
-    add_method(clsDistType, 'as_numeric',
-               retval('bamboo::NumericType *', caller_owns_return = False),
-               [], is_virtual = True)
-    add_method(clsDistType, 'as_array',
-               retval('bamboo::ArrayType *', caller_owns_return = False),
-               [], is_virtual = True)
-    add_method(clsDistType, 'as_struct',
-               retval('bamboo::Struct*', caller_owns_return = False),
-               [], is_virtual = True)
-    add_method(clsDistType, 'as_method',
-               retval('bamboo::Method *', caller_owns_return = False),
-               [], is_virtual = True)
-    add_method(clsDistType, 'get_alias',
-               retval('const std::string'),
-               [], is_const = True)
+    add_method(clsDistType, 'as_numeric', retval_child('bamboo::NumericType *'), [], is_virtual = True)
+    add_method(clsDistType, 'as_array', retval_child('bamboo::ArrayType *'), [], is_virtual = True)
+    add_method(clsDistType, 'as_struct', retval_child('bamboo::Struct*'), [], is_virtual = True)
+    add_method(clsDistType, 'as_method', retval_child('bamboo::Method *'), [], is_virtual = True)
+    add_method(clsDistType, 'get_alias', retval('const std::string'), [], is_const = True)
     add_method(clsDistType, 'set_alias', None, [param('const std::string&', 'alias')])
     clsNumType.add_constructor([param('bamboo::Subtype', 'subtype')])
     add_method(clsNumType, 'get_divisor', retval('unsigned int'), [], is_const = True)
@@ -185,17 +189,15 @@ def generate(file_):
     clsArrType.add_constructor([
                param('bamboo::DistributedType *', 'elementType', transfer_ownership = False),
                param('const bamboo::NumericRange&', 'arraySize', default_value = 'bamboo::NumericRange()')])
-    add_method(clsArrType, 'get_element_type', retval('const bamboo::DistributedType *'), [], is_const = True)
+    add_method(clsArrType, 'get_element_type', retval_child('const bamboo::DistributedType *'), [], is_const = True)
     add_method(clsArrType, 'get_array_size', retval('unsigned int'), [], is_const = True)
     add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
     add_method(clsArrType, 'get_range', retval('bamboo::NumericRange'), [], is_const = True)
     clsMethod.add_constructor([])
     add_method(clsMethod, 'get_num_parameters', retval('size_t'), [], is_const = True)
-    add_method(clsMethod, 'get_parameter',
-               retval('bamboo::Parameter *', caller_owns_return = False),
+    add_method(clsMethod, 'get_parameter', retval_child('bamboo::Parameter *'),
                [param('unsigned int', 'n')])
-    add_method(clsMethod, 'get_parameter_by_name',
-               retval('bamboo::Parameter *', caller_owns_return = False),
+    add_method(clsMethod, 'get_parameter_by_name', retval_child('bamboo::Parameter *'),
                [param('const std::string&', 'name')]),
     add_method(clsMethod, 'add_parameter', retval('bool'),
                [param('bamboo::Parameter *', 'param', transfer_ownership = True)])
@@ -204,16 +206,13 @@ def generate(file_):
                param('const std::string&', 'name')])
     add_method(clsStruct, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsStruct, 'get_name', retval('std::string'), [], is_const = True)
-    add_method(clsStruct, 'get_module', retval('bamboo::Module *', caller_owns_return = False), [])
+    add_method(clsStruct, 'get_module', retval_child('bamboo::Module *'), [])
     add_method(clsStruct, 'get_num_fields', retval('size_t'), [], is_const = True)
-    add_method(clsStruct, 'get_field',
-               retval('bamboo::Field *', caller_owns_return = False),
+    add_method(clsStruct, 'get_field', retval_child('bamboo::Field *'),
                [param('unsigned int', 'n')])
-    add_method(clsStruct, 'get_field_by_id',
-               retval('bamboo::Field *', caller_owns_return = False),
+    add_method(clsStruct, 'get_field_by_id', retval_child('bamboo::Field *'),
                [param('unsigned int', 'id')])
-    add_method(clsStruct, 'get_field_by_name',
-               retval('bamboo::Field *', caller_owns_return = False),
+    add_method(clsStruct, 'get_field_by_name', retval_child('bamboo::Field *'),
                [param('const std::string&', 'name')])
     add_method(clsStruct, 'add_field', retval('bool'),
                [param('bamboo::Field *', 'field', transfer_ownership = True)])
@@ -221,30 +220,21 @@ def generate(file_):
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('const std::string&', 'name')])
     add_method(clsClass, 'get_num_parents', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_parent',
-               retval('bamboo::Class *', caller_owns_return = False),
-               [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_parent', retval_child('bamboo::Class *'), [param('unsigned int', 'n')])
     add_method(clsClass, 'get_num_children', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_child',
-               retval('bamboo::Class *', caller_owns_return = False),
-               [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_child', retval_child('bamboo::Class *'), [param('unsigned int', 'n')])
     add_method(clsClass, 'has_constructor', retval('bool'), [], is_const = True)
-    add_method(clsClass, 'get_constructor',
-               retval('bamboo::Field *', caller_owns_return = False), [])
+    add_method(clsClass, 'get_constructor', retval_child('bamboo::Field *'), [])
     add_method(clsClass, 'get_num_base_fields', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_base_field',
-               retval('bamboo::Field *', caller_owns_return = False),
-               [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_base_field', retval_child('bamboo::Field *'), [param('unsigned int', 'n')])
     add_method(clsClass, 'add_parent', None,
                [param('bamboo::Class *', 'parent', transfer_ownership = False)])
     clsParam.add_constructor([
                param('bamboo::DistributedType *', 'type', transfer_ownership = False),
                param('const std::string&', 'name', default_value = '""')])
     add_method(clsParam, 'get_name', retval('std::string'), [], is_const = False)
-    add_method(clsParam, 'get_type',
-               retval('bamboo::DistributedType *', caller_owns_return = False), [])
-    add_method(clsParam, 'get_method',
-               retval('bamboo::Method *', caller_owns_return = False), [])
+    add_method(clsParam, 'get_type', retval_child('bamboo::DistributedType *'), [])
+    add_method(clsParam, 'get_method', retval_child('bamboo::Method *'), [])
     add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
     add_method(clsParam, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsParam, 'set_name', retval('bool'), [param('const std::string&', 'name')])
@@ -257,10 +247,8 @@ def generate(file_):
                param('const std::string&', 'name', default_value = '""')])
     add_method(clsField, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsField, 'get_name', retval('std::string'), [], is_const = False)
-    add_method(clsField, 'get_type',
-               retval('bamboo::DistributedType *', caller_owns_return = False), [])
-    add_method(clsField, 'get_struct',
-               retval('bamboo::Struct *', caller_owns_return = False), [])
+    add_method(clsField, 'get_type', retval_child('bamboo::DistributedType *'), [])
+    add_method(clsField, 'get_struct', retval_child('bamboo::Struct *'), [])
     add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
     add_method(clsField, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsField, 'set_name', retval('bool'), [param('const std::string&', 'name')])
@@ -333,7 +321,7 @@ def generate(file_):
                [param('unsigned int', 'index')], throw = [indexError])
     add_method(structBuffer, 'set_byte', None,
                [param('unsigned int', 'index'), param('char', 'item')], throw = [indexError])
-    add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = False),
+    add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = True),
                  [param('const std::string&', 'filename')])
     add_function(dcfile, 'parse_dcfile', retval('bool'),
                  [param('bamboo::Module *', 'module', transfer_ownership = False),
@@ -355,6 +343,9 @@ def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]
     doc = functionDocstrings[mod.get_name()][name]
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)
+
+def retval_child(typestr, **kwargs):
+    return retval(typestr, custodian = -1, caller_owns_return = False, return_internal_reference = True, **kwargs)
 
 if __name__ == "__main__":
     import sys, os
