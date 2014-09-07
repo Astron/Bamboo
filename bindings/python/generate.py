@@ -171,10 +171,10 @@ def generate(file_):
     add_method(clsDistType, 'has_fixed_size', retval('bool'), [], is_const = True)
     add_method(clsDistType, 'get_size', retval('size_t'), [], is_const = True)
     add_method(clsDistType, 'has_alias', retval('bool'), [], is_const = True)
-    add_method(clsDistType, 'as_numeric', retval_child('bamboo::NumericType *'), [], is_virtual = True)
-    add_method(clsDistType, 'as_array', retval_child('bamboo::ArrayType *'), [], is_virtual = True)
-    add_method(clsDistType, 'as_struct', retval_child('bamboo::Struct*'), [], is_virtual = True)
-    add_method(clsDistType, 'as_method', retval_child('bamboo::Method *'), [], is_virtual = True)
+    add_method(clsDistType, 'as_numeric', retval_self('bamboo::NumericType *'), [], is_virtual = True)
+    add_method(clsDistType, 'as_array', retval_self('bamboo::ArrayType *'), [], is_virtual = True)
+    add_method(clsDistType, 'as_struct', retval_self('bamboo::Struct*'), [], is_virtual = True)
+    add_method(clsDistType, 'as_method', retval_self('bamboo::Method *'), [], is_virtual = True)
     add_method(clsDistType, 'get_alias', retval('const std::string'), [], is_const = True)
     add_method(clsDistType, 'set_alias', None, [param('const std::string&', 'alias')])
     clsNumType.add_constructor([param('bamboo::Subtype', 'subtype')])
@@ -206,7 +206,7 @@ def generate(file_):
                param('const std::string&', 'name')])
     add_method(clsStruct, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsStruct, 'get_name', retval('std::string'), [], is_const = True)
-    add_method(clsStruct, 'get_module', retval_child('bamboo::Module *'), [])
+    add_method(clsStruct, 'get_module', retval_parent('bamboo::Module *'), [])
     add_method(clsStruct, 'get_num_fields', retval('size_t'), [], is_const = True)
     add_method(clsStruct, 'get_field', retval_child('bamboo::Field *'),
                [param('unsigned int', 'n')])
@@ -234,7 +234,7 @@ def generate(file_):
                param('const std::string&', 'name', default_value = '""')])
     add_method(clsParam, 'get_name', retval('std::string'), [], is_const = False)
     add_method(clsParam, 'get_type', retval_child('bamboo::DistributedType *'), [])
-    add_method(clsParam, 'get_method', retval_child('bamboo::Method *'), [])
+    add_method(clsParam, 'get_method', retval_parent('bamboo::Method *'), [])
     add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
     add_method(clsParam, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsParam, 'set_name', retval('bool'), [param('const std::string&', 'name')])
@@ -248,7 +248,7 @@ def generate(file_):
     add_method(clsField, 'get_id', retval('unsigned int'), [], is_const = True)
     add_method(clsField, 'get_name', retval('std::string'), [], is_const = False)
     add_method(clsField, 'get_type', retval_child('bamboo::DistributedType *'), [])
-    add_method(clsField, 'get_struct', retval_child('bamboo::Struct *'), [])
+    add_method(clsField, 'get_struct', retval_parent('bamboo::Struct *'), [])
     add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
     add_method(clsField, 'get_default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsField, 'set_name', retval('bool'), [param('const std::string&', 'name')])
@@ -345,6 +345,18 @@ def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]
     doc = functionDocstrings[mod.get_name()][name]
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)
+
+def retval_self(typestr, **kwargs):
+    # N.B. Currently this is an alias for retval_child, but we may consider
+    #      changing it to have different behavior to make memory management cleaner.
+    #      For now its ok, because usage of this pattern tends to be cleaned-up fairly quickly.
+    return retval_child(typestr, **kwargs)
+
+def retval_parent(typestr, **kwargs):
+    # FIXME: Currently this is an alias for retval_child, but it needs to be
+    #        changed to have the returned object be the custodian of the child
+    #        to reduce the amount of reference-loops that are generated
+    return retval_child(typestr, **kwargs)
 
 def retval_child(typestr, **kwargs):
     return retval(typestr, custodian = -1, caller_owns_return = False, return_internal_reference = True, **kwargs)
