@@ -280,7 +280,7 @@ if(BUILD_PYTHON)
         OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
           ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
-          ${CMAKE_BINARY_DIR}/python/.pythonBindings.cpp
+          ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
         MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
         IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
     endif()
