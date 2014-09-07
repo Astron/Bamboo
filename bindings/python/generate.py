@@ -321,6 +321,8 @@ def generate(file_):
                [param('unsigned int', 'index')], throw = [indexError])
     add_method(structBuffer, 'set_byte', None,
                [param('unsigned int', 'index'), param('char', 'item')], throw = [indexError])
+    add_function(traits, 'legacy_hash', retval('uint32_t'),
+                 [param('const bamboo::Module *', 'module', transfer_ownership = False)])
     add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = True),
                  [param('const std::string&', 'filename')])
     add_function(dcfile, 'parse_dcfile', retval('bool'),

@@ -157,6 +157,9 @@ altnames = {
     'get_byte': ['__getitem__'],
     'set_byte': ['__setitem__'],
 
+    # traits/hashes.h
+    'legacy_hash': ['legacy_hash', 'legacyHash'],
+
     # dcfile/parse.h
     'read_dcfile':   ['read_dcfile',   'readDCFile'],
     'parse_dcfile':  ['parse_dcfile',  'parseDCFile'],
@@ -203,7 +206,12 @@ classDocstrings = {
 }
 
 functionDocstrings = {
-    'dcfile' : {
+    'traits': {
+    # hashes.h
+        'legacy_hash':
+'Produces a hash which matches that of the legacy dcparser in Panda3D.',
+    },
+    'dcfile': {
     # parse.h
         'read_dcfile':
 'Opens the given file or stream and parses it as a .dc file.  Classes defined in '       +

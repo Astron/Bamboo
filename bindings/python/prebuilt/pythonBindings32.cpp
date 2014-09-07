@@ -10918,7 +10918,51 @@ initbamboo_module(void)
     }
     return m;
 }
+/* --- module functions --- */
+
+
+PyObject *
+_wrap_bamboo_traits_legacy_hash(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    uint32_t retval;
+    PyBambooModule *module;
+    bamboo::Module *module_ptr;
+    const char *keywords[] = {"module", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooModule_Type, &module)) {
+        return NULL;
+    }
+    module_ptr = (module ? module->obj : NULL);
+    retval = bamboo::legacy_hash(module_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+PyObject * _wrap_bamboo_traits_legacy_hash(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs);
+
+
+PyObject *
+_wrap_bamboo_traits_legacyHash(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    uint32_t retval;
+    PyBambooModule *module;
+    bamboo::Module *module_ptr;
+    const char *keywords[] = {"module", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooModule_Type, &module)) {
+        return NULL;
+    }
+    module_ptr = (module ? module->obj : NULL);
+    retval = bamboo::legacy_hash(module_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+PyObject * _wrap_bamboo_traits_legacyHash(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs);
+
 static PyMethodDef bamboo_traits_functions[] = {
+    {(char *) "legacy_hash", (PyCFunction) _wrap_bamboo_traits_legacy_hash, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "legacyHash", (PyCFunction) _wrap_bamboo_traits_legacyHash, METH_KEYWORDS|METH_VARARGS, NULL },
     {NULL, NULL, 0, NULL}
 };
 #if PY_VERSION_HEX >= 0x03000000
