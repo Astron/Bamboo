@@ -52,9 +52,9 @@ sizetag_t BlobValue::size() const {
     return m_blob.size();
 }
 
-Value BlobValue::get_item(sizetag_t index) { return Value(new IntValue(m_blob[index])); }
-const Value BlobValue::get_item(sizetag_t index) const { return Value(new IntValue(m_blob[index])); }
-void BlobValue::set_item(sizetag_t index, const Value val) { m_blob[index] = (uint8_t)val; }
+Value BlobValue::_getitem_(sizetag_t index) { return Value(new IntValue(m_blob[index])); }
+const Value BlobValue::_getitem_(sizetag_t index) const { return Value(new IntValue(m_blob[index])); }
+void BlobValue::_setitem_(sizetag_t index, const Value val) { m_blob[index] = (uint8_t)val; }
 
 
 } // close namespace bamboo

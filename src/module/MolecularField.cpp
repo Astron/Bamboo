@@ -61,7 +61,7 @@ bool MolecularField::add_field(Field *field) {
             m_has_default_value = true;
         }
 
-        m_default_value.set_item(m_fields.size() - 1, field->get_default_value());
+        m_default_value[m_fields.size() - 1] = field->get_default_value();
     }
 
     return true;

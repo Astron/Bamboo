@@ -51,9 +51,9 @@ sizetag_t StringValue::size() const {
     return m_string.length();
 }
 
-Value StringValue::get_item(sizetag_t index) { return Value(new IntValue(m_string[index])); }
-const Value StringValue::get_item(sizetag_t index) const { return Value(new IntValue(m_string[index])); }
-void StringValue::set_item(sizetag_t index, const Value val) { m_string[index] = (char)val; }
+Value StringValue::_getitem_(sizetag_t index) { return Value(new IntValue(m_string[index])); }
+const Value StringValue::_getitem_(sizetag_t index) const { return Value(new IntValue(m_string[index])); }
+void StringValue::_setitem_(sizetag_t index, const Value val) { m_string[index] = (char)val; }
 
 
 } // close namespace bamboo

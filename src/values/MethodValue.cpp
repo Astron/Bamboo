@@ -40,7 +40,7 @@ sizetag_t MethodValue::size() const {
     return m_method->get_num_parameters();
 }
 
-Value MethodValue::get_item(sizetag_t index) {
+Value MethodValue::_getitem_(sizetag_t index) {
     if(index >= m_method->get_num_parameters()) {
         throw out_of_range("parameter index out of range for method value.");
     }
@@ -52,7 +52,7 @@ Value MethodValue::get_item(sizetag_t index) {
 
     return found_item->second;
 }
-Value MethodValue::get_item(const string& item) {
+Value MethodValue::_getitem_(const string& item) {
     if(m_method->get_parameter_by_name(item) == nullptr) {
         throw out_of_range("parameter name invalid for method value.");
     }
@@ -65,7 +65,7 @@ Value MethodValue::get_item(const string& item) {
 
     return found_item->second;
 }
-const Value MethodValue::get_item(sizetag_t index) const {
+const Value MethodValue::_getitem_(sizetag_t index) const {
     if(index >= m_method->get_num_parameters()) {
         throw out_of_range("parameter index out of range for method value.");
     }
@@ -77,7 +77,7 @@ const Value MethodValue::get_item(sizetag_t index) const {
 
     return found_item->second;
 }
-const Value MethodValue::get_item(const string& item) const {
+const Value MethodValue::_getitem_(const string& item) const {
     if(m_method->get_parameter_by_name(item) == nullptr) {
         throw out_of_range("parameter name invalid for method value.");
     }
@@ -90,14 +90,14 @@ const Value MethodValue::get_item(const string& item) const {
 
     return found_item->second;
 }
-void MethodValue::set_item(sizetag_t index, const Value val) {
+void MethodValue::_setitem_(sizetag_t index, const Value val) {
     if(index >= m_method->get_num_parameters()) {
         throw out_of_range("parameter assignment index out of range for method value.");
     }
 
     m_params.insert(pair<sizetag_t, Value>(index, val));
 }
-void MethodValue::set_item(const string& item, const Value val) {
+void MethodValue::_setitem_(const string& item, const Value val) {
     if(m_method->get_parameter_by_name(item) == nullptr) {
         throw out_of_range("parameter name invalid for assignment to method value.");
     }

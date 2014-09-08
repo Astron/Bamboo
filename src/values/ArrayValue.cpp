@@ -39,9 +39,9 @@ sizetag_t ArrayValue::size() const {
     return m_elements.size();
 }
 
-Value ArrayValue::get_item(sizetag_t index) { return m_elements[index]; }
-const Value ArrayValue::get_item(sizetag_t index) const { return m_elements[index]; }
-void ArrayValue::set_item(sizetag_t index, const Value val) { m_elements[index] = val; }
+Value ArrayValue::_getitem_(sizetag_t index) { return m_elements[index]; }
+const Value ArrayValue::_getitem_(sizetag_t index) const { return m_elements[index]; }
+void ArrayValue::_setitem_(sizetag_t index, const Value val) { m_elements[index] = val; }
 
 void ArrayValue::append(const Value val) { m_elements.push_back(val); }
 

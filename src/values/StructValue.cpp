@@ -40,7 +40,7 @@ sizetag_t StructValue::size() const {
     return m_struct->get_num_fields();
 }
 
-Value StructValue::get_item(sizetag_t index) {
+Value StructValue::_getitem_(sizetag_t index) {
     if(index >= m_struct->get_num_fields()) {
         throw out_of_range("field index out of range for struct value.");
     }
@@ -52,7 +52,7 @@ Value StructValue::get_item(sizetag_t index) {
 
     return found_item->second;
 }
-Value StructValue::get_item(const string& item) {
+Value StructValue::_getitem_(const string& item) {
     if(m_struct->get_field_by_name(item) == nullptr) {
         throw out_of_range("field name invalid for struct value.");
     }
@@ -65,7 +65,7 @@ Value StructValue::get_item(const string& item) {
 
     return found_item->second;
 }
-const Value StructValue::get_item(sizetag_t index) const {
+const Value StructValue::_getitem_(sizetag_t index) const {
     if(index >= m_struct->get_num_fields()) {
         throw out_of_range("field index out of range for struct value.");
     }
@@ -77,7 +77,7 @@ const Value StructValue::get_item(sizetag_t index) const {
 
     return found_item->second;
 }
-const Value StructValue::get_item(const string& item) const {
+const Value StructValue::_getitem_(const string& item) const {
     if(m_struct->get_field_by_name(item) == nullptr) {
         throw out_of_range("field name invalid for struct value.");
     }
@@ -90,14 +90,14 @@ const Value StructValue::get_item(const string& item) const {
 
     return found_item->second;
 }
-void StructValue::set_item(sizetag_t index, const Value val) {
+void StructValue::_setitem_(sizetag_t index, const Value val) {
     if(index >= m_struct->get_num_fields()) {
         throw out_of_range("field assignment index out of range for struct value.");
     }
 
     m_fields.insert(pair<sizetag_t, Value>(index, val));
 }
-void StructValue::set_item(const string& item, const Value val) {
+void StructValue::_setitem_(const string& item, const Value val) {
     if(m_struct->get_field_by_name(item) == nullptr) {
         throw out_of_range("field name invalid for assignment to struct value.");
     }

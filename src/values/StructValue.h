@@ -29,12 +29,12 @@ class StructValue : public ValueInterface {
 
     // array accessor like methods for pointer operations
     //     Throws: out_of_range
-    virtual Value get_item(sizetag_t index);
-    virtual Value get_item(const std::string& item);
-    virtual const Value get_item(sizetag_t index) const;
-    virtual const Value get_item(const std::string& item) const;
-    virtual void set_item(sizetag_t index, const Value);
-    virtual void set_item(const std::string& item, const Value);
+    virtual Value _getitem_(sizetag_t index);
+    virtual Value _getitem_(const std::string& item);
+    virtual const Value _getitem_(sizetag_t index) const;
+    virtual const Value _getitem_(const std::string& item) const;
+    virtual void _setitem_(sizetag_t index, const Value);
+    virtual void _setitem_(const std::string& item, const Value);
 };
 
 

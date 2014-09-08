@@ -17,6 +17,7 @@ def generate(file_):
     bits.add_include('"bits/byteorder.h"')
     bits.add_include('"bits/sizetag.h"')
     bits.add_include('"bits/Buffer.h"')
+    bits.add_include('"bits/Sequence.h"')
     values.add_include('"values/Value.h"')
     module.add_include('"module/ArrayType.h"')
     module.add_include('"module/Class.h"')
@@ -38,7 +39,10 @@ def generate(file_):
     wire.add_include('"wire/DatagramIterator.h"')
 
     # Declare classes
-    structBuffer = bits.add_struct('Buffer')
+    structBytes = bits.add_struct('Bytes')
+    clsBytesIterator = bits.add_class('iterator', outer_class = structBytes)
+    structBuffer = bits.add_struct('Buffer',
+        docstring = classDocstrings['Buffer'])
     indexError = bits.add_exception('out_of_range',
         custom_name = 'IndexError',
         foreign_cpp_namespace = 'std',
@@ -51,7 +55,8 @@ def generate(file_):
         custom_name = 'ConversionError',
         foreign_cpp_namespace = 'std',
         message_rvalue = 'exc.what()');
-    clsValue = values.add_class('Value', docstring = classDocstrings['Value'])
+    clsValue = values.add_class('Value',
+        docstring = classDocstrings['Value'])
     clsModule = module.add_class('Module',
         docstring = classDocstrings['Module'])
     clsDistType = module.add_class('DistributedType',
@@ -74,8 +79,10 @@ def generate(file_):
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_class('NumericRange')
-    clsDatagram = wire.add_class('Datagram')
-    clsDgIter = wire.add_class('DatagramIterator')
+    clsDatagram = wire.add_class('Datagram',
+        docstring = classDocstrings['Datagram'])
+    clsDgIter = wire.add_class('DatagramIterator',
+        docstring = classDocstrings['DatagramIterator'])
 
     # Declare enums
     enumSubtype = module.add_enum('Subtype', [
@@ -114,13 +121,13 @@ def generate(file_):
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)],
                is_const = True, throw = [typeError])
     add_method(clsValue, 'size', retval('unsigned int'), [], is_const = True)
-    add_method(clsValue, 'get_item', retval('bamboo::Value'),
+    add_method(clsValue, '_getitem_', retval('bamboo::Value'),
                [param('unsigned int', 'index')], throw = [indexError])
-    add_method(clsValue, 'get_item', retval('bamboo::Value'),
+    add_method(clsValue, '_getitem_', retval('bamboo::Value'),
                [param('const std::string&', 'item')], throw = [indexError])
-    add_method(clsValue, 'set_item', None,
+    add_method(clsValue, '_setitem_', None,
                [param('unsigned int', 'index'), param('const Value', 'value')], throw = [indexError])
-    add_method(clsValue, 'set_item', None,
+    add_method(clsValue, '_setitem_', None,
                [param('const std::string&', 'item'), param('const Value', 'value')], throw = [indexError])
     clsModule.add_constructor([])
     add_method(clsModule, 'get_num_classes', retval('size_t'), [], is_const = True)
@@ -317,6 +324,23 @@ def generate(file_):
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)])
     add_method(clsDgIter, 'read_packed', retval('bamboo::Buffer'),
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)])
+
+    structBytes.add_copy_constructor()
+    add_method(structBytes, '_len_', retval('unsigned int'), [])
+    add_method(structBytes, '_getitem_', retval('uint8_t'),
+               [param('int', 'index')], throw = [indexError])
+    add_method(structBytes, '_setitem_', None,
+               [param('int', 'index'), param('uint8_t', 'item')], throw = [indexError])
+    add_method(structBytes, '_getslice_', retval('bamboo::Bytes'),
+               [param('int', 'i'), param('int', 'j')])
+    add_method(structBytes, '_setslice_', None,
+               [param('int', 'i'), param('int', 'j'), param('bamboo::Bytes', 'bytes')])
+    add_method(structBytes, '_iter_', retval('bamboo::Bytes::iterator'), [])
+    clsBytesIterator.add_copy_constructor()
+    add_method(clsBytesIterator, '_iter_', retval('bamboo::Bytes::iterator'), [])
+    add_method(clsBytesIterator, 'next', retval('uint8_t'), [])
+    add_method(clsBytesIterator, 'prev', retval('uint8_t'), [])
+
 
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()

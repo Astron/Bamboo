@@ -23,9 +23,9 @@ class ArrayValue : public ValueInterface {
 
     // array accessor like methods for pointer operations
     //     Throws: out_of_range
-    virtual Value get_item(sizetag_t index);
-    virtual const Value get_item(sizetag_t index) const;
-    virtual void set_item(sizetag_t index, const Value);
+    virtual Value _getitem_(sizetag_t index);
+    virtual const Value _getitem_(sizetag_t index) const;
+    virtual void _setitem_(sizetag_t index, const Value);
 
     void append(const Value);
 };

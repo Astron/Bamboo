@@ -47,7 +47,6 @@ inline std::vector<uint8_t> as_buffer(const std::string& r) {
     return std::vector<uint8_t>(r.begin(), r.end());
 }
 
-
 inline void pack_value(char r, std::vector<uint8_t>& buf) {
     buf.insert(buf.end(), (uint8_t *)&r, (uint8_t *)(&r + 1));
 }

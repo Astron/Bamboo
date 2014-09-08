@@ -1,6 +1,7 @@
 // Filename: Buffer.h
 #pragma once
 #include "buffers.h"
+#include "Sequence.h"
 #include <stdexcept>
 namespace bamboo {
 
@@ -69,6 +70,7 @@ struct Buffer {
     inline void pack_float64(double r) { return pack_value(r, data); }
     inline void pack_string(const std::string& r) { return pack_value(r, data); }
     inline void pack_buffer(const std::vector<uint8_t>& r) { return pack_value(r, data); }
+    inline void pack_bytes(const Bytes& r) { return data.insert(data.end(), r.begin(), r.end()); }
 
     static Buffer from_bool(bool r) { return as_buffer(r); }
     static Buffer from_char(char r) { return as_buffer(r); }
@@ -83,37 +85,8 @@ struct Buffer {
     static Buffer from_float32(float r) { return as_buffer(r); }
     static Buffer from_float64(double r) { return as_buffer(r); }
     static Buffer from_string(const std::string& r) { return as_buffer(r); }
+    static Buffer from_bytes(const Bytes& r) { return std::vector<uint8_t>(r.begin(), r.end()); }
 };
-
-/*
-struct ReadOnlyBuffer {
-    const std::vector<uint8_t>& data;
-    sizetag_t offset;
-
-    ReadOnlyBuffer(const ReadOnlyBuffer& buf) : data(buf.data), offset(buf.offset) {}
-    ReadOnlyBuffer& operator=(const std::vector<uint8_t>& rhs) {
-        data = rhs;
-        offset = 0;
-        return *this;
-    }
-    operator const std::vector<uint8_t>&() const { return data; }
-
-    inline const uint8_t& operator[](size_t index) const { return data[index]; }
-
-    inline bool read_bool() { return bamboo::read_bool(data, offset); }
-    inline char read_char() { return bamboo::read_char(data, offset); }
-    inline int8_t read_int8() { return bamboo::read_int8(data, offset); }
-    inline int16_t read_int16() { return bamboo::read_int16(data, offset); }
-    inline int32_t read_int32() { return bamboo::read_int32(data, offset); }
-    inline int64_t read_int64() { return bamboo::read_int64(data, offset); }
-    inline uint8_t read_uint8() { return bamboo::read_uint8(data, offset); }
-    inline uint16_t read_uint16() { return bamboo::read_uint16(data, offset); }
-    inline uint32_t read_uint32() { return bamboo::read_uint32(data, offset); }
-    inline uint64_t read_uint64() { return bamboo::read_uint64(data, offset); }
-    inline float read_float32() { return bamboo::read_float32(data, offset); }
-    inline double read_float64() { return bamboo::read_float64(data, offset); }
-};
-*/
 
 
 } // close namespace bamboo

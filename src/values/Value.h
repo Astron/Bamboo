@@ -67,19 +67,19 @@ class Value {
     // [] -- array subscription may be used to access the items in the value
     // TODO: Some voodoo magic with these to provide
     //     May throw std::out_of_range.
-    inline Value operator[](sizetag_t index) { return get_item(index); }
-    inline const Value operator[](sizetag_t index) const { return get_item(index); }
-    inline Value operator[](const std::string& item) { return get_item(item); }
-    inline const Value operator[](const std::string& item) const { return get_item(item); }
+    inline Value operator[](sizetag_t index) { return _getitem_(index); }
+    inline const Value operator[](sizetag_t index) const { return _getitem_(index); }
+    inline Value operator[](const std::string& item) { return _getitem_(item); }
+    inline const Value operator[](const std::string& item) const { return _getitem_(item); }
 
     // These functions are primarily for use with bindings.
     // In C++ code, use array subscription instead.
-    inline Value get_item(sizetag_t index) { return m_value->get_item(index); }
-    inline Value get_item(const std::string& item) { return m_value->get_item(item); }
-    inline const Value get_item(sizetag_t index) const { return m_value->get_item(index); }
-    inline const Value get_item(const std::string& item) const { return m_value->get_item(item); }
-    inline void set_item(sizetag_t index, const Value value) { return m_value->set_item(index, value); }
-    inline void set_item(const std::string& item, const Value value) { return m_value->set_item(item, value); }
+    inline Value _getitem_(sizetag_t index) { return m_value->_getitem_(index); }
+    inline Value _getitem_(const std::string& item) { return m_value->_getitem_(item); }
+    inline const Value _getitem_(sizetag_t index) const { return m_value->_getitem_(index); }
+    inline const Value _getitem_(const std::string& item) const { return m_value->_getitem_(item); }
+    inline void _setitem_(sizetag_t index, const Value value) { return m_value->_setitem_(index, value); }
+    inline void _setitem_(const std::string& item, const Value value) { return m_value->_setitem_(item, value); }
 
     // These functions are primarily for use with bindings.
     // In C++ code, use implicit conversions instead.

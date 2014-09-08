@@ -27,23 +27,23 @@ vector<uint8_t> ValueInterface::as_blob() const { throw bad_cast(); }
 sizetag_t ValueInterface::size() const { return 0; }
 
 // array_accessor like operations
-Value ValueInterface::get_item(sizetag_t) {
-    throw out_of_range("get_item isn't allowed for this type of value.");
+Value ValueInterface::_getitem_(sizetag_t) {
+    throw out_of_range("_getitem_ isn't allowed for this type of value.");
 }
-Value ValueInterface::get_item(const std::string&) {
-    throw out_of_range("get_item by item name isn't allowed for this type of value.");
+Value ValueInterface::_getitem_(const std::string&) {
+    throw out_of_range("_getitem_ by item name isn't allowed for this type of value.");
 }
-const Value ValueInterface::get_item(sizetag_t) const {
-    throw out_of_range("get_item isn't allowed for this type of value.");
+const Value ValueInterface::_getitem_(sizetag_t) const {
+    throw out_of_range("_getitem_ isn't allowed for this type of value.");
 }
-const Value ValueInterface::get_item(const std::string&) const {
-    throw out_of_range("get_item by item name isn't allowed for this type of value.");
+const Value ValueInterface::_getitem_(const std::string&) const {
+    throw out_of_range("_getitem_ by item name isn't allowed for this type of value.");
 }
-void ValueInterface::set_item(sizetag_t, const Value) {
-    throw out_of_range("set_item isn't allowed for this type of value.");
+void ValueInterface::_setitem_(sizetag_t, const Value) {
+    throw out_of_range("_setitem_ isn't allowed for this type of value.");
 }
-void ValueInterface::set_item(const std::string&, const Value) {
-    throw out_of_range("set_item by item name isn't allowed for this type of value.");
+void ValueInterface::_setitem_(const std::string&, const Value) {
+    throw out_of_range("_setitem_ by item name isn't allowed for this type of value.");
 }
 
 

@@ -1,21 +1,28 @@
 altnames = {
     # Common alternate names
+    'cap':  ['cap'],
+    'size': ['size', '__len__'],
     'copy': ['copy', '__deepcopy__'],
-    'seek': ['seek'],
     'tell': ['tell'],
+    'seek': ['seek'],
     'skip': ['skip'],
-    'size': ['size'],
     'type': ['type'],
     'data': ['data'],
-    'cap':  ['cap'],
+    'next': ['next'],
+    'prev': ['prev'],
+
+    # Explicit Builtins
+    '_len_':      ['__len__'],
+    '_iter_':     ['__iter__'],
+    '_getitem_':  ['__getitem__'],
+    '_setitem_':  ['__setitem__'],
+    '_getslice_': ['__getslice__'],
+    '_setslice_': ['__setslice__'],
 
     # Value
     'from_type':   ['from_type',   'fromType'],
     'from_packed': ['from_packed', 'fromPacked'],
     'pack':        ['pack'],
-    # These methods are for python array subscription
-    'get_item': ['__getitem__'],
-    'set_item': ['__setitem__'],
 
     # Module
     'get_num_classes':   ['get_num_classes',   'getNumClasses'],
@@ -249,6 +256,12 @@ classDocstrings = {
 'A Value is a local representation of data.  '                                +
 'The library uses the Value class to do some magic for us that allows us to ' +
 'manipulate dynamically-typed data similar freely in a loosely-typed language.',
+    'Datagram':
+'A Datagram is a buffer of binary data in network-endianness.',
+    'DatagramIterator':
+'A DatagramIterator lets you step trough a datagram by reading a single value at a time.',
+    'Buffer':
+'A Buffer is a convenience object for building and reading data in native-endianess.'
 }
 
 functionDocstrings = {

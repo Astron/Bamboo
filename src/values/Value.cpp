@@ -275,7 +275,7 @@ Value Value::from_packed(const DistributedType *type, const vector<uint8_t>& buf
             StructValue *r = new StructValue(str);
             size_t num_fields = str->get_num_fields();
             for(unsigned int i = 0; i < num_fields; ++i) {
-                r->set_item(i, from_packed(str->get_field(i)->get_type(), buf, offset));
+                r->_setitem_(i, from_packed(str->get_field(i)->get_type(), buf, offset));
             }
             return Value(r);
         }
@@ -284,7 +284,7 @@ Value Value::from_packed(const DistributedType *type, const vector<uint8_t>& buf
             MethodValue *r = new MethodValue(method);
             size_t num_params = method->get_num_parameters();
             for(unsigned int i = 0; i < num_params; ++i) {
-                r->set_item(i, from_packed(method->get_parameter(i)->get_type(), buf, offset));
+                r->_setitem_(i, from_packed(method->get_parameter(i)->get_type(), buf, offset));
             }
             return Value(r);
         }
