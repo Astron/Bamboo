@@ -109,7 +109,7 @@ def generate(file_):
                is_static = True, throw = [typeError])
     add_method(clsValue, 'from_packed', retval('bamboo::Value'),
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False),
-                param('const Buffer&', 'packed')], is_static = True, throw = [typeError])
+                param('const bamboo::Buffer&', 'packed')], is_static = True, throw = [typeError])
     add_method(clsValue, 'pack', retval('bamboo::Buffer'),
                [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)],
                is_const = True, throw = [typeError])
@@ -241,7 +241,7 @@ def generate(file_):
     add_method(clsParam, 'set_type', retval('bool'),
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
     add_method(clsParam, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
-    add_method(clsParam, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
+    add_method(clsParam, 'set_default_value', retval('bool'), [param('const bamboo::Buffer&', 'value')])
     clsField.add_constructor([
                param('bamboo::DistributedType *', 'type', transfer_ownership = False),
                param('const std::string&', 'name', default_value = '""')])
@@ -255,10 +255,69 @@ def generate(file_):
     add_method(clsField, 'set_type', None,
                [param('bamboo::DistributedType *', 'type', transfer_ownership = False)]),
     add_method(clsField, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
-    add_method(clsField, 'set_default_value', retval('bool'), [param('const Buffer&', 'value')])
+    add_method(clsField, 'set_default_value', retval('bool'), [param('const bamboo::Buffer&', 'value')])
     clsMolecular.add_constructor([
                param('bamboo::Class *', 'cls', transfer_ownership = False),
                param('const std::string&', 'name')])
+    clsDatagram.add_constructor([])
+    clsDatagram.add_copy_constructor()
+    add_method(clsDatagram, 'size', retval('size_t'), [], is_const = True)
+    add_method(clsDatagram, 'cap', retval('size_t'), [], is_const = True)
+    add_method(clsDatagram, 'add_bool', None, [param('bool', 'value')])
+    add_method(clsDatagram, 'add_char', None, [param('char', 'value')])
+    add_method(clsDatagram, 'add_int8', None, [param('int8_t', 'value')])
+    add_method(clsDatagram, 'add_int16', None, [param('int16_t', 'value')])
+    add_method(clsDatagram, 'add_int32', None, [param('int32_t', 'value')])
+    add_method(clsDatagram, 'add_int64', None, [param('int64_t', 'value')])
+    add_method(clsDatagram, 'add_uint8', None, [param('uint8_t', 'value')])
+    add_method(clsDatagram, 'add_uint16', None, [param('uint16_t', 'value')])
+    add_method(clsDatagram, 'add_uint32', None, [param('uint32_t', 'value')])
+    add_method(clsDatagram, 'add_uint64', None, [param('uint64_t', 'value')])
+    add_method(clsDatagram, 'add_float32', None, [param('float', 'value')])
+    add_method(clsDatagram, 'add_float64', None, [param('double', 'value')])
+    add_method(clsDatagram, 'add_data', None, [param('const bamboo::Buffer&', 'value')])
+    add_method(clsDatagram, 'add_string', None, [param('const std::string&', 'value')])
+    add_method(clsDatagram, 'add_blob', None, [param('const bamboo::Buffer&', 'value')])
+    add_method(clsDatagram, 'add_value', None,
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False),
+                param('const Value', 'value')])
+    add_method(clsDatagram, 'add_packed', None,
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False),
+                param('const bamboo::Buffer&', 'packed'),
+                param('size_t', 'offset', default_value = '0')])
+    clsDgIter.add_constructor([
+            param('const bamboo::Datagram&', 'dg'),
+            param('size_t', 'offset', default_value = '0')])
+    clsDgIter.add_copy_constructor()
+    add_method(clsDgIter, 'tell', retval('size_t'), [], is_const = True)
+    add_method(clsDgIter, 'seek', None, [param('size_t', 'offset')])
+    add_method(clsDgIter, 'skip', None, [param('size_t', 'length')])
+    add_method(clsDgIter, 'skip_type', None,
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)])
+    add_method(clsDgIter, 'get_remaining', retval('size_t'), [], is_const = True)
+    add_method(clsDgIter, 'read_remainder', retval('bamboo::Buffer'), [])
+    add_method(clsDgIter, 'read_bool', retval('bool'), [])
+    add_method(clsDgIter, 'read_char', retval('char'), [])
+    add_method(clsDgIter, 'read_int8', retval('int8_t'), [])
+    add_method(clsDgIter, 'read_int16', retval('int16_t'), [])
+    add_method(clsDgIter, 'read_int32', retval('int32_t'), [])
+    add_method(clsDgIter, 'read_int64', retval('int64_t'), [])
+    add_method(clsDgIter, 'read_uint8', retval('uint8_t'), [])
+    add_method(clsDgIter, 'read_uint16', retval('uint16_t'), [])
+    add_method(clsDgIter, 'read_uint32', retval('uint32_t'), [])
+    add_method(clsDgIter, 'read_uint64', retval('uint64_t'), [])
+    add_method(clsDgIter, 'read_float32', retval('float'), [])
+    add_method(clsDgIter, 'read_float64', retval('double'), [])
+    add_method(clsDgIter, 'read_size', retval('size_t'), [])
+    add_method(clsDgIter, 'read_string', retval('std::string'), [])
+    add_method(clsDgIter, 'read_blob', retval('bamboo::Buffer'), [])
+    add_method(clsDgIter, 'read_datagram', retval('bamboo::Datagram'), [])
+    add_method(clsDgIter, 'read_data', retval('bamboo::Buffer'), [param('size_t', 'length')])
+    add_method(clsDgIter, 'read_value', retval('bamboo::Value'),
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)])
+    add_method(clsDgIter, 'read_packed', retval('bamboo::Buffer'),
+               [param('const bamboo::DistributedType *', 'type', transfer_ownership = False)])
+
     structBuffer.add_constructor([])
     structBuffer.add_copy_constructor()
     add_method(structBuffer, 'copy', retval('bamboo::Buffer'), [])

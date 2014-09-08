@@ -192,30 +192,30 @@ class DatagramIterator {
     // read_packed can also endian-swap packed data into a pre-existing buffer.
     void read_packed(const DistributedType *, std::vector<uint8_t>&);
 
+    // skip increments the current message offset by a length.
+    //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
+    void skip(sizetag_t length) {
+        check_read_length(length);
+        m_offset += length;
+    }
+
     // skip_type can be used to seek past the packed data for a DistributedType.
     //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
     void skip_type(const DistributedType *);
-
-    // tell returns the current message offset in std::vector<uint8_t>
-    sizetag_t tell() const {
-        return m_offset;
-    }
 
     // get_remaining returns the number of unread bytes left
     sizetag_t get_remaining() const {
         return m_dg->size() - m_offset;
     }
 
+    // tell returns the current message offset in std::vector<uint8_t>
+    sizetag_t tell() const {
+        return m_offset;
+    }
+
     // seek sets the current message offset in std::vector<uint8_t>
     void seek(sizetag_t to) {
         m_offset = to;
-    }
-
-    // skip increments the current message offset by a length.
-    //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
-    void skip(sizetag_t length) {
-        check_read_length(length);
-        m_offset += length;
     }
 };
 

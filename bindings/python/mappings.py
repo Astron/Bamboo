@@ -3,9 +3,11 @@ altnames = {
     'copy': ['copy', '__deepcopy__'],
     'seek': ['seek'],
     'tell': ['tell'],
+    'skip': ['skip'],
     'size': ['size'],
     'type': ['type'],
     'data': ['data'],
+    'cap':  ['cap'],
 
     # Value
     'from_type':   ['from_type',   'fromType'],
@@ -156,6 +158,50 @@ altnames = {
     # These methods are for python array subscription
     'get_byte': ['__getitem__'],
     'set_byte': ['__setitem__'],
+
+    # Datagram
+    'add_bool':    ['add_bool',    'addBool'],
+    'add_char':    ['add_char',    'addChar'],
+    'add_int8':    ['add_int8',    'addInt8'],
+    'add_int16':   ['add_int16',   'addInt16'],
+    'add_int32':   ['add_int32',   'addInt32'],
+    'add_int64':   ['add_int64',   'addInt64'],
+    'add_uint8':   ['add_uint8',   'addUint8'],
+    'add_uint16':  ['add_uint16',  'addUint16'],
+    'add_uint32':  ['add_uint32',  'addUint32'],
+    'add_uint64':  ['add_uint64',  'addUint64'],
+    'add_float32': ['add_float32', 'addFloat32'],
+    'add_float64': ['add_float64', 'addFloat64'],
+    'add_size':    ['add_size',    'addSize'],
+    'add_data':    ['add_data',    'addData'],
+    'add_string':  ['add_string',  'addString'],
+    'add_blob':    ['add_blob',    'addBlob'],
+    'add_value':   ['add_value',   'addValue'],
+    'add_packed':  ['add_packed',  'addPacked'],
+
+    # Datagram Iterator
+    #'read_bool':    ['read_bool',    'readBool'],
+    #'read_char':    ['read_char',    'readChar'],
+    #'read_int8':    ['read_int8',    'readInt8'],
+    #'read_int16':   ['read_int16',   'readInt16'],
+    #'read_int32':   ['read_int32',   'readInt32'],
+    #'read_int64':   ['read_int64',   'readInt64'],
+    #'read_uint8':   ['read_uint8',   'readUint8'],
+    #'read_uint16':  ['read_uint16',  'readUint16'],
+    #'read_uint32':  ['read_uint32',  'readUint32'],
+    #'read_uint64':  ['read_uint64',  'readUint64'],
+    #'read_float32': ['read_float32', 'readFloat32'],
+    #'read_float64': ['read_float64', 'readFloat64'],
+    'read_size':      ['read_size',      'readSize'],
+    'read_string':    ['read_string',    'readString'],
+    'read_blob':      ['read_blob',      'readBlob'],
+    'read_datagram':  ['read_datagram',  'readDatagram'],
+    'read_data':      ['read_data',      'readData'],
+    'read_remainder': ['read_remainder', 'readRemainder'],
+    'read_value':     ['read_value',     'readValue'],
+    'read_packed':    ['read_packed',    'readPacked'],
+    'get_remaining':  ['get_remaining',  'getRemaining'],
+    'skip_type':      ['skip_type',      'skipType'],
 
     # traits/hashes.h
     'legacy_hash': ['legacy_hash', 'legacyHash'],
@@ -442,5 +488,107 @@ methodDocstrings = {
         'set_default_value':
 'Defines a default value for this field.  ' +
 'Returns false if the value is invalid for the field\'s type.',
+    },
+
+    'Datagram': {
+        'add_bool':
+'Adds an 8-bit integer to the datagram that is guaranteed ' +
+'to be one of the values 0x00 (false) or 0x01 (true).',
+        'add_char':
+'Adds an 8-bit ascii-character value to the datagram.',
+        'add_int8':
+'Adds a signed 8-bit integer value to the datagram.',
+        'add_int16':
+'Adds a signed 16-bit integer value to the datagram arranged in little-endian.',
+        'add_int32':
+'Adds a signed 32-bit integer value to the datagram arranged in little-endian.',
+        'add_int64':
+'Adds a signed 64-bit integer value to the datagram arranged in little-endian.',
+        'add_uint8':
+'Adds an unsigned 8-bit integer value to the datagram.',
+        'add_uint16':
+'Adds an unsigned 16-bit integer value to the datagram arranged in little-endian.',
+        'add_uint32':
+'Adds an unsigned 32-bit integer value to the datagram arranged in little-endian.',
+        'add_uint64':
+'Adds an unsigned 64-bit integer value to the datagram arranged in little-endian.',
+        'add_float32':
+'Adds a float (32-bit IEEE 754 floating point) value to the datagram',
+        'add_float64':
+'Adds a double (64-bit IEEE 754 floating point) value to the datagram.',
+        'add_size':
+'Adds a length-tag to the datagram.',
+        'add_data':
+'Adds a Buffer directly to the end of the datagram.',
+        'add_string':
+'Adds a string to the datagram; a length tag (typically a uint16_t) ' +
+'is prepended to the string before it is added.',
+        'add_blob':
+'Adds a blob to the datagram from a Buffer; a length tag (typically a uint16_t) ' +
+'is prepended to the blob before it is added.',
+        'add_value':
+'Adds a Value with the given type packed into the datagram, converting ' +
+'byte-order from native-endianess to wire-endianess (if necessary).',
+        'add_packed':
+'Adds data from a packed value, returning the number of bytes read from the Buffer.',
+        'size':
+'Returns the amount of data added to the datagram in bytes.',
+        'cap':
+'Returns the currently allocated size of the datagram in memory (ie. capacity).',
+    },
+
+    'DatagramIterator': {
+        'read_bool':
+'Reads the next byte from the datagram and returns either false or true.',
+        'read_char':
+'Reads a byte from the datagram, returning an 8-bit ascii character.',
+        'read_int8':
+'Reads a byte from the datagram, returning a signed 8-bit integer.',
+        'read_int16':
+'Reads 2 bytes from the datagram, returning a signed 16-bit integer in native endianness.',
+        'read_int32':
+'Reads 4 bytes from the datagram, returning a signed 32-bit integer in native endianness.',
+        'read_int64':
+'Reads 8 bytes from the datagram, returning a signed 64-bit integer in native endianness.',
+        'read_uint8':
+'Reads a byte from the datagram, returning an usigned 8-bit integer.',
+        'read_uint16':
+'Reads 2 bytes from the datagram, returning an usigned 16-bit integer in native endianness.',
+        'read_uint32':
+'Reads 4 bytes from the datagram, returning an usigned 32-bit integer in native endianness.',
+        'read_uint64':
+'Reads 8 bytes from the datagram, returning an usigned 64-bit integer in native endianness.',
+        'read_size':
+'Reads a length-tag from the datagram.',
+        'read_float32':
+'Reads reads 4 bytes from the datagram, returning a 32-bit float in native endianness.',
+        'read_float64':
+'Reads reads 8 bytes from the datagram, returning a 64-bit float in native endianness.',
+        'read_string':
+'Reads a length, then reads a string of that length from the datagram.',
+        'read_blob':
+'Reads a length, then reads a blob of that length from the datagram.',
+        'read_datagram':
+'Reads a blob from the datagram and returns it as another datagram.',
+        'read_data':
+'Reads the next N bytes in the datagram and returns them as a Buffer.',
+        'read_remainder':
+'Reads the remainder of the datagram and returns it as a Buffer.',
+        'read_value':
+'Reads the Value for a DistributedType from the datagram.',
+        'read_packed':
+'Reads a Value for a DistributedType and returns it as a buffer converted to native endianness.',
+        'get_remaining':
+'Returns the number of unread bytes left in the Datagram.',
+        'tell':
+'Returns the current offset in bytes of the DatagramIterator into the datagram,.',
+        'seek':
+'Sets the current offset in bytes of the DatagramIterator into the datagram.',
+        'skip':
+'Increments the current offset into the datagram by N.  ' +
+'Throws DatagramIteratorEOF if it skips past the end of the datagram.',
+        'skip_type':
+'Seeks past the packed data for a DistributedType.  ' +
+'Throws DatagramIteratorEOF if it skips past the end of the datagram.',
     },
 }

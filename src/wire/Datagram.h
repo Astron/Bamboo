@@ -162,21 +162,21 @@ class Datagram {
         buf_offset += 1;
     }
 
-    // add_uint16 adds a unsigned 16-bit integer value to the datagram arranged in little-endian.
+    // add_uint16 adds an unsigned 16-bit integer value to the datagram arranged in little-endian.
     void add_uint16(const uint16_t& v) {
         check_add_length(2);
         *(uint16_t *)(buf + buf_offset) = swap_le(v);
         buf_offset += 2;
     }
 
-    // add_uint32 adds a unsigned 32-bit integer value to the datagram arranged in little-endian.
+    // add_uint32 adds an unsigned 32-bit integer value to the datagram arranged in little-endian.
     void add_uint32(const uint32_t& v) {
         check_add_length(4);
         *(uint32_t *)(buf + buf_offset) = swap_le(v);
         buf_offset += 4;
     }
 
-    // add_uint64 adds a unsigned 64-bit integer value to the datagram arranged in little-endian.
+    // add_uint64 adds an unsigned 64-bit integer value to the datagram arranged in little-endian.
     void add_uint64(const uint64_t& v) {
         check_add_length(8);
         *(uint64_t *)(buf + buf_offset) = swap_le(v);
