@@ -1,7 +1,7 @@
 // Filename: Buffer.h
 #pragma once
 #include "buffers.h"
-#include "Sequence.h"
+#include "Bytes.h"
 #include <stdexcept>
 namespace bamboo {
 

@@ -12,6 +12,8 @@ altnames = {
     'prev': ['prev'],
 
     # Explicit Builtins
+    '_add_':      ['__add__'],
+    '_radd_':     ['__radd__'],
     '_len_':      ['__len__'],
     '_iter_':     ['__iter__'],
     '_getitem_':  ['__getitem__'],

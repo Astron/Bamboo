@@ -6,6 +6,7 @@
 #include <string.h>  // for memcpy
 #include "../bits/sizetag.h"
 #include "../bits/byteorder.h"
+#include "../bits/Bytes.h"
 namespace bamboo {  // close namespace bamboo
 
 
@@ -300,6 +301,11 @@ class Datagram {
     // get_data returns a pointer to the start of the Datagram's data buffer.
     const uint8_t *get_data() const {
         return buf;
+    }
+
+    // data returns an efficient structured handle to the Datagram's data buffer.
+    const Bytes data() {
+        return Bytes{int(buf_offset), buf};
     }
 };
 

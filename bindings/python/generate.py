@@ -268,6 +268,7 @@ def generate(file_):
                param('const std::string&', 'name')])
     clsDatagram.add_constructor([])
     clsDatagram.add_copy_constructor()
+    add_method(clsDatagram, 'data', retval('std::string'), [], is_const = True)
     add_method(clsDatagram, 'size', retval('size_t'), [], is_const = True)
     add_method(clsDatagram, 'cap', retval('size_t'), [], is_const = True)
     add_method(clsDatagram, 'add_bool', None, [param('bool', 'value')])
@@ -336,6 +337,10 @@ def generate(file_):
     add_method(structBytes, '_setslice_', None,
                [param('int', 'i'), param('int', 'j'), param('bamboo::Bytes', 'bytes')])
     add_method(structBytes, '_iter_', retval('bamboo::Bytes::iterator'), [])
+    add_method(structBytes, '_add_', retval('std::string'),
+              [param('const std::string&', 'rhs')], is_const = True)
+    add_method(structBytes, '_radd_', retval('std::string'),
+              [param('const std::string&', 'lhs')], is_const = True)
     clsBytesIterator.add_copy_constructor()
     add_method(clsBytesIterator, '_iter_', retval('bamboo::Bytes::iterator'), [])
     add_method(clsBytesIterator, 'next', retval('uint8_t'), [])
