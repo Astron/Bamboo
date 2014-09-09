@@ -78,6 +78,7 @@ typedef enum _PyBindGenWrapperFlags {
 #include "bits/byteorder.h"
 #include "bits/sizetag.h"
 #include "bits/Buffer.h"
+#include "bits/Sequence.h"
 #include "values/Value.h"
 #include "module/ArrayType.h"
 #include "module/Class.h"
@@ -98,6 +99,26 @@ typedef enum _PyBindGenWrapperFlags {
 #include "wire/Datagram.h"
 #include "wire/DatagramIterator.h"
 /* --- forward declarations --- */
+
+
+typedef struct {
+    PyObject_HEAD
+    bamboo::Bytes *obj;
+    PyBindGenWrapperFlags flags:8;
+} PyBambooBytes;
+
+
+extern PyTypeObject PyBambooBytes_Type;
+
+
+typedef struct {
+    PyObject_HEAD
+    bamboo::Bytes::iterator *obj;
+    PyBindGenWrapperFlags flags:8;
+} PyBambooBytesIterator;
+
+
+extern PyTypeObject PyBambooBytesIterator_Type;
 
 
 typedef struct {
@@ -303,6 +324,9 @@ typedef struct {
 extern PyTypeObject PyBambooDatagramIterator_Type;
 
 
+int _wrap_convert_py2c__bamboo__Bytes(PyObject *value, bamboo::Bytes *address);
+
+
 int _wrap_convert_py2c__bamboo__Buffer(PyObject *value, bamboo::Buffer *address);
 
 
@@ -311,10 +335,666 @@ int _wrap_convert_py2c__bamboo__Value(PyObject *value, bamboo::Value *address);
 
 int _wrap_convert_py2c__std__string(PyObject *value, std::string *address);
 
+
+int _wrap_convert_py2c__bamboo__Datagram(PyObject *value, bamboo::Datagram *address);
+
 static PyMethodDef bamboo_bits_functions[] = {
     {NULL, NULL, 0, NULL}
 };
 /* --- classes --- */
+
+
+
+
+static int
+_wrap_PyBambooBytes__tp_init__0(PyBambooBytes *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    const char *keywords[] = {NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "", (char **) keywords)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    self->obj = new bamboo::Bytes();
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+static int
+_wrap_PyBambooBytes__tp_init__1(PyBambooBytes *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyBambooBytes *ctor_arg;
+    const char *keywords[] = {"ctor_arg", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBytes_Type, &ctor_arg)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    self->obj = new bamboo::Bytes(*((PyBambooBytes *) ctor_arg)->obj);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+static int
+_wrap_PyBambooBytes__tp_init__2(PyBambooBytes *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyBambooBytes *ctor_arg;
+    const char *keywords[] = {"ctor_arg", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBytes_Type, &ctor_arg)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    self->obj = new bamboo::Bytes(*((PyBambooBytes *) ctor_arg)->obj);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+int _wrap_PyBambooBytes__tp_init(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    int retval;
+    PyObject *error_list;
+    PyObject *exceptions[3] = {0,};
+    retval = _wrap_PyBambooBytes__tp_init__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooBytes__tp_init__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    retval = _wrap_PyBambooBytes__tp_init__2(self, args, kwargs, &exceptions[2]);
+    if (!exceptions[2]) {
+        Py_DECREF(exceptions[0]);
+        Py_DECREF(exceptions[1]);
+        return retval;
+    }
+    error_list = PyList_New(3);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyList_SET_ITEM(error_list, 2, PyObject_Str(exceptions[2]));
+    Py_DECREF(exceptions[2]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return -1;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___getitem__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    uint8_t retval;
+    int index;
+    const char *keywords[] = {"index", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &index)) {
+        return NULL;
+    }
+    try
+    {
+        retval = self->obj->_getitem_(index);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        return NULL;
+    }
+    py_retval = Py_BuildValue((char *) "i", (int)retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___getslice__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int i;
+    int j;
+    const char *keywords[] = {"i", "j", NULL};
+    PyBambooBytes *py_Bytes;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "ii", (char **) keywords, &i, &j)) {
+        return NULL;
+    }
+    bamboo::Bytes retval = self->obj->_getslice_(i, j);
+    py_Bytes = PyObject_New(PyBambooBytes, &PyBambooBytes_Type);
+    py_Bytes->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Bytes->obj = new bamboo::Bytes(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Bytes);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___setslice__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int i;
+    int j;
+    PyBambooBytes *bytes;
+    const char *keywords[] = {"i", "j", "bytes", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "iiO!", (char **) keywords, &i, &j, &PyBambooBytes_Type, &bytes)) {
+        return NULL;
+    }
+    self->obj->_setslice_(i, j, *((PyBambooBytes *) bytes)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___iter__(PyBambooBytes *self)
+{
+    PyObject *py_retval;
+    PyBambooBytesIterator *py_iterator;
+
+    bamboo::Bytes::iterator retval = self->obj->_iter_();
+    py_iterator = PyObject_New(PyBambooBytesIterator, &PyBambooBytesIterator_Type);
+    py_iterator->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_iterator->obj = new bamboo::Bytes::iterator(retval);
+    py_retval = Py_BuildValue((char *) "N", py_iterator);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___setitem__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int index;
+    int item;
+    const char *keywords[] = {"index", "item", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "ii", (char **) keywords, &index, &item)) {
+        return NULL;
+    }
+    if (item > 0xff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    try
+    {
+        self->obj->_setitem_(index, item);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        return NULL;
+    }
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___len__(PyBambooBytes *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->_len_();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+static PyObject*
+_wrap_PyBambooBytes__copy__(PyBambooBytes *self)
+{
+
+    PyBambooBytes *py_copy;
+    py_copy = PyObject_New(PyBambooBytes, &PyBambooBytes_Type);
+    py_copy->obj = new bamboo::Bytes(*self->obj);
+    py_copy->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return (PyObject*) py_copy;
+}
+
+static PyMethodDef PyBambooBytes_methods[] = {
+    {(char *) "__iter__", (PyCFunction) _wrap_PyBambooBytes___iter__, METH_NOARGS, NULL },
+    {(char *) "__copy__", (PyCFunction) _wrap_PyBambooBytes__copy__, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+
+static void
+_wrap_PyBambooBytes__tp_dealloc(PyBambooBytes *self)
+{
+        bamboo::Bytes *tmp = self->obj;
+        self->obj = NULL;
+        if (!(self->flags&PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED)) {
+            delete tmp;
+        }
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject*
+_wrap_PyBambooBytes__tp_richcompare (PyBambooBytes *PYBINDGEN_UNUSED(self), PyBambooBytes *other, int opid)
+{
+
+    if (!PyObject_IsInstance((PyObject*) other, (PyObject*) &PyBambooBytes_Type)) {
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    }
+    switch (opid)
+    {
+    case Py_LT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_LE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_EQ:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_NE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    } /* closes switch (opid) */
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+}
+
+
+int _wrap_convert_py2c__bamboo__Bytes(PyObject *value, bamboo::Bytes *address)
+{
+    PyObject *py_retval;
+    PyBambooBytes *tmp_Bytes;
+
+    py_retval = Py_BuildValue((char *) "(O)", value);
+    if (!PyArg_ParseTuple(py_retval, (char *) "O!", &PyBambooBytes_Type, &tmp_Bytes)) {
+        Py_DECREF(py_retval);
+        return 0;
+    }
+    *address = *tmp_Bytes->obj;
+    Py_DECREF(py_retval);
+    return 1;
+}
+
+
+#if PY_MAJOR_VERSION < 3
+static PyObject*
+BambooBytes__sq_slice (PyBambooBytes *py_self, Py_ssize_t py_i1, Py_ssize_t py_i2)
+{
+    PyObject *result;
+    PyObject *args;
+
+    args = Py_BuildValue("(ii)", py_i1, py_i2);
+    result = _wrap_PyBambooBytes___getslice__(py_self, args, NULL);
+    Py_DECREF(args);
+    if (PyErr_ExceptionMatches(PyExc_IndexError) ||
+        PyErr_ExceptionMatches(PyExc_StopIteration)) {
+        Py_XDECREF(result);
+        return NULL;
+    } else {
+        return result;
+    }
+}
+#endif
+
+
+#if PY_MAJOR_VERSION < 3
+static int
+BambooBytes__sq_ass_slice (PyBambooBytes *py_self, Py_ssize_t py_i1, Py_ssize_t py_i2, PyBambooBytes *py_vals)
+{
+    PyObject *result;
+    PyObject *args;
+
+    args = Py_BuildValue("(iiO)", py_i1, py_i2, py_vals);
+    result = _wrap_PyBambooBytes___setslice__(py_self, args, NULL);
+    Py_DECREF(args);
+    if (result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error trying to set slice in container.");
+        return -1;
+    } else if (PyInt_Check(result) == 0) {
+        PyErr_SetString(PyExc_RuntimeError, "Error trying to set slice in container -- wrapped method should return integer status.");
+        return -1;
+    } else {
+        int iresult = int(PyInt_AS_LONG(result));
+        Py_DECREF(result);
+        return iresult;
+    }
+}
+#endif
+
+
+static PyObject*
+BambooBytes__sq_item (PyBambooBytes *py_self, Py_ssize_t py_i)
+{
+    PyObject *result;
+    PyObject *args;
+
+    args = Py_BuildValue("(i)", py_i);
+    result = _wrap_PyBambooBytes___getitem__(py_self, args, NULL);
+    Py_DECREF(args);
+    if (PyErr_ExceptionMatches(PyExc_IndexError) ||
+        PyErr_ExceptionMatches(PyExc_StopIteration)) {
+        Py_XDECREF(result);
+        return NULL;
+    } else {
+        return result;
+    }
+}
+
+
+
+
+static int
+BambooBytes__sq_ass_item (PyBambooBytes *py_self, Py_ssize_t py_i, PyObject *py_val)
+{
+    PyObject *result;
+    PyObject *args;
+
+    args = Py_BuildValue("(iO)", py_i, py_val);
+    result = _wrap_PyBambooBytes___setitem__(py_self, args, NULL);
+    Py_DECREF(args);
+    if (result == NULL) {
+        PyErr_SetString(PyExc_IndexError, "Unknown error trying to set value in container.");
+        return -1;
+#if PY_MAJOR_VERSION >= 3
+    } else if (PyLong_Check(result) == 0) {
+#else
+    } else if (PyInt_Check(result) == 0) {
+#endif
+        PyErr_SetString(PyExc_IndexError, "Error trying to set value in container -- wrapped method should return integer status.");
+        return -1;
+    } else {
+#if PY_MAJOR_VERSION >= 3
+        int iresult = int(PyLong_AS_LONG(result));
+#else
+        int iresult = int(PyInt_AS_LONG(result));
+#endif
+        Py_DECREF(result);
+        return iresult;
+    }
+}
+
+
+
+static Py_ssize_t
+BambooBytes__sq_length (PyBambooBytes *py_self)
+{
+    PyObject *py_result;
+    Py_ssize_t result;
+
+    py_result = _wrap_PyBambooBytes___len__(py_self);
+    if (py_result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error in attempting to determine __len__.");
+        Py_XDECREF(py_result);
+        return -1;
+    }
+    result = PyLong_AsSsize_t(py_result);
+    Py_DECREF(py_result);
+    return result;
+}
+
+
+
+static PySequenceMethods BambooBytes__py_sequence_methods = {
+    (lenfunc) BambooBytes__sq_length,
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+    (ssizeargfunc) BambooBytes__sq_item,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeargfunc) BambooBytes__sq_slice,
+#else
+    NULL,
+#endif
+    (ssizeobjargproc) BambooBytes__sq_ass_item,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeobjargproc) BambooBytes__sq_ass_slice,
+#else
+    NULL,
+#endif
+    (objobjproc) NULL,
+    /* Added in release 2.0 */
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+};
+
+
+PyTypeObject PyBambooBytes_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    (char *) "bamboo.bits.Bytes",            /* tp_name */
+    sizeof(PyBambooBytes),                  /* tp_basicsize */
+    0,                                 /* tp_itemsize */
+    /* methods */
+    (destructor)_wrap_PyBambooBytes__tp_dealloc,        /* tp_dealloc */
+    (printfunc)0,                      /* tp_print */
+    (getattrfunc)NULL,       /* tp_getattr */
+    (setattrfunc)NULL,       /* tp_setattr */
+    (cmpfunc)NULL,           /* tp_compare */
+    (reprfunc)NULL,             /* tp_repr */
+    (PyNumberMethods*)NULL,     /* tp_as_number */
+    (PySequenceMethods*)&BambooBytes__py_sequence_methods, /* tp_as_sequence */
+    (PyMappingMethods*)NULL,   /* tp_as_mapping */
+    (hashfunc)NULL,             /* tp_hash */
+    (ternaryfunc)NULL,          /* tp_call */
+    (reprfunc)NULL,              /* tp_str */
+    (getattrofunc)NULL,     /* tp_getattro */
+    (setattrofunc)NULL,     /* tp_setattro */
+    (PyBufferProcs*)NULL,  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                      /* tp_flags */
+    NULL,                        /* Documentation string */
+    (traverseproc)NULL,     /* tp_traverse */
+    (inquiry)NULL,             /* tp_clear */
+    (richcmpfunc)_wrap_PyBambooBytes__tp_richcompare,   /* tp_richcompare */
+    0,             /* tp_weaklistoffset */
+    (getiterfunc)NULL,          /* tp_iter */
+    (iternextfunc)NULL,     /* tp_iternext */
+    (struct PyMethodDef*)PyBambooBytes_methods, /* tp_methods */
+    (struct PyMemberDef*)0,              /* tp_members */
+    0,                     /* tp_getset */
+    NULL,                              /* tp_base */
+    NULL,                              /* tp_dict */
+    (descrgetfunc)NULL,    /* tp_descr_get */
+    (descrsetfunc)NULL,    /* tp_descr_set */
+    0,                 /* tp_dictoffset */
+    (initproc)_wrap_PyBambooBytes__tp_init,             /* tp_init */
+    (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
+    (newfunc)PyType_GenericNew,               /* tp_new */
+    (freefunc)0,             /* tp_free */
+    (inquiry)NULL,             /* tp_is_gc */
+    NULL,                              /* tp_bases */
+    NULL,                              /* tp_mro */
+    NULL,                              /* tp_cache */
+    NULL,                              /* tp_subclasses */
+    NULL,                              /* tp_weaklist */
+    (destructor) NULL                  /* tp_del */
+};
+
+
+
+
+static int
+_wrap_PyBambooBytesIterator__tp_init(PyBambooBytesIterator *self, PyObject *args, PyObject *kwargs)
+{
+    PyBambooBytesIterator *ctor_arg;
+    const char *keywords[] = {"ctor_arg", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBytesIterator_Type, &ctor_arg)) {
+        return -1;
+    }
+    self->obj = new bamboo::Bytes::iterator(*((PyBambooBytesIterator *) ctor_arg)->obj);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+
+PyObject *
+_wrap_PyBambooBytesIterator___iter__(PyBambooBytesIterator *self)
+{
+    PyObject *py_retval;
+    PyBambooBytesIterator *py_iterator;
+
+    bamboo::Bytes::iterator retval = self->obj->_iter_();
+    py_iterator = PyObject_New(PyBambooBytesIterator, &PyBambooBytesIterator_Type);
+    py_iterator->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_iterator->obj = new bamboo::Bytes::iterator(retval);
+    py_retval = Py_BuildValue((char *) "N", py_iterator);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytesIterator_prev(PyBambooBytesIterator *self)
+{
+    PyObject *py_retval;
+    uint8_t retval;
+
+    retval = self->obj->prev();
+    py_retval = Py_BuildValue((char *) "i", (int)retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytesIterator_next(PyBambooBytesIterator *self)
+{
+    PyObject *py_retval;
+    uint8_t retval;
+
+    retval = self->obj->next();
+    py_retval = Py_BuildValue((char *) "i", (int)retval);
+    return py_retval;
+}
+
+
+static PyObject*
+_wrap_PyBambooBytesIterator__copy__(PyBambooBytesIterator *self)
+{
+
+    PyBambooBytesIterator *py_copy;
+    py_copy = PyObject_New(PyBambooBytesIterator, &PyBambooBytesIterator_Type);
+    py_copy->obj = new bamboo::Bytes::iterator(*self->obj);
+    py_copy->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return (PyObject*) py_copy;
+}
+
+static PyMethodDef PyBambooBytesIterator_methods[] = {
+    {(char *) "__iter__", (PyCFunction) _wrap_PyBambooBytesIterator___iter__, METH_NOARGS, NULL },
+    {(char *) "prev", (PyCFunction) _wrap_PyBambooBytesIterator_prev, METH_NOARGS, NULL },
+    {(char *) "next", (PyCFunction) _wrap_PyBambooBytesIterator_next, METH_NOARGS, NULL },
+    {(char *) "__copy__", (PyCFunction) _wrap_PyBambooBytesIterator__copy__, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+
+static void
+_wrap_PyBambooBytesIterator__tp_dealloc(PyBambooBytesIterator *self)
+{
+        bamboo::Bytes::iterator *tmp = self->obj;
+        self->obj = NULL;
+        if (!(self->flags&PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED)) {
+            delete tmp;
+        }
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject*
+_wrap_PyBambooBytesIterator__tp_richcompare (PyBambooBytesIterator *PYBINDGEN_UNUSED(self), PyBambooBytesIterator *other, int opid)
+{
+
+    if (!PyObject_IsInstance((PyObject*) other, (PyObject*) &PyBambooBytesIterator_Type)) {
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    }
+    switch (opid)
+    {
+    case Py_LT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_LE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_EQ:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_NE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    } /* closes switch (opid) */
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+}
+
+PyTypeObject PyBambooBytesIterator_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    (char *) "bamboo.bits.Bytes.iterator",            /* tp_name */
+    sizeof(PyBambooBytesIterator),                  /* tp_basicsize */
+    0,                                 /* tp_itemsize */
+    /* methods */
+    (destructor)_wrap_PyBambooBytesIterator__tp_dealloc,        /* tp_dealloc */
+    (printfunc)0,                      /* tp_print */
+    (getattrfunc)NULL,       /* tp_getattr */
+    (setattrfunc)NULL,       /* tp_setattr */
+    (cmpfunc)NULL,           /* tp_compare */
+    (reprfunc)NULL,             /* tp_repr */
+    (PyNumberMethods*)NULL,     /* tp_as_number */
+    (PySequenceMethods*)NULL, /* tp_as_sequence */
+    (PyMappingMethods*)NULL,   /* tp_as_mapping */
+    (hashfunc)NULL,             /* tp_hash */
+    (ternaryfunc)NULL,          /* tp_call */
+    (reprfunc)NULL,              /* tp_str */
+    (getattrofunc)NULL,     /* tp_getattro */
+    (setattrofunc)NULL,     /* tp_setattro */
+    (PyBufferProcs*)NULL,  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                      /* tp_flags */
+    NULL,                        /* Documentation string */
+    (traverseproc)NULL,     /* tp_traverse */
+    (inquiry)NULL,             /* tp_clear */
+    (richcmpfunc)_wrap_PyBambooBytesIterator__tp_richcompare,   /* tp_richcompare */
+    0,             /* tp_weaklistoffset */
+    (getiterfunc)NULL,          /* tp_iter */
+    (iternextfunc)NULL,     /* tp_iternext */
+    (struct PyMethodDef*)PyBambooBytesIterator_methods, /* tp_methods */
+    (struct PyMemberDef*)0,              /* tp_members */
+    0,                     /* tp_getset */
+    NULL,                              /* tp_base */
+    NULL,                              /* tp_dict */
+    (descrgetfunc)NULL,    /* tp_descr_get */
+    (descrsetfunc)NULL,    /* tp_descr_set */
+    0,                 /* tp_dictoffset */
+    (initproc)_wrap_PyBambooBytesIterator__tp_init,             /* tp_init */
+    (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
+    (newfunc)PyType_GenericNew,               /* tp_new */
+    (freefunc)0,             /* tp_free */
+    (inquiry)NULL,             /* tp_is_gc */
+    NULL,                              /* tp_bases */
+    NULL,                              /* tp_mro */
+    NULL,                              /* tp_cache */
+    NULL,                              /* tp_subclasses */
+    NULL,                              /* tp_weaklist */
+    (destructor) NULL                  /* tp_del */
+};
+
 
 
 
@@ -440,29 +1120,6 @@ int _wrap_PyBambooBuffer__tp_init(PyBambooBuffer *self, PyObject *args, PyObject
 
 
 PyObject *
-_wrap_PyBambooBuffer_fromString(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    const char *val;
-    Py_ssize_t val_len;
-    std::string val_std;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
-        return NULL;
-    }
-    val_std = std::string(val, val_len);
-    bamboo::Buffer retval = bamboo::Buffer::from_string(val_std);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_pack_int64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -475,81 +1132,6 @@ _wrap_PyBambooBuffer_pack_int64(PyBambooBuffer *self, PyObject *args, PyObject *
     self->obj->pack_int64(val);
     Py_INCREF(Py_None);
     py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packInt8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7f) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_int8(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packBool(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    bool val;
-    PyObject *py_val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
-        return NULL;
-    }
-    val = (bool) PyObject_IsTrue(py_val);
-    self->obj->pack_bool(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_string(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    const char *val;
-    Py_ssize_t val_len;
-    std::string val_std;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
-        return NULL;
-    }
-    val_std = std::string(val, val_len);
-    bamboo::Buffer retval = bamboo::Buffer::from_string(val_std);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_uint64(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    uint64_t retval;
-
-    retval = self->obj->read_uint64();
-    py_retval = Py_BuildValue((char *) "K", retval);
     return py_retval;
 }
 
@@ -574,55 +1156,6 @@ _wrap_PyBambooBuffer_fromUint8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject
     py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Buffer->obj = new bamboo::Buffer(retval);
     py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromUint64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    uint64_t val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_uint64(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packFloat32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    float val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_float32(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_readBool(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    bool retval;
-
-    retval = self->obj->read_bool();
-    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -667,97 +1200,6 @@ _wrap_PyBambooBuffer_from_bool(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject
 
 
 PyObject *
-_wrap_PyBambooBuffer_pack_float32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    float val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_float32(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_uint16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0xffff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_uint16(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromInt16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7fff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_int16(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_int16(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    int16_t retval;
-
-    retval = self->obj->read_int16();
-    py_retval = Py_BuildValue((char *) "i", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packBuffer(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    PyBambooBuffer *val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &val)) {
-        return NULL;
-    }
-    self->obj->pack_buffer(*((PyBambooBuffer *) val)->obj);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_packUint32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -787,23 +1229,6 @@ _wrap_PyBambooBuffer_read_int32(PyBambooBuffer *self)
 
 
 PyObject *
-_wrap_PyBambooBuffer_seek(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    unsigned int index;
-    const char *keywords[] = {"index", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &index)) {
-        return NULL;
-    }
-    self->obj->seek(index);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_readInt8(PyBambooBuffer *self)
 {
     PyObject *py_retval;
@@ -816,83 +1241,6 @@ _wrap_PyBambooBuffer_readInt8(PyBambooBuffer *self)
 
 
 PyObject *
-_wrap_PyBambooBuffer_size(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    unsigned int retval;
-
-    retval = self->obj->size();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packUint16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0xffff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_uint16(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_bool(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    bool retval;
-
-    retval = self->obj->read_bool();
-    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_int8(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    int8_t retval;
-
-    retval = self->obj->read_int8();
-    py_retval = Py_BuildValue((char *) "i", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_float32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    float val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_float32(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_readFloat32(PyBambooBuffer *self)
 {
     PyObject *py_retval;
@@ -900,63 +1248,6 @@ _wrap_PyBambooBuffer_readFloat32(PyBambooBuffer *self)
 
     retval = self->obj->read_float32();
     py_retval = Py_BuildValue((char *) "f", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_buffer(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    PyBambooBuffer *val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &val)) {
-        return NULL;
-    }
-    self->obj->pack_buffer(*((PyBambooBuffer *) val)->obj);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_uint64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    uint64_t val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_uint64(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_string(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    const char *val;
-    Py_ssize_t val_len;
-    std::string val_std;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
-        return NULL;
-    }
-    val_std = std::string(val, val_len);
-    self->obj->pack_string(val_std);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
     return py_retval;
 }
 
@@ -979,25 +1270,258 @@ _wrap_PyBambooBuffer_packChar(PyBambooBuffer *self, PyObject *args, PyObject *kw
 
 
 PyObject *
-_wrap_PyBambooBuffer_readInt64(PyBambooBuffer *self)
+_wrap_PyBambooBuffer_packInt64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    int64_t retval;
+    int64_t val;
+    const char *keywords[] = {"val", NULL};
 
-    retval = self->obj->read_int64();
-    py_retval = Py_BuildValue((char *) "L", retval);
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_int64(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
     return py_retval;
 }
 
 
 PyObject *
-_wrap_PyBambooBuffer_readUint8(PyBambooBuffer *self)
+_wrap_PyBambooBuffer_pack_uint8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_uint8(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_string(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    const char *val;
+    Py_ssize_t val_len;
+    std::string val_std;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
+        return NULL;
+    }
+    val_std = std::string(val, val_len);
+    bamboo::Buffer retval = bamboo::Buffer::from_string(val_std);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_float64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    double val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_float64(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer___getitem__(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
     uint8_t retval;
+    unsigned int index;
+    const char *keywords[] = {"index", NULL};
 
-    retval = self->obj->read_uint8();
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &index)) {
+        return NULL;
+    }
+    try
+    {
+        retval = self->obj->get_byte(index);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", (int)retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer___deepcopy__(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    PyBambooBuffer *py_Buffer;
+
+    bamboo::Buffer retval = self->obj->copy();
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_int8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7f) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_int8(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_uint16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xffff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_uint16(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_bool(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool val;
+    PyObject *py_val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
+        return NULL;
+    }
+    val = (bool) PyObject_IsTrue(py_val);
+    self->obj->pack_bool(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_int32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int32_t val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int32(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromUint16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xffff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_uint16(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_int16(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    int16_t retval;
+
+    retval = self->obj->read_int16();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_int8(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    int8_t retval;
+
+    retval = self->obj->read_int8();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_float64(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    double retval;
+
+    retval = self->obj->read_float64();
+    py_retval = Py_BuildValue((char *) "d", retval);
     return py_retval;
 }
 
@@ -1040,251 +1564,17 @@ _wrap_PyBambooBuffer_pack_uint64(PyBambooBuffer *self, PyObject *args, PyObject 
 
 
 PyObject *
-_wrap_PyBambooBuffer_packInt64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+_wrap_PyBambooBuffer_from_uint64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    int64_t val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_int64(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_bool(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    bool val;
-    PyObject *py_val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
-        return NULL;
-    }
-    val = (bool) PyObject_IsTrue(py_val);
-    self->obj->pack_bool(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_uint8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0xff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_uint8(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_int8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
+    uint64_t val;
     const char *keywords[] = {"val", NULL};
     PyBambooBuffer *py_Buffer;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
         return NULL;
     }
-    if (val > 0x7f) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_int8(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromInt64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int64_t val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_int64(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packUint8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0xff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_uint8(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_uint32(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    uint32_t retval;
-
-    retval = self->obj->read_uint32();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_tell(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    unsigned int retval;
-
-    retval = self->obj->tell();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_readUint64(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    uint64_t retval;
-
-    retval = self->obj->read_uint64();
-    py_retval = Py_BuildValue((char *) "K", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_uint16(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    uint16_t retval;
-
-    retval = self->obj->read_uint16();
-    py_retval = Py_BuildValue((char *) "i", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_float64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    double val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_float64(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_uint32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    unsigned int val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_uint32(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer___getitem__(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    uint8_t retval;
-    unsigned int index;
-    const char *keywords[] = {"index", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &index)) {
-        return NULL;
-    }
-    try
-    {
-        retval = self->obj->get_byte(index);
-    } catch (std::out_of_range const &exc) {
-        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
-        return NULL;
-    }
-    py_retval = Py_BuildValue((char *) "i", (int)retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromInt8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7f) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_int8(val);
+    bamboo::Buffer retval = bamboo::Buffer::from_uint64(val);
     py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
     py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Buffer->obj = new bamboo::Buffer(retval);
@@ -1311,21 +1601,6 @@ _wrap_PyBambooBuffer_pack_int32(PyBambooBuffer *self, PyObject *args, PyObject *
 
 
 PyObject *
-_wrap_PyBambooBuffer___deepcopy__(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    PyBambooBuffer *py_Buffer;
-
-    bamboo::Buffer retval = self->obj->copy();
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_read_char(PyBambooBuffer *self)
 {
     PyObject *py_retval;
@@ -1338,100 +1613,18 @@ _wrap_PyBambooBuffer_read_char(PyBambooBuffer *self)
 
 
 PyObject *
-_wrap_PyBambooBuffer_fromUint16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0xffff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_uint16(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_int16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7fff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_int16(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_readFloat64(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    double retval;
-
-    retval = self->obj->read_float64();
-    py_retval = Py_BuildValue((char *) "d", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromInt32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+_wrap_PyBambooBuffer_packInt32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
     int32_t val;
     const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
         return NULL;
     }
-    bamboo::Buffer retval = bamboo::Buffer::from_int32(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromBool(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    bool val;
-    PyObject *py_val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
-        return NULL;
-    }
-    val = (bool) PyObject_IsTrue(py_val);
-    bamboo::Buffer retval = bamboo::Buffer::from_bool(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    self->obj->pack_int32(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
     return py_retval;
 }
 
@@ -1497,21 +1690,6 @@ _wrap_PyBambooBuffer_from_int16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObjec
 
 
 PyObject *
-_wrap_PyBambooBuffer_copy(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    PyBambooBuffer *py_Buffer;
-
-    bamboo::Buffer retval = self->obj->copy();
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_fromChar(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -1552,45 +1730,17 @@ _wrap_PyBambooBuffer_from_char(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject
 
 
 PyObject *
-_wrap_PyBambooBuffer_read_float64(PyBambooBuffer *self)
+_wrap_PyBambooBuffer_from_float64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    double retval;
-
-    retval = self->obj->read_float64();
-    py_retval = Py_BuildValue((char *) "d", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_readInt32(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    int32_t retval;
-
-    retval = self->obj->read_int32();
-    py_retval = Py_BuildValue((char *) "i", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_uint8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
+    double val;
     const char *keywords[] = {"val", NULL};
     PyBambooBuffer *py_Buffer;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
         return NULL;
     }
-    if (val > 0xff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_uint8(val);
+    bamboo::Buffer retval = bamboo::Buffer::from_float64(val);
     py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
     py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Buffer->obj = new bamboo::Buffer(retval);
@@ -1619,145 +1769,6 @@ _wrap_PyBambooBuffer___setitem__(PyBambooBuffer *self, PyObject *args, PyObject 
     }
     Py_INCREF(Py_None);
     py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_uint32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    unsigned int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_uint32(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packUint64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    uint64_t val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_uint64(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_float64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    double val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_float64(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_readInt16(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    int16_t retval;
-
-    retval = self->obj->read_int16();
-    py_retval = Py_BuildValue((char *) "i", retval);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_fromFloat64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    double val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_float64(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_pack_int8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7f) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_int8(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_from_int32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int32_t val;
-    const char *keywords[] = {"val", NULL};
-    PyBambooBuffer *py_Buffer;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    bamboo::Buffer retval = bamboo::Buffer::from_int32(val);
-    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
-    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
-    py_Buffer->obj = new bamboo::Buffer(retval);
-    py_retval = Py_BuildValue((char *) "N", py_Buffer);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_read_float32(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    float retval;
-
-    retval = self->obj->read_float32();
-    py_retval = Py_BuildValue((char *) "f", retval);
     return py_retval;
 }
 
@@ -1820,56 +1831,6 @@ _wrap_PyBambooBuffer_pack_char(PyBambooBuffer *self, PyObject *args, PyObject *k
 
 
 PyObject *
-_wrap_PyBambooBuffer_readUint32(PyBambooBuffer *self)
-{
-    PyObject *py_retval;
-    uint32_t retval;
-
-    retval = self->obj->read_uint32();
-    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packInt16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    if (val > 0x7fff) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return NULL;
-    }
-    self->obj->pack_int16(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooBuffer_packInt32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
-{
-    PyObject *py_retval;
-    int32_t val;
-    const char *keywords[] = {"val", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
-        return NULL;
-    }
-    self->obj->pack_int32(val);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooBuffer_readUint16(PyBambooBuffer *self)
 {
     PyObject *py_retval;
@@ -1882,17 +1843,78 @@ _wrap_PyBambooBuffer_readUint16(PyBambooBuffer *self)
 
 
 PyObject *
-_wrap_PyBambooBuffer_from_int64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+_wrap_PyBambooBuffer_packInt8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    int64_t val;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7f) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_int8(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_uint64(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint64_t retval;
+
+    retval = self->obj->read_uint64();
+    py_retval = Py_BuildValue((char *) "K", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromInt16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
     const char *keywords[] = {"val", NULL};
     PyBambooBuffer *py_Buffer;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
         return NULL;
     }
-    bamboo::Buffer retval = bamboo::Buffer::from_int64(val);
+    if (val > 0x7fff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int16(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromInt8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7f) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int8(val);
     py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
     py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Buffer->obj = new bamboo::Buffer(retval);
@@ -1925,6 +1947,676 @@ _wrap_PyBambooBuffer_from_uint16(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObje
 }
 
 
+PyObject *
+_wrap_PyBambooBuffer_size(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_bool(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->read_bool();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_buffer(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooBuffer *val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &val)) {
+        return NULL;
+    }
+    self->obj->pack_buffer(*((PyBambooBuffer *) val)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_string(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    const char *val;
+    Py_ssize_t val_len;
+    std::string val_std;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
+        return NULL;
+    }
+    val_std = std::string(val, val_len);
+    self->obj->pack_string(val_std);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readInt64(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    int64_t retval;
+
+    retval = self->obj->read_int64();
+    py_retval = Py_BuildValue((char *) "L", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readUint8(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint8_t retval;
+
+    retval = self->obj->read_uint8();
+    py_retval = Py_BuildValue((char *) "i", (int)retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_int64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int64_t val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int64(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromInt64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int64_t val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int64(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packUint8(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_uint8(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_tell(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->tell();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer___len__(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_uint16(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint16_t retval;
+
+    retval = self->obj->read_uint16();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_int16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7fff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_int16(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_copy(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    PyBambooBuffer *py_Buffer;
+
+    bamboo::Buffer retval = self->obj->copy();
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_uint32(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint32_t retval;
+
+    retval = self->obj->read_uint32();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packUint64(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    uint64_t val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_uint64(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readInt16(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    int16_t retval;
+
+    retval = self->obj->read_int16();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_read_float32(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    float retval;
+
+    retval = self->obj->read_float32();
+    py_retval = Py_BuildValue((char *) "f", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readUint32(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint32_t retval;
+
+    retval = self->obj->read_uint32();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromBool(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool val;
+    PyObject *py_val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
+        return NULL;
+    }
+    val = (bool) PyObject_IsTrue(py_val);
+    bamboo::Buffer retval = bamboo::Buffer::from_bool(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packBool(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool val;
+    PyObject *py_val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O", (char **) keywords, &py_val)) {
+        return NULL;
+    }
+    val = (bool) PyObject_IsTrue(py_val);
+    self->obj->pack_bool(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromString(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    const char *val;
+    Py_ssize_t val_len;
+    std::string val_std;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &val, &val_len)) {
+        return NULL;
+    }
+    val_std = std::string(val, val_len);
+    bamboo::Buffer retval = bamboo::Buffer::from_string(val_std);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_uint32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    unsigned int val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_uint32(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readBool(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    bool retval;
+
+    retval = self->obj->read_bool();
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromInt32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int32_t val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int32(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_float32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    float val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_float32(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packBuffer(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooBuffer *val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooBuffer_Type, &val)) {
+        return NULL;
+    }
+    self->obj->pack_buffer(*((PyBambooBuffer *) val)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_seek(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    unsigned int index;
+    const char *keywords[] = {"index", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &index)) {
+        return NULL;
+    }
+    self->obj->seek(index);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packUint16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xffff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_uint16(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_float32(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    float val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_float32(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromFloat64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    double val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_float64(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_fromUint64(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    uint64_t val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &val)) {
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_uint64(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_int8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7f) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_int8(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_from_uint8(PyBambooBuffer *PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+    PyBambooBuffer *py_Buffer;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0xff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    bamboo::Buffer retval = bamboo::Buffer::from_uint8(val);
+    py_Buffer = PyObject_New(PyBambooBuffer, &PyBambooBuffer_Type);
+    py_Buffer->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    py_Buffer->obj = new bamboo::Buffer(retval);
+    py_retval = Py_BuildValue((char *) "N", py_Buffer);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readUint64(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    uint64_t retval;
+
+    retval = self->obj->read_uint64();
+    py_retval = Py_BuildValue((char *) "K", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readFloat64(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    double retval;
+
+    retval = self->obj->read_float64();
+    py_retval = Py_BuildValue((char *) "d", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packFloat32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    float val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_float32(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_readInt32(PyBambooBuffer *self)
+{
+    PyObject *py_retval;
+    int32_t retval;
+
+    retval = self->obj->read_int32();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_pack_uint32(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    unsigned int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &val)) {
+        return NULL;
+    }
+    self->obj->pack_uint32(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBuffer_packInt16(PyBambooBuffer *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    int val;
+    const char *keywords[] = {"val", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &val)) {
+        return NULL;
+    }
+    if (val > 0x7fff) {
+        PyErr_SetString(PyExc_ValueError, "Out of range");
+        return NULL;
+    }
+    self->obj->pack_int16(val);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
 static PyObject*
 _wrap_PyBambooBuffer__copy__(PyBambooBuffer *self)
 {
@@ -1937,89 +2629,89 @@ _wrap_PyBambooBuffer__copy__(PyBambooBuffer *self)
 }
 
 static PyMethodDef PyBambooBuffer_methods[] = {
-    {(char *) "fromString", (PyCFunction) _wrap_PyBambooBuffer_fromString, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "pack_int64", (PyCFunction) _wrap_PyBambooBuffer_pack_int64, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "packInt8", (PyCFunction) _wrap_PyBambooBuffer_packInt8, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "packBool", (PyCFunction) _wrap_PyBambooBuffer_packBool, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "from_string", (PyCFunction) _wrap_PyBambooBuffer_from_string, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "read_uint64", (PyCFunction) _wrap_PyBambooBuffer_read_uint64, METH_NOARGS, NULL },
     {(char *) "fromUint8", (PyCFunction) _wrap_PyBambooBuffer_fromUint8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "fromUint64", (PyCFunction) _wrap_PyBambooBuffer_fromUint64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "packFloat32", (PyCFunction) _wrap_PyBambooBuffer_packFloat32, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "readBool", (PyCFunction) _wrap_PyBambooBuffer_readBool, METH_NOARGS, NULL },
     {(char *) "packFloat64", (PyCFunction) _wrap_PyBambooBuffer_packFloat64, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "from_bool", (PyCFunction) _wrap_PyBambooBuffer_from_bool, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "pack_float32", (PyCFunction) _wrap_PyBambooBuffer_pack_float32, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "pack_uint16", (PyCFunction) _wrap_PyBambooBuffer_pack_uint16, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "fromInt16", (PyCFunction) _wrap_PyBambooBuffer_fromInt16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "read_int16", (PyCFunction) _wrap_PyBambooBuffer_read_int16, METH_NOARGS, NULL },
-    {(char *) "packBuffer", (PyCFunction) _wrap_PyBambooBuffer_packBuffer, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "packUint32", (PyCFunction) _wrap_PyBambooBuffer_packUint32, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "read_int32", (PyCFunction) _wrap_PyBambooBuffer_read_int32, METH_NOARGS, NULL },
-    {(char *) "seek", (PyCFunction) _wrap_PyBambooBuffer_seek, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "readInt8", (PyCFunction) _wrap_PyBambooBuffer_readInt8, METH_NOARGS, NULL },
-    {(char *) "size", (PyCFunction) _wrap_PyBambooBuffer_size, METH_NOARGS, NULL },
-    {(char *) "packUint16", (PyCFunction) _wrap_PyBambooBuffer_packUint16, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "read_bool", (PyCFunction) _wrap_PyBambooBuffer_read_bool, METH_NOARGS, NULL },
-    {(char *) "read_int8", (PyCFunction) _wrap_PyBambooBuffer_read_int8, METH_NOARGS, NULL },
-    {(char *) "from_float32", (PyCFunction) _wrap_PyBambooBuffer_from_float32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "readFloat32", (PyCFunction) _wrap_PyBambooBuffer_readFloat32, METH_NOARGS, NULL },
-    {(char *) "pack_buffer", (PyCFunction) _wrap_PyBambooBuffer_pack_buffer, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "from_uint64", (PyCFunction) _wrap_PyBambooBuffer_from_uint64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "pack_string", (PyCFunction) _wrap_PyBambooBuffer_pack_string, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "packChar", (PyCFunction) _wrap_PyBambooBuffer_packChar, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "readInt64", (PyCFunction) _wrap_PyBambooBuffer_readInt64, METH_NOARGS, NULL },
-    {(char *) "readUint8", (PyCFunction) _wrap_PyBambooBuffer_readUint8, METH_NOARGS, NULL },
+    {(char *) "packInt64", (PyCFunction) _wrap_PyBambooBuffer_packInt64, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "pack_uint8", (PyCFunction) _wrap_PyBambooBuffer_pack_uint8, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "from_string", (PyCFunction) _wrap_PyBambooBuffer_from_string, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "pack_float64", (PyCFunction) _wrap_PyBambooBuffer_pack_float64, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "__deepcopy__", (PyCFunction) _wrap_PyBambooBuffer___deepcopy__, METH_NOARGS, NULL },
+    {(char *) "pack_int8", (PyCFunction) _wrap_PyBambooBuffer_pack_int8, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "pack_uint16", (PyCFunction) _wrap_PyBambooBuffer_pack_uint16, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "pack_bool", (PyCFunction) _wrap_PyBambooBuffer_pack_bool, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "from_int32", (PyCFunction) _wrap_PyBambooBuffer_from_int32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "fromUint16", (PyCFunction) _wrap_PyBambooBuffer_fromUint16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "read_int16", (PyCFunction) _wrap_PyBambooBuffer_read_int16, METH_NOARGS, NULL },
+    {(char *) "read_int8", (PyCFunction) _wrap_PyBambooBuffer_read_int8, METH_NOARGS, NULL },
+    {(char *) "read_float64", (PyCFunction) _wrap_PyBambooBuffer_read_float64, METH_NOARGS, NULL },
     {(char *) "packString", (PyCFunction) _wrap_PyBambooBuffer_packString, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "pack_uint64", (PyCFunction) _wrap_PyBambooBuffer_pack_uint64, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "packInt64", (PyCFunction) _wrap_PyBambooBuffer_packInt64, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "pack_bool", (PyCFunction) _wrap_PyBambooBuffer_pack_bool, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "pack_uint8", (PyCFunction) _wrap_PyBambooBuffer_pack_uint8, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "from_int8", (PyCFunction) _wrap_PyBambooBuffer_from_int8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "fromInt64", (PyCFunction) _wrap_PyBambooBuffer_fromInt64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "packUint8", (PyCFunction) _wrap_PyBambooBuffer_packUint8, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "read_uint32", (PyCFunction) _wrap_PyBambooBuffer_read_uint32, METH_NOARGS, NULL },
-    {(char *) "tell", (PyCFunction) _wrap_PyBambooBuffer_tell, METH_NOARGS, NULL },
-    {(char *) "readUint64", (PyCFunction) _wrap_PyBambooBuffer_readUint64, METH_NOARGS, NULL },
-    {(char *) "read_uint16", (PyCFunction) _wrap_PyBambooBuffer_read_uint16, METH_NOARGS, NULL },
-    {(char *) "pack_float64", (PyCFunction) _wrap_PyBambooBuffer_pack_float64, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "from_uint32", (PyCFunction) _wrap_PyBambooBuffer_from_uint32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "fromInt8", (PyCFunction) _wrap_PyBambooBuffer_fromInt8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "from_uint64", (PyCFunction) _wrap_PyBambooBuffer_from_uint64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "pack_int32", (PyCFunction) _wrap_PyBambooBuffer_pack_int32, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "__deepcopy__", (PyCFunction) _wrap_PyBambooBuffer___deepcopy__, METH_NOARGS, NULL },
     {(char *) "read_char", (PyCFunction) _wrap_PyBambooBuffer_read_char, METH_NOARGS, NULL },
-    {(char *) "fromUint16", (PyCFunction) _wrap_PyBambooBuffer_fromUint16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "pack_int16", (PyCFunction) _wrap_PyBambooBuffer_pack_int16, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "readFloat64", (PyCFunction) _wrap_PyBambooBuffer_readFloat64, METH_NOARGS, NULL },
-    {(char *) "fromInt32", (PyCFunction) _wrap_PyBambooBuffer_fromInt32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "fromBool", (PyCFunction) _wrap_PyBambooBuffer_fromBool, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "packInt32", (PyCFunction) _wrap_PyBambooBuffer_packInt32, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "read_int64", (PyCFunction) _wrap_PyBambooBuffer_read_int64, METH_NOARGS, NULL },
     {(char *) "read_uint8", (PyCFunction) _wrap_PyBambooBuffer_read_uint8, METH_NOARGS, NULL },
     {(char *) "readChar", (PyCFunction) _wrap_PyBambooBuffer_readChar, METH_NOARGS, NULL },
     {(char *) "from_int16", (PyCFunction) _wrap_PyBambooBuffer_from_int16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "copy", (PyCFunction) _wrap_PyBambooBuffer_copy, METH_NOARGS, NULL },
     {(char *) "fromChar", (PyCFunction) _wrap_PyBambooBuffer_fromChar, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "from_char", (PyCFunction) _wrap_PyBambooBuffer_from_char, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "read_float64", (PyCFunction) _wrap_PyBambooBuffer_read_float64, METH_NOARGS, NULL },
-    {(char *) "readInt32", (PyCFunction) _wrap_PyBambooBuffer_readInt32, METH_NOARGS, NULL },
-    {(char *) "from_uint8", (PyCFunction) _wrap_PyBambooBuffer_from_uint8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "pack_uint32", (PyCFunction) _wrap_PyBambooBuffer_pack_uint32, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "packUint64", (PyCFunction) _wrap_PyBambooBuffer_packUint64, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "from_float64", (PyCFunction) _wrap_PyBambooBuffer_from_float64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "readInt16", (PyCFunction) _wrap_PyBambooBuffer_readInt16, METH_NOARGS, NULL },
-    {(char *) "fromFloat64", (PyCFunction) _wrap_PyBambooBuffer_fromFloat64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "pack_int8", (PyCFunction) _wrap_PyBambooBuffer_pack_int8, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "from_int32", (PyCFunction) _wrap_PyBambooBuffer_from_int32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
-    {(char *) "read_float32", (PyCFunction) _wrap_PyBambooBuffer_read_float32, METH_NOARGS, NULL },
     {(char *) "fromUint32", (PyCFunction) _wrap_PyBambooBuffer_fromUint32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "fromFloat32", (PyCFunction) _wrap_PyBambooBuffer_fromFloat32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "pack_char", (PyCFunction) _wrap_PyBambooBuffer_pack_char, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "readUint32", (PyCFunction) _wrap_PyBambooBuffer_readUint32, METH_NOARGS, NULL },
-    {(char *) "packInt16", (PyCFunction) _wrap_PyBambooBuffer_packInt16, METH_KEYWORDS|METH_VARARGS, NULL },
-    {(char *) "packInt32", (PyCFunction) _wrap_PyBambooBuffer_packInt32, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "readUint16", (PyCFunction) _wrap_PyBambooBuffer_readUint16, METH_NOARGS, NULL },
-    {(char *) "from_int64", (PyCFunction) _wrap_PyBambooBuffer_from_int64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "packInt8", (PyCFunction) _wrap_PyBambooBuffer_packInt8, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "read_uint64", (PyCFunction) _wrap_PyBambooBuffer_read_uint64, METH_NOARGS, NULL },
+    {(char *) "fromInt16", (PyCFunction) _wrap_PyBambooBuffer_fromInt16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "fromInt8", (PyCFunction) _wrap_PyBambooBuffer_fromInt8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
     {(char *) "from_uint16", (PyCFunction) _wrap_PyBambooBuffer_from_uint16, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "size", (PyCFunction) _wrap_PyBambooBuffer_size, METH_NOARGS, NULL },
+    {(char *) "read_bool", (PyCFunction) _wrap_PyBambooBuffer_read_bool, METH_NOARGS, NULL },
+    {(char *) "pack_buffer", (PyCFunction) _wrap_PyBambooBuffer_pack_buffer, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "pack_string", (PyCFunction) _wrap_PyBambooBuffer_pack_string, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "readInt64", (PyCFunction) _wrap_PyBambooBuffer_readInt64, METH_NOARGS, NULL },
+    {(char *) "readUint8", (PyCFunction) _wrap_PyBambooBuffer_readUint8, METH_NOARGS, NULL },
+    {(char *) "from_int64", (PyCFunction) _wrap_PyBambooBuffer_from_int64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "fromInt64", (PyCFunction) _wrap_PyBambooBuffer_fromInt64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "packUint8", (PyCFunction) _wrap_PyBambooBuffer_packUint8, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "tell", (PyCFunction) _wrap_PyBambooBuffer_tell, METH_NOARGS, NULL },
+    {(char *) "read_uint16", (PyCFunction) _wrap_PyBambooBuffer_read_uint16, METH_NOARGS, NULL },
+    {(char *) "pack_int16", (PyCFunction) _wrap_PyBambooBuffer_pack_int16, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "copy", (PyCFunction) _wrap_PyBambooBuffer_copy, METH_NOARGS, NULL },
+    {(char *) "read_uint32", (PyCFunction) _wrap_PyBambooBuffer_read_uint32, METH_NOARGS, NULL },
+    {(char *) "packUint64", (PyCFunction) _wrap_PyBambooBuffer_packUint64, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "readInt16", (PyCFunction) _wrap_PyBambooBuffer_readInt16, METH_NOARGS, NULL },
+    {(char *) "read_float32", (PyCFunction) _wrap_PyBambooBuffer_read_float32, METH_NOARGS, NULL },
+    {(char *) "readUint32", (PyCFunction) _wrap_PyBambooBuffer_readUint32, METH_NOARGS, NULL },
+    {(char *) "fromBool", (PyCFunction) _wrap_PyBambooBuffer_fromBool, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "packBool", (PyCFunction) _wrap_PyBambooBuffer_packBool, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "fromString", (PyCFunction) _wrap_PyBambooBuffer_fromString, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "from_uint32", (PyCFunction) _wrap_PyBambooBuffer_from_uint32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "readBool", (PyCFunction) _wrap_PyBambooBuffer_readBool, METH_NOARGS, NULL },
+    {(char *) "fromInt32", (PyCFunction) _wrap_PyBambooBuffer_fromInt32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "pack_float32", (PyCFunction) _wrap_PyBambooBuffer_pack_float32, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "packBuffer", (PyCFunction) _wrap_PyBambooBuffer_packBuffer, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "seek", (PyCFunction) _wrap_PyBambooBuffer_seek, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "packUint16", (PyCFunction) _wrap_PyBambooBuffer_packUint16, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "from_float32", (PyCFunction) _wrap_PyBambooBuffer_from_float32, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "fromFloat64", (PyCFunction) _wrap_PyBambooBuffer_fromFloat64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "fromUint64", (PyCFunction) _wrap_PyBambooBuffer_fromUint64, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "from_int8", (PyCFunction) _wrap_PyBambooBuffer_from_int8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "from_uint8", (PyCFunction) _wrap_PyBambooBuffer_from_uint8, METH_KEYWORDS|METH_VARARGS|METH_STATIC, NULL },
+    {(char *) "readUint64", (PyCFunction) _wrap_PyBambooBuffer_readUint64, METH_NOARGS, NULL },
+    {(char *) "readFloat64", (PyCFunction) _wrap_PyBambooBuffer_readFloat64, METH_NOARGS, NULL },
+    {(char *) "packFloat32", (PyCFunction) _wrap_PyBambooBuffer_packFloat32, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "readInt32", (PyCFunction) _wrap_PyBambooBuffer_readInt32, METH_NOARGS, NULL },
+    {(char *) "pack_uint32", (PyCFunction) _wrap_PyBambooBuffer_pack_uint32, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "packInt16", (PyCFunction) _wrap_PyBambooBuffer_packInt16, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "__copy__", (PyCFunction) _wrap_PyBambooBuffer__copy__, METH_NOARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
@@ -2138,8 +2830,27 @@ BambooBuffer__sq_ass_item (PyBambooBuffer *py_self, Py_ssize_t py_i, PyObject *p
 
 
 
+static Py_ssize_t
+BambooBuffer__sq_length (PyBambooBuffer *py_self)
+{
+    PyObject *py_result;
+    Py_ssize_t result;
+
+    py_result = _wrap_PyBambooBuffer___len__(py_self);
+    if (py_result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error in attempting to determine __len__.");
+        Py_XDECREF(py_result);
+        return -1;
+    }
+    result = PyLong_AsSsize_t(py_result);
+    Py_DECREF(py_result);
+    return result;
+}
+
+
+
 static PySequenceMethods BambooBuffer__py_sequence_methods = {
-    (lenfunc) NULL,
+    (lenfunc) BambooBuffer__sq_length,
     (binaryfunc) NULL,
     (ssizeargfunc) NULL,
     (ssizeargfunc) BambooBuffer__sq_item,
@@ -2183,7 +2894,7 @@ PyTypeObject PyBambooBuffer_Type = {
     (setattrofunc)NULL,     /* tp_setattro */
     (PyBufferProcs*)NULL,  /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                      /* tp_flags */
-    NULL,                        /* Documentation string */
+    "A Buffer is a convenience object for building and reading data in native-endianess.",                        /* Documentation string */
     (traverseproc)NULL,     /* tp_traverse */
     (inquiry)NULL,             /* tp_clear */
     (richcmpfunc)_wrap_PyBambooBuffer__tp_richcompare,   /* tp_richcompare */
@@ -2245,6 +2956,16 @@ initbamboo_bits(void)
     if (m == NULL) {
         return NULL;
     }
+    /* Register the 'bamboo::Bytes' class */
+    if (PyType_Ready(&PyBambooBytes_Type)) {
+        return NULL;
+    }
+    PyModule_AddObject(m, (char *) "Bytes", (PyObject *) &PyBambooBytes_Type);
+    /* Register the 'bamboo::Bytes::iterator' class */
+    if (PyType_Ready(&PyBambooBytesIterator_Type)) {
+        return NULL;
+    }
+    PyDict_SetItemString((PyObject*) PyBambooBytes_Type.tp_dict, (char *) "iterator", (PyObject *) &PyBambooBytesIterator_Type);
     /* Register the 'bamboo::Buffer' class */
     if (PyType_Ready(&PyBambooBuffer_Type)) {
         return NULL;
@@ -2313,7 +3034,7 @@ _wrap_PyBambooValue___getitem____0(PyBambooValue *self, PyObject *args, PyObject
     }
     try
     {
-        retval = self->obj->get_item(index);
+        retval = self->obj->_getitem_(index);
     } catch (std::out_of_range const &exc) {
         PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
         return NULL;
@@ -2348,7 +3069,7 @@ _wrap_PyBambooValue___getitem____1(PyBambooValue *self, PyObject *args, PyObject
     item_std = std::string(item, item_len);
     try
     {
-        retval = self->obj->get_item(item_std);
+        retval = self->obj->_getitem_(item_std);
     } catch (std::out_of_range const &exc) {
         PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
         return NULL;
@@ -2435,7 +3156,7 @@ _wrap_PyBambooValue___setitem____0(PyBambooValue *self, PyObject *args, PyObject
     }
     try
     {
-        self->obj->set_item(index, *((PyBambooValue *) value)->obj);
+        self->obj->_setitem_(index, *((PyBambooValue *) value)->obj);
     } catch (std::out_of_range const &exc) {
         PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
         return NULL;
@@ -2467,7 +3188,7 @@ _wrap_PyBambooValue___setitem____1(PyBambooValue *self, PyObject *args, PyObject
     item_std = std::string(item, item_len);
     try
     {
-        self->obj->set_item(item_std, *((PyBambooValue *) value)->obj);
+        self->obj->_setitem_(item_std, *((PyBambooValue *) value)->obj);
     } catch (std::out_of_range const &exc) {
         PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
         return NULL;
@@ -2620,6 +3341,18 @@ _wrap_PyBambooValue_pack(PyBambooValue *self, PyObject *args, PyObject *kwargs)
 
 
 PyObject *
+_wrap_PyBambooValue___len__(PyBambooValue *self)
+{
+    PyObject *py_retval;
+    unsigned int retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
 _wrap_PyBambooValue_size(PyBambooValue *self)
 {
     PyObject *py_retval;
@@ -2767,8 +3500,27 @@ BambooValue__sq_ass_item (PyBambooValue *py_self, Py_ssize_t py_i, PyObject *py_
 
 
 
+static Py_ssize_t
+BambooValue__sq_length (PyBambooValue *py_self)
+{
+    PyObject *py_result;
+    Py_ssize_t result;
+
+    py_result = _wrap_PyBambooValue___len__(py_self);
+    if (py_result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error in attempting to determine __len__.");
+        Py_XDECREF(py_result);
+        return -1;
+    }
+    result = PyLong_AsSsize_t(py_result);
+    Py_DECREF(py_result);
+    return result;
+}
+
+
+
 static PySequenceMethods BambooValue__py_sequence_methods = {
-    (lenfunc) NULL,
+    (lenfunc) BambooValue__sq_length,
     (binaryfunc) NULL,
     (ssizeargfunc) NULL,
     (ssizeargfunc) BambooValue__sq_item,
@@ -11633,6 +12385,18 @@ _wrap_PyBambooDatagram_add_int8(PyBambooDatagram *self, PyObject *args, PyObject
 
 
 PyObject *
+_wrap_PyBambooDatagram___len__(PyBambooDatagram *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
 _wrap_PyBambooDatagram_add_int16(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -12016,6 +12780,65 @@ _wrap_PyBambooDatagram__tp_richcompare (PyBambooDatagram *PYBINDGEN_UNUSED(self)
     return Py_NotImplemented;
 }
 
+
+int _wrap_convert_py2c__bamboo__Datagram(PyObject *value, bamboo::Datagram *address)
+{
+    PyObject *py_retval;
+    PyBambooDatagram *tmp_Datagram;
+
+    py_retval = Py_BuildValue((char *) "(O)", value);
+    if (!PyArg_ParseTuple(py_retval, (char *) "O!", &PyBambooDatagram_Type, &tmp_Datagram)) {
+        Py_DECREF(py_retval);
+        return 0;
+    }
+    *address = *tmp_Datagram->obj;
+    Py_DECREF(py_retval);
+    return 1;
+}
+
+
+static Py_ssize_t
+BambooDatagram__sq_length (PyBambooDatagram *py_self)
+{
+    PyObject *py_result;
+    Py_ssize_t result;
+
+    py_result = _wrap_PyBambooDatagram___len__(py_self);
+    if (py_result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error in attempting to determine __len__.");
+        Py_XDECREF(py_result);
+        return -1;
+    }
+    result = PyLong_AsSsize_t(py_result);
+    Py_DECREF(py_result);
+    return result;
+}
+
+
+
+static PySequenceMethods BambooDatagram__py_sequence_methods = {
+    (lenfunc) BambooDatagram__sq_length,
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+    (ssizeargfunc) NULL,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeargfunc) NULL,
+#else
+    NULL,
+#endif
+    (ssizeobjargproc) NULL,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeobjargproc) NULL,
+#else
+    NULL,
+#endif
+    (objobjproc) NULL,
+    /* Added in release 2.0 */
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+};
+
+
 PyTypeObject PyBambooDatagram_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     (char *) "bamboo.wire.Datagram",            /* tp_name */
@@ -12029,7 +12852,7 @@ PyTypeObject PyBambooDatagram_Type = {
     (cmpfunc)NULL,           /* tp_compare */
     (reprfunc)NULL,             /* tp_repr */
     (PyNumberMethods*)NULL,     /* tp_as_number */
-    (PySequenceMethods*)NULL, /* tp_as_sequence */
+    (PySequenceMethods*)&BambooDatagram__py_sequence_methods, /* tp_as_sequence */
     (PyMappingMethods*)NULL,   /* tp_as_mapping */
     (hashfunc)NULL,             /* tp_hash */
     (ternaryfunc)NULL,          /* tp_call */
@@ -12038,7 +12861,7 @@ PyTypeObject PyBambooDatagram_Type = {
     (setattrofunc)NULL,     /* tp_setattro */
     (PyBufferProcs*)NULL,  /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                      /* tp_flags */
-    NULL,                        /* Documentation string */
+    "A Datagram is a buffer of binary data in network-endianness.",                        /* Documentation string */
     (traverseproc)NULL,     /* tp_traverse */
     (inquiry)NULL,             /* tp_clear */
     (richcmpfunc)_wrap_PyBambooDatagram__tp_richcompare,   /* tp_richcompare */
@@ -12927,7 +13750,7 @@ PyTypeObject PyBambooDatagramIterator_Type = {
     (setattrofunc)NULL,     /* tp_setattro */
     (PyBufferProcs*)NULL,  /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                      /* tp_flags */
-    NULL,                        /* Documentation string */
+    "A DatagramIterator lets you step trough a datagram by reading a single value at a time.",                        /* Documentation string */
     (traverseproc)NULL,     /* tp_traverse */
     (inquiry)NULL,             /* tp_clear */
     (richcmpfunc)_wrap_PyBambooDatagramIterator__tp_richcompare,   /* tp_richcompare */
