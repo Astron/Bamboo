@@ -517,6 +517,26 @@ _wrap_PyBambooBytes___iter__(PyBambooBytes *self)
 
 
 PyObject *
+_wrap_PyBambooBytes___radd__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    const char *lhs;
+    Py_ssize_t lhs_len;
+    std::string lhs_std;
+    const char *keywords[] = {"lhs", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &lhs, &lhs_len)) {
+        return NULL;
+    }
+    lhs_std = std::string(lhs, lhs_len);
+    retval = self->obj->_radd_(lhs_std);
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
 _wrap_PyBambooBytes___setitem__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -540,6 +560,26 @@ _wrap_PyBambooBytes___setitem__(PyBambooBytes *self, PyObject *args, PyObject *k
     }
     Py_INCREF(Py_None);
     py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooBytes___add__(PyBambooBytes *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    const char *rhs;
+    Py_ssize_t rhs_len;
+    std::string rhs_std;
+    const char *keywords[] = {"rhs", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &rhs, &rhs_len)) {
+        return NULL;
+    }
+    rhs_std = std::string(rhs, rhs_len);
+    retval = self->obj->_add_(rhs_std);
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
 
@@ -569,6 +609,7 @@ _wrap_PyBambooBytes__copy__(PyBambooBytes *self)
 
 static PyMethodDef PyBambooBytes_methods[] = {
     {(char *) "__iter__", (PyCFunction) _wrap_PyBambooBytes___iter__, METH_NOARGS, NULL },
+    {(char *) "__radd__", (PyCFunction) _wrap_PyBambooBytes___radd__, METH_KEYWORDS|METH_VARARGS, NULL },
     {(char *) "__copy__", (PyCFunction) _wrap_PyBambooBytes__copy__, METH_NOARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
@@ -653,6 +694,20 @@ BambooBytes__sq_slice (PyBambooBytes *py_self, Py_ssize_t py_i1, Py_ssize_t py_i
     }
 }
 #endif
+
+
+static PyObject*
+BambooBytes__sq_concat (PyBambooBytes *py_self, PyBambooBytes *py_rhs)
+{
+    PyObject *result;
+    PyObject *args;
+
+    args = Py_BuildValue("(O)", py_rhs);
+    result = _wrap_PyBambooBytes___add__(py_self, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+
 
 
 #if PY_MAJOR_VERSION < 3
@@ -754,7 +809,7 @@ BambooBytes__sq_length (PyBambooBytes *py_self)
 
 static PySequenceMethods BambooBytes__py_sequence_methods = {
     (lenfunc) BambooBytes__sq_length,
-    (binaryfunc) NULL,
+    (binaryfunc) BambooBytes__sq_concat,
     (ssizeargfunc) NULL,
     (ssizeargfunc) BambooBytes__sq_item,
 #if PY_MAJOR_VERSION < 3
@@ -12568,6 +12623,18 @@ _wrap_PyBambooDatagram_addUint64(PyBambooDatagram *self, PyObject *args, PyObjec
 
 
 PyObject *
+_wrap_PyBambooDatagram_data(PyBambooDatagram *self)
+{
+    PyObject *py_retval;
+    std::string retval;
+
+    retval = self->obj->data();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
 _wrap_PyBambooDatagram_addFloat64(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -12725,6 +12792,7 @@ static PyMethodDef PyBambooDatagram_methods[] = {
     {(char *) "addInt32", (PyCFunction) _wrap_PyBambooDatagram_addInt32, METH_KEYWORDS|METH_VARARGS, "Adds a signed 32-bit integer value to the datagram arranged in little-endian." },
     {(char *) "addInt16", (PyCFunction) _wrap_PyBambooDatagram_addInt16, METH_KEYWORDS|METH_VARARGS, "Adds a signed 16-bit integer value to the datagram arranged in little-endian." },
     {(char *) "addUint64", (PyCFunction) _wrap_PyBambooDatagram_addUint64, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 64-bit integer value to the datagram arranged in little-endian." },
+    {(char *) "data", (PyCFunction) _wrap_PyBambooDatagram_data, METH_NOARGS, NULL },
     {(char *) "addFloat64", (PyCFunction) _wrap_PyBambooDatagram_addFloat64, METH_KEYWORDS|METH_VARARGS, "Adds a double (64-bit IEEE 754 floating point) value to the datagram." },
     {(char *) "add_uint64", (PyCFunction) _wrap_PyBambooDatagram_add_uint64, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 64-bit integer value to the datagram arranged in little-endian." },
     {(char *) "cap", (PyCFunction) _wrap_PyBambooDatagram_cap, METH_NOARGS, "Returns the currently allocated size of the datagram in memory (ie. capacity)." },
