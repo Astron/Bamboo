@@ -23,9 +23,9 @@ Value DatagramIterator::read_value(const DistributedType *type) {
 vector<uint8_t> DatagramIterator::read_packed(const DistributedType *type) {
 #ifndef PLATFORM_BIG_ENDIAN
     // We're little endian so we don't have to worry about byte-swapping the data
-    const uint8_t *start = m_dg->get_data() + m_offset;
+    const uint8_t *start = m_dg->data() + m_offset;
     skip_type(type); // note: this will advanced m_offset
-    return vector<uint8_t>(start, m_dg->get_data() + m_offset);
+    return vector<uint8_t>(start, m_dg->data() + m_offset);
 #else
     // Lets go ahead and unpack that manually
     vector<uint8_t> buf;
