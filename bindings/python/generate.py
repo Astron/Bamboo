@@ -343,9 +343,11 @@ def add_method(cls, name, ret, params, **kwargs):
 
 def add_custom_method(cls, name, *args, **kwargs):
     names = altnames[name]
-    class_wrapper = wrapperNames[cls.name]
+    if cls.get_python_name() in methodDocstrings and \
+       name in methodDocstrings[cls.get_python_name()]:
+      kwargs['docstring'] = methodDocstrings[cls.get_python_name()][name]
     for n in names:
-      cls.add_custom_method_wrapper(n, class_wrapper + n, wrapperBodies[name] % n, *args, **kwargs)
+      cls.add_custom_method_wrapper(n, wrapperNames[cls.name] + n, wrapperBodies[name] % n, *args, **kwargs)
 
 def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]

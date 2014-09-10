@@ -772,10 +772,10 @@ _wrap_PyBambooValue__copy__(PyBambooValue *self)
 }
 
 static PyMethodDef PyBambooValue_methods[] = {
-    {(char *) "from_packed", (PyCFunction) _wrap_PyBambooValue_from_packed, METH_STATIC|METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "from_packed", (PyCFunction) _wrap_PyBambooValue_from_packed, METH_STATIC|METH_KEYWORDS|METH_VARARGS, "Returns the Value for the provided type unpacked from a buffer." },
     {(char *) "from_type", (PyCFunction) _wrap_PyBambooValue_from_type, METH_KEYWORDS|METH_VARARGS|METH_STATIC, "Returns the default Value for the provided type." },
     {(char *) "fromType", (PyCFunction) _wrap_PyBambooValue_fromType, METH_KEYWORDS|METH_VARARGS|METH_STATIC, "Returns the default Value for the provided type." },
-    {(char *) "fromPacked", (PyCFunction) _wrap_PyBambooValue_fromPacked, METH_STATIC|METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "fromPacked", (PyCFunction) _wrap_PyBambooValue_fromPacked, METH_STATIC|METH_KEYWORDS|METH_VARARGS, "Returns the Value for the provided type unpacked from a buffer." },
     {(char *) "size", (PyCFunction) _wrap_PyBambooValue_size, METH_NOARGS, "Returns the size (the number of items) in a value.  Size may be called on an array, string, blob, struct, or function value." },
     {(char *) "__copy__", (PyCFunction) _wrap_PyBambooValue__copy__, METH_NOARGS, NULL},
     {NULL, NULL, 0, NULL}
@@ -9659,7 +9659,7 @@ static PyMethodDef PyBambooDatagram_methods[] = {
     {(char *) "addInt32", (PyCFunction) _wrap_PyBambooDatagram_addInt32, METH_KEYWORDS|METH_VARARGS, "Adds a signed 32-bit integer value to the datagram arranged in little-endian." },
     {(char *) "addInt16", (PyCFunction) _wrap_PyBambooDatagram_addInt16, METH_KEYWORDS|METH_VARARGS, "Adds a signed 16-bit integer value to the datagram arranged in little-endian." },
     {(char *) "addUint64", (PyCFunction) _wrap_PyBambooDatagram_addUint64, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 64-bit integer value to the datagram arranged in little-endian." },
-    {(char *) "data", (PyCFunction) _wrap_PyBambooDatagram_data, METH_NOARGS, NULL },
+    {(char *) "data", (PyCFunction) _wrap_PyBambooDatagram_data, METH_NOARGS, "Returns a copy of the bytes in the Datagram." },
     {(char *) "addFloat64", (PyCFunction) _wrap_PyBambooDatagram_addFloat64, METH_KEYWORDS|METH_VARARGS, "Adds a double (64-bit IEEE 754 floating point) value to the datagram." },
     {(char *) "add_uint64", (PyCFunction) _wrap_PyBambooDatagram_add_uint64, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 64-bit integer value to the datagram arranged in little-endian." },
     {(char *) "cap", (PyCFunction) _wrap_PyBambooDatagram_cap, METH_NOARGS, "Returns the currently allocated size of the datagram in memory (ie. capacity)." },

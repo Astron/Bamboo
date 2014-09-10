@@ -506,6 +506,8 @@ methodDocstrings = {
 'Returns the amount of data added to the datagram in bytes.',
         'cap':
 'Returns the currently allocated size of the datagram in memory (ie. capacity).',
+        'data':
+'Returns a copy of the bytes in the Datagram.',
     },
 
     'DatagramIterator': {
