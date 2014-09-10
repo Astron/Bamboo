@@ -1,4 +1,4 @@
-// Filename: traits.cpp
+// Filename: bits.cpp
 #include "sizetag.h"
 #include "byteorder.h"
 namespace bamboo { // open namespace bamboo

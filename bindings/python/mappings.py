@@ -13,7 +13,9 @@ altnames = {
 
     # Explicit Builtins
     '_add_':      ['__add__'],
+    '_sub_':      ['__sub__'],
     '_radd_':     ['__radd__'],
+    '_rsub_':     ['__rsub__'],
     '_len_':      ['__len__'],
     '_iter_':     ['__iter__'],
     '_getitem_':  ['__getitem__'],
@@ -124,50 +126,6 @@ altnames = {
     #'set_type':          ['set_type',          'setType'],
     #'set_default_value': ['set_default_value', 'setDefaultValue'],
 
-    # Buffer
-    'read_bool':    ['read_bool',    'readBool'],
-    'read_char':    ['read_char',    'readChar'],
-    'read_int8':    ['read_int8',    'readInt8'],
-    'read_int16':   ['read_int16',   'readInt16'],
-    'read_int32':   ['read_int32',   'readInt32'],
-    'read_int64':   ['read_int64',   'readInt64'],
-    'read_uint8':   ['read_uint8',   'readUint8'],
-    'read_uint16':  ['read_uint16',  'readUint16'],
-    'read_uint32':  ['read_uint32',  'readUint32'],
-    'read_uint64':  ['read_uint64',  'readUint64'],
-    'read_float32': ['read_float32', 'readFloat32'],
-    'read_float64': ['read_float64', 'readFloat64'],
-    'pack_bool':    ['pack_bool',    'packBool'],
-    'pack_char':    ['pack_char',    'packChar'],
-    'pack_int8':    ['pack_int8',    'packInt8'],
-    'pack_int16':   ['pack_int16',   'packInt16'],
-    'pack_int32':   ['pack_int32',   'packInt32'],
-    'pack_int64':   ['pack_int64',   'packInt64'],
-    'pack_uint8':   ['pack_uint8',   'packUint8'],
-    'pack_uint16':  ['pack_uint16',  'packUint16'],
-    'pack_uint32':  ['pack_uint32',  'packUint32'],
-    'pack_uint64':  ['pack_uint64',  'packUint64'],
-    'pack_float32': ['pack_float32', 'packFloat32'],
-    'pack_float64': ['pack_float64', 'packFloat64'],
-    'pack_string':  ['pack_string',  'packString'],
-    'pack_buffer':  ['pack_buffer',  'packBuffer'],
-    'from_bool':    ['from_bool',    'fromBool'],
-    'from_char':    ['from_char',    'fromChar'],
-    'from_int8':    ['from_int8',    'fromInt8'],
-    'from_int16':   ['from_int16',   'fromInt16'],
-    'from_int32':   ['from_int32',   'fromInt32'],
-    'from_int64':   ['from_int64',   'fromInt64'],
-    'from_uint8':   ['from_uint8',   'fromUint8'],
-    'from_uint16':  ['from_uint16',  'fromUint16'],
-    'from_uint32':  ['from_uint32',  'fromUint32'],
-    'from_uint64':  ['from_uint64',  'fromUint64'],
-    'from_float32': ['from_float32', 'fromFloat32'],
-    'from_float64': ['from_float64', 'fromFloat64'],
-    'from_string':  ['from_string',  'fromString'],
-    # These methods are for python array subscription
-    'get_byte': ['__getitem__'],
-    'set_byte': ['__setitem__'],
-
     # Datagram
     'add_bool':    ['add_bool',    'addBool'],
     'add_char':    ['add_char',    'addChar'],
@@ -189,18 +147,18 @@ altnames = {
     'add_packed':  ['add_packed',  'addPacked'],
 
     # Datagram Iterator
-    #'read_bool':    ['read_bool',    'readBool'],
-    #'read_char':    ['read_char',    'readChar'],
-    #'read_int8':    ['read_int8',    'readInt8'],
-    #'read_int16':   ['read_int16',   'readInt16'],
-    #'read_int32':   ['read_int32',   'readInt32'],
-    #'read_int64':   ['read_int64',   'readInt64'],
-    #'read_uint8':   ['read_uint8',   'readUint8'],
-    #'read_uint16':  ['read_uint16',  'readUint16'],
-    #'read_uint32':  ['read_uint32',  'readUint32'],
-    #'read_uint64':  ['read_uint64',  'readUint64'],
-    #'read_float32': ['read_float32', 'readFloat32'],
-    #'read_float64': ['read_float64', 'readFloat64'],
+    'read_bool':      ['read_bool',      'readBool'],
+    'read_char':      ['read_char',      'readChar'],
+    'read_int8':      ['read_int8',      'readInt8'],
+    'read_int16':     ['read_int16',     'readInt16'],
+    'read_int32':     ['read_int32',     'readInt32'],
+    'read_int64':     ['read_int64',     'readInt64'],
+    'read_uint8':     ['read_uint8',     'readUint8'],
+    'read_uint16':    ['read_uint16',    'readUint16'],
+    'read_uint32':    ['read_uint32',    'readUint32'],
+    'read_uint64':    ['read_uint64',    'readUint64'],
+    'read_float32':   ['read_float32',   'readFloat32'],
+    'read_float64':   ['read_float64',   'readFloat64'],
     'read_size':      ['read_size',      'readSize'],
     'read_string':    ['read_string',    'readString'],
     'read_blob':      ['read_blob',      'readBlob'],
@@ -262,8 +220,6 @@ classDocstrings = {
 'A Datagram is a buffer of binary data in network-endianness.',
     'DatagramIterator':
 'A DatagramIterator lets you step trough a datagram by reading a single value at a time.',
-    'Buffer':
-'A Buffer is a convenience object for building and reading data in native-endianess.'
 }
 
 functionDocstrings = {
@@ -534,18 +490,18 @@ methodDocstrings = {
         'add_size':
 'Adds a length-tag to the datagram.',
         'add_data':
-'Adds a Buffer directly to the end of the datagram.',
+'Adds bytes directly to the end of the datagram.',
         'add_string':
 'Adds a string to the datagram; a length tag (typically a uint16_t) ' +
 'is prepended to the string before it is added.',
         'add_blob':
-'Adds a blob to the datagram from a Buffer; a length tag (typically a uint16_t) ' +
+'Adds a blob to the datagram from bytes; a length tag (typically a uint16_t) ' +
 'is prepended to the blob before it is added.',
         'add_value':
 'Adds a Value with the given type packed into the datagram, converting ' +
 'byte-order from native-endianess to wire-endianess (if necessary).',
         'add_packed':
-'Adds data from a packed value, returning the number of bytes read from the Buffer.',
+'Adds data from a packed value, returning the number of bytes read from the packed data.',
         'size':
 'Returns the amount of data added to the datagram in bytes.',
         'cap':
@@ -586,9 +542,9 @@ methodDocstrings = {
         'read_datagram':
 'Reads a blob from the datagram and returns it as another datagram.',
         'read_data':
-'Reads the next N bytes in the datagram and returns them as a Buffer.',
+'Reads the next N bytes in the datagram..',
         'read_remainder':
-'Reads the remainder of the datagram and returns it as a Buffer.',
+'Reads the remainder of the datagram.',
         'read_value':
 'Reads the Value for a DistributedType from the datagram.',
         'read_packed':
