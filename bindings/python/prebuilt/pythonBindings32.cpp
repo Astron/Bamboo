@@ -9067,6 +9067,53 @@ _wrap_PyBambooDatagram_addInt8(PyBambooDatagram *self, PyObject *args, PyObject 
 }
 
 
+
+
+PyObject *
+_custom_wrap_PyBambooDatagram_add_data(PyBambooDatagram *self, PyObject *args,
+                                 PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    const char *value;
+    Py_ssize_t value_len;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &value, &value_len)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+
+    self->obj->add_data((const uint8_t *)value, value_len);
+
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject * _wrap_PyBambooDatagram_add_data(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[1] = {0,};
+    retval = _custom_wrap_PyBambooDatagram_add_data(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    error_list = PyList_New(1);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
 PyObject *
 _wrap_PyBambooDatagram_addUint8(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
 {
@@ -9569,6 +9616,53 @@ _wrap_PyBambooDatagram_cap(PyBambooDatagram *self)
 }
 
 
+
+
+PyObject *
+_custom_wrap_PyBambooDatagram_addData(PyBambooDatagram *self, PyObject *args,
+                                 PyObject *kwargs, PyObject **return_exception)
+{
+    PyObject *py_retval;
+    const char *value;
+    Py_ssize_t value_len;
+    const char *keywords[] = {"value", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &value, &value_len)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return NULL;
+    }
+
+    self->obj->add_data((const uint8_t *)value, value_len);
+
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject * _wrap_PyBambooDatagram_addData(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject * retval;
+    PyObject *error_list;
+    PyObject *exceptions[1] = {0,};
+    retval = _custom_wrap_PyBambooDatagram_addData(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    error_list = PyList_New(1);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return NULL;
+}
+
+
 PyObject *
 _wrap_PyBambooDatagram_add_float64(PyBambooDatagram *self, PyObject *args, PyObject *kwargs)
 {
@@ -9637,6 +9731,7 @@ _wrap_PyBambooDatagram__copy__(PyBambooDatagram *self)
 static PyMethodDef PyBambooDatagram_methods[] = {
     {(char *) "add_int32", (PyCFunction) _wrap_PyBambooDatagram_add_int32, METH_KEYWORDS|METH_VARARGS, "Adds a signed 32-bit integer value to the datagram arranged in little-endian." },
     {(char *) "addInt8", (PyCFunction) _wrap_PyBambooDatagram_addInt8, METH_KEYWORDS|METH_VARARGS, "Adds a signed 8-bit integer value to the datagram." },
+    {(char *) "add_data", (PyCFunction) _wrap_PyBambooDatagram_add_data, METH_KEYWORDS|METH_VARARGS, "Adds bytes directly to the end of the datagram." },
     {(char *) "addUint8", (PyCFunction) _wrap_PyBambooDatagram_addUint8, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 8-bit integer value to the datagram." },
     {(char *) "addChar", (PyCFunction) _wrap_PyBambooDatagram_addChar, METH_KEYWORDS|METH_VARARGS, "Adds an 8-bit ascii-character value to the datagram." },
     {(char *) "addFloat32", (PyCFunction) _wrap_PyBambooDatagram_addFloat32, METH_KEYWORDS|METH_VARARGS, "Adds a float (32-bit IEEE 754 floating point) value to the datagram" },
@@ -9663,6 +9758,7 @@ static PyMethodDef PyBambooDatagram_methods[] = {
     {(char *) "addFloat64", (PyCFunction) _wrap_PyBambooDatagram_addFloat64, METH_KEYWORDS|METH_VARARGS, "Adds a double (64-bit IEEE 754 floating point) value to the datagram." },
     {(char *) "add_uint64", (PyCFunction) _wrap_PyBambooDatagram_add_uint64, METH_KEYWORDS|METH_VARARGS, "Adds an unsigned 64-bit integer value to the datagram arranged in little-endian." },
     {(char *) "cap", (PyCFunction) _wrap_PyBambooDatagram_cap, METH_NOARGS, "Returns the currently allocated size of the datagram in memory (ie. capacity)." },
+    {(char *) "addData", (PyCFunction) _wrap_PyBambooDatagram_addData, METH_KEYWORDS|METH_VARARGS, "Adds bytes directly to the end of the datagram." },
     {(char *) "add_float64", (PyCFunction) _wrap_PyBambooDatagram_add_float64, METH_KEYWORDS|METH_VARARGS, "Adds a double (64-bit IEEE 754 floating point) value to the datagram." },
     {(char *) "add_char", (PyCFunction) _wrap_PyBambooDatagram_add_char, METH_KEYWORDS|METH_VARARGS, "Adds an 8-bit ascii-character value to the datagram." },
     {(char *) "add_string", (PyCFunction) _wrap_PyBambooDatagram_add_string, METH_KEYWORDS|METH_VARARGS, "Adds a string to the datagram; a length tag (typically a uint16_t) is prepended to the string before it is added." },

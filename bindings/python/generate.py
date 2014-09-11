@@ -279,6 +279,7 @@ def generate(file_):
     add_method(clsDatagram, 'add_uint64', None, [param('uint64_t', 'value')])
     add_method(clsDatagram, 'add_float32', None, [param('float', 'value')])
     add_method(clsDatagram, 'add_float64', None, [param('double', 'value')])
+    add_custom_method(clsDatagram, 'add_data')
     #add_method(clsDatagram, 'add_data', None, [param('const bamboo::Buffer&', 'value')])
     add_method(clsDatagram, 'add_string', None, [param('const std::string&', 'value')])
     #add_method(clsDatagram, 'add_blob', None, [param('const bamboo::Buffer&', 'value')])
