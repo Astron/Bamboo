@@ -38,18 +38,21 @@ def generate(file_):
     wire.add_include('"wire/DatagramIterator.h"')
 
     # Declare classes
-    indexError = bits.add_exception('out_of_range',
+    indexError = bamboo.add_exception('out_of_range',
         custom_name = 'IndexError',
         foreign_cpp_namespace = 'std',
-        message_rvalue = 'exc.what()')
-    typeError = bits.add_exception('invalid_argument',
+        message_rvalue = 'exc.what()',
+        is_standard_error = True)
+    typeError = bamboo.add_exception('invalid_argument',
         custom_name = 'TypeError',
         foreign_cpp_namespace = 'std',
-        message_rvalue = 'exc.what()')
-    conversionError = bits.add_exception('bad_cast',
+        message_rvalue = 'exc.what()',
+        is_standard_error = True)
+    conversionError = bamboo.add_exception('bad_cast',
         custom_name = 'ConversionError',
         foreign_cpp_namespace = 'std',
-        message_rvalue = 'exc.what()');
+        message_rvalue = 'exc.what()',
+        is_standard_error = True);
     clsValue = values.add_class('Value',
         docstring = classDocstrings['Value'])
     clsModule = module.add_class('Module',

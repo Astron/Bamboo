@@ -98,15 +98,6 @@ typedef enum _PyBindGenWrapperFlags {
 #include "wire/DatagramIterator.h"
 /* --- forward declarations --- */
 
-
-extern PyTypeObject *Pystd__out_of_range_Type;
-
-
-extern PyTypeObject *Pystd__invalid_argument_Type;
-
-
-extern PyTypeObject *Pystd__bad_cast_Type;
-
 /* --- forward declarations --- */
 
 
@@ -303,17 +294,6 @@ int _wrap_convert_py2c__bamboo__Datagram(PyObject *value, bamboo::Datagram *addr
 static PyMethodDef bamboo_bits_functions[] = {
     {NULL, NULL, 0, NULL}
 };
-/* --- exceptions --- */
-
-
-PyTypeObject *Pystd__out_of_range_Type;
-
-
-PyTypeObject *Pystd__invalid_argument_Type;
-
-
-PyTypeObject *Pystd__bad_cast_Type;
-
 #if PY_VERSION_HEX >= 0x03000000
 static struct PyModuleDef bamboo_bits_moduledef = {
     PyModuleDef_HEAD_INIT,
@@ -336,24 +316,6 @@ initbamboo_bits(void)
     if (m == NULL) {
         return NULL;
     }
-    /* Register the 'std::out_of_range' exception */
-    if ((Pystd__out_of_range_Type = (PyTypeObject*) PyErr_NewException((char*)"bamboo.bits.IndexError", NULL, NULL)) == NULL) {
-        return NULL;
-    }
-    Py_INCREF((PyObject *) Pystd__out_of_range_Type);
-    PyModule_AddObject(m, (char *) "IndexError", (PyObject *) Pystd__out_of_range_Type);
-    /* Register the 'std::invalid_argument' exception */
-    if ((Pystd__invalid_argument_Type = (PyTypeObject*) PyErr_NewException((char*)"bamboo.bits.TypeError", NULL, NULL)) == NULL) {
-        return NULL;
-    }
-    Py_INCREF((PyObject *) Pystd__invalid_argument_Type);
-    PyModule_AddObject(m, (char *) "TypeError", (PyObject *) Pystd__invalid_argument_Type);
-    /* Register the 'std::bad_cast' exception */
-    if ((Pystd__bad_cast_Type = (PyTypeObject*) PyErr_NewException((char*)"bamboo.bits.ConversionError", NULL, NULL)) == NULL) {
-        return NULL;
-    }
-    Py_INCREF((PyObject *) Pystd__bad_cast_Type);
-    PyModule_AddObject(m, (char *) "ConversionError", (PyObject *) Pystd__bad_cast_Type);
     return m;
 }
 static PyMethodDef bamboo_values_functions[] = {
@@ -401,7 +363,7 @@ _wrap_PyBambooValue___getitem____0(PyBambooValue *self, PyObject *args, PyObject
     {
         retval = self->obj->_getitem_(index);
     } catch (std::out_of_range const &exc) {
-        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -436,7 +398,7 @@ _wrap_PyBambooValue___getitem____1(PyBambooValue *self, PyObject *args, PyObject
     {
         retval = self->obj->_getitem_(item_std);
     } catch (std::out_of_range const &exc) {
-        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -502,7 +464,7 @@ _custom_wrap_PyBambooValue_from_packed(PyBambooValue *PYBINDGEN_UNUSED(dummy), P
     {
         retval = bamboo::Value::from_packed(type_ptr, packed_std);
     } catch (std::invalid_argument const &exc) {
-        PyErr_SetString((PyObject *) Pystd__invalid_argument_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_TypeError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -553,7 +515,7 @@ _wrap_PyBambooValue___setitem____0(PyBambooValue *self, PyObject *args, PyObject
     {
         self->obj->_setitem_(index, *((PyBambooValue *) value)->obj);
     } catch (std::out_of_range const &exc) {
-        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
         return NULL;
     }
     Py_INCREF(Py_None);
@@ -585,7 +547,7 @@ _wrap_PyBambooValue___setitem____1(PyBambooValue *self, PyObject *args, PyObject
     {
         self->obj->_setitem_(item_std, *((PyBambooValue *) value)->obj);
     } catch (std::out_of_range const &exc) {
-        PyErr_SetString((PyObject *) Pystd__out_of_range_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
         return NULL;
     }
     Py_INCREF(Py_None);
@@ -636,7 +598,7 @@ _wrap_PyBambooValue_from_type(PyBambooValue *PYBINDGEN_UNUSED(dummy), PyObject *
     {
         retval = bamboo::Value::from_type(type_ptr);
     } catch (std::invalid_argument const &exc) {
-        PyErr_SetString((PyObject *) Pystd__invalid_argument_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_TypeError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -665,7 +627,7 @@ _wrap_PyBambooValue_fromType(PyBambooValue *PYBINDGEN_UNUSED(dummy), PyObject *a
     {
         retval = bamboo::Value::from_type(type_ptr);
     } catch (std::invalid_argument const &exc) {
-        PyErr_SetString((PyObject *) Pystd__invalid_argument_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_TypeError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -707,7 +669,7 @@ _custom_wrap_PyBambooValue_fromPacked(PyBambooValue *PYBINDGEN_UNUSED(dummy), Py
     {
         retval = bamboo::Value::from_packed(type_ptr, packed_std);
     } catch (std::invalid_argument const &exc) {
-        PyErr_SetString((PyObject *) Pystd__invalid_argument_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_TypeError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
@@ -10694,6 +10656,14 @@ initbamboo_wire(void)
 static PyMethodDef bamboo_functions[] = {
     {NULL, NULL, 0, NULL}
 };
+/* --- exceptions --- */
+
+
+
+
+
+
+
 #if PY_VERSION_HEX >= 0x03000000
 static struct PyModuleDef bamboo_moduledef = {
     PyModuleDef_HEAD_INIT,

@@ -35,7 +35,7 @@ _custom_wrap_PyBambooValue_%s(PyBambooValue *PYBINDGEN_UNUSED(dummy), PyObject *
     {
         retval = bamboo::Value::from_packed(type_ptr, packed_std);
     } catch (std::invalid_argument const &exc) {
-        PyErr_SetString((PyObject *) Pystd__invalid_argument_Type, exc.what());
+        PyErr_SetString((PyObject *) PyExc_TypeError, exc.what());
         return NULL;
     }
     py_Value = PyObject_New(PyBambooValue, &PyBambooValue_Type);
