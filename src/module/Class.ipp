@@ -2,8 +2,8 @@
 namespace bamboo { // open namespace
 
 
-// get_num_parents returns the number of superclasses this class inherits from.
-inline size_t Class::get_num_parents() const {
+// num_parents returns the number of superclasses this class inherits from.
+inline size_t Class::num_parents() const {
     return m_parents.size();
 }
 // get_parent returns the <n>th parent-/super-class this class inherits from.
@@ -14,8 +14,8 @@ inline const Class *Class::get_parent(unsigned int n) const {
     return m_parents.at(n);
 }
 
-// get_num_children returns the number of subclasses that inherit from this class.
-inline size_t Class::get_num_children() const {
+// num_children returns the number of subclasses that inherit from this class.
+inline size_t Class::num_children() const {
     return m_children.size();
 }
 // get_child returns the <n>th child-/sub-class that inherits this class.
@@ -31,17 +31,17 @@ inline const Class *Class::get_child(unsigned int n) const {
 inline bool Class::has_constructor() const {
     return (m_constructor != nullptr);
 }
-// get_constructor returns the constructor method for this class if it is defined,
+// constructor returns the constructor method for this class if it is defined,
 //     or nullptr if the class uses the default constructor.
-inline Field *Class::get_constructor() {
+inline Field *Class::constructor() {
     return m_constructor;
 }
-inline const Field *Class::get_constructor() const {
+inline const Field *Class::constructor() const {
     return m_constructor;
 }
 
-// get_num_base_fields returns the number of fields declared directly in this class.
-inline size_t Class::get_num_base_fields() const {
+// num_base_fields returns the number of fields declared directly in this class.
+inline size_t Class::num_base_fields() const {
     return m_base_fields.size();
 }
 // get_base_field returns the <n>th field from the class excluding any inherited fields.

@@ -2,34 +2,41 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
-#include "../values/Value.h"
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Foward declarations
-class DistributedType;
+class Type;
 class Method;
+class Value;
 class HashGenerator;
 
 // A Parameter is a single argument/parameter of a Method.
-class Parameter {
+// Parameter's constructor throws null_error if the type is null.
+class Parameter
+{
   public:
-    Parameter(DistributedType *type, const std::string& name = "");
+    Parameter(Type *type, const std::string& name = ""); // TODO: Throw null_error
+    Parameter(const Parameter&) = delete;
+    Parameter& operator=(const Parameter&) = delete;
 
-    // get_name returns the parameter's name.  An unnamed parameter returns the empty string.
-    inline const std::string& get_name() const;
-    // get_type returns the DistributedType of the Parameter.
-    inline DistributedType *get_type();
-    inline const DistributedType *get_type() const;
+    // name returns the parameter's name.  An unnamed parameter returns the empty string.
+    inline const std::string& name() const;
+    // position returns the parameter's order in the function.
+    inline unsigned int position() const;
+    // type returns the Type of the Parameter.
+    inline Type *type();
+    inline const Type *type() const;
     // get_method returns the Method that contains the Parameter.
     inline Method *get_method();
     inline const Method *get_method() const;
 
     // has_default_value returns true if a default value was defined for this parameter.
     inline bool has_default_value() const;
-    // get_default_value returns the default value for this parameter.
-    //     If a default value hasn't been set, returns an implicit default.
-    inline const Value get_default_value() const;
+    // default_value returns the default value for this parameter.
+    //     Returns nullptr if there is no default value.
+    inline const Value *default_value() const;
 
     // set_name sets the name of this parameter.  Returns false if a parameter with
     //     the same name already exists in the containing method.
@@ -37,25 +44,32 @@ class Parameter {
 
     // set_type sets the distributed type of the parameter and clear's the default value.
     //     Returns false if a parameter cannot represent <type>.
-    bool set_type(DistributedType *type);
+    bool set_type(Type *type);
 
     // set_default_value defines a default value for this parameter.
-    //     Returns false if the value is invalid for the parameter's type.
-    bool set_default_value(const Value default_value);
+    //     Returns false if the value is invalid for the field's type.
+    bool set_default_value(const Value& default_value);
+    bool set_default_value(const Value *default_value);
     bool set_default_value(const std::vector<uint8_t>& default_value);
 
+    struct sort_by_position {
+        inline bool operator()(const Parameter *lhs, const Parameter *rhs) const;
+    };
+
   private:
+    // set_position allows a method to tell the parameter its order in the function.
+    void set_position(unsigned int);
     // set_method sets a pointer to the method containing the parameter.
     void set_method(Method *method);
     friend class Method;
 
-    std::string m_name;
+    Type *m_type;
     std::string m_type_alias;
-    DistributedType *m_type; // cannot be a Method object
-    Method *m_method;
+    std::string m_name;
 
-    bool m_has_default_value; // is true if an explicity default has been set
-    Value m_default_value; // the binary data of the default value encoded in a string
+    Method *m_method = nullptr;
+    Value *m_default_value = nullptr;
+    unsigned int m_position = 0;
 };
 
 

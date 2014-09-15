@@ -2,27 +2,27 @@
 namespace bamboo { // open namespace
 
 
-// get_id returns a unique index number associated with this struct.
-inline unsigned int Struct::get_id() const {
+// id() returns a unique index number associated with this struct.
+inline unsigned int Struct::id() const {
     return m_id;
 }
 
-// get_name returns the name of this struct.
-inline const std::string& Struct::get_name() const {
+// name returns the name of this struct.
+inline const std::string& Struct::name() const {
     return m_name;
 }
 
-// get_module returns the Module object that contains the struct.
-inline Module *Struct::get_module() {
+// module returns the Module object that contains the struct.
+inline Module *Struct::module() {
     return m_module;
 }
-inline const Module *Struct::get_module() const {
+inline const Module *Struct::module() const {
     return m_module;
 }
 
 
-// get_num_fields returns the number of fields in the struct.
-inline size_t Struct::get_num_fields() const {
+// num_fields returns the number of fields in the struct.
+inline size_t Struct::num_fields() const {
     return m_fields.size();
 }
 
@@ -33,21 +33,16 @@ inline Field *Struct::get_field(unsigned int n) {
 inline const Field *Struct::get_field(unsigned int n) const {
     return m_fields.at(n);
 }
-// get_field_names returns a mapping of field names to field number in the struct.
-inline const std::unordered_map<std::string, unsigned int>& Struct::get_field_names() const {
-    return m_indices_by_name;
-}
 
-
-// get_field_by_id returns the field with the index <id>, or nullptr if no such field exists.
-inline Field *Struct::get_field_by_id(unsigned int id) {
+// field_by_id returns the field with the index <id>, or nullptr if no such field exists.
+inline Field *Struct::field_by_id(unsigned int id) {
     auto it = m_fields_by_id.find(id);
     if(it == m_fields_by_id.end()) {
         return nullptr;
     }
     return it->second;
 }
-inline const Field *Struct::get_field_by_id(unsigned int id) const {
+inline const Field *Struct::field_by_id(unsigned int id) const {
     auto it = m_fields_by_id.find(id);
     if(it == m_fields_by_id.end()) {
         return nullptr;
@@ -55,15 +50,15 @@ inline const Field *Struct::get_field_by_id(unsigned int id) const {
     return it->second;
 }
 
-// get_field_by_name returns the field with <name>, or nullptr if no such field exists.
-inline Field *Struct::get_field_by_name(const std::string& name) {
+// field_by_name returns the field with <name>, or nullptr if no such field exists.
+inline Field *Struct::field_by_name(const std::string& name) {
     auto it = m_fields_by_name.find(name);
     if(it == m_fields_by_name.end()) {
         return nullptr;
     }
     return it->second;
 }
-inline const Field *Struct::get_field_by_name(const std::string& name) const {
+inline const Field *Struct::field_by_name(const std::string& name) const {
     auto it = m_fields_by_name.find(name);
     if(it == m_fields_by_name.end()) {
         return nullptr;

@@ -1,13 +1,14 @@
-// Filename: parser.h
+// Filename: parse.h
 #pragma once
 #include <stdint.h>
 #include <string> // std::string
 #include <vector> // std::vector
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Forward declarations
-class DistributedType;
+class Type;
 class Module;
 
 // read_dcfile opens the given file or stream and parses it as a .dc file.  Classes defined in
@@ -24,11 +25,11 @@ bool parse_dcfile(Module *f, const std::string& filename);
 
 
 // parse_dcvalue reads a .dc-formatted parameter value and outputs the data in packed form
-//     matching the appropriate DistributedType and suitable for a default parameter value.
+//     matching the appropriate Type and suitable for a default parameter value.
 //     If an error occurs, the error reason is returned instead of the parsed value.
-std::vector<uint8_t> parse_dcvalue(const DistributedType *, const std::string& formatted,
+std::vector<uint8_t> parse_dcvalue(const Type *, const std::string& formatted,
                                    bool& err);
-std::vector<uint8_t> parse_dcvalue(const DistributedType *, std::istream& in, bool& err);
+std::vector<uint8_t> parse_dcvalue(const Type *, std::istream& in, bool& err);
 
 
 } // close namespace bamboo

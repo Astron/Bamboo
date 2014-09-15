@@ -1,14 +1,16 @@
 // This file is just a dump of all the hash code extracted from the classes
 // themselves and is not yet meant to be compiled.
 
-uint32_t Module::get_hash() const {
+uint32_t Module::hash() const
+{
     HashGenerator hashgen;
     generate_hash(hashgen);
-    return hashgen.get_hash();
+    return hashgen.hash();
 }
 
 // generate_hash accumulates the properties of this module into the hash.
-void Module::generate_hash(HashGenerator& hashgen) const {
+void Module::generate_hash(HashGenerator& hashgen) const
+{
     hashgen.add_int(m_classes.size());
     for(auto it = m_classes.begin(); it != m_classes.end(); ++it) {
         (*it)->generate_hash(hashgen);
@@ -26,8 +28,9 @@ void Module::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this type into the hash.
-void ArrayType::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
+void Array::generate_hash(HashGenerator& hashgen) const
+{
+    Type::generate_hash(hashgen);
     m_element_type->generate_hash(hashgen);
     if(has_range()) {
         hashgen.add_int(m_array_range.min.integer);
@@ -38,8 +41,9 @@ void ArrayType::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this class into the hash.
-void Class::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
+void Class::generate_hash(HashGenerator& hashgen) const
+{
+    Type::generate_hash(hashgen);
     hashgen.add_string(m_name);
 
     /* Hash our inheritence tree */
@@ -48,7 +52,7 @@ void Class::generate_hash(HashGenerator& hashgen) const {
     // and that relationship will be hashed when each child is hashed.
     hashgen.add_int(m_parents.size());
     for(auto it = m_parents.begin(); it != m_parents.end(); ++it) {
-        hashgen.add_int((*it)->get_id());
+        hashgen.add_int((*it)->id());
     }
 
     /* Hash our constructor */
@@ -66,7 +70,8 @@ void Class::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this field into the hash.
-void DistributedType::generate_hash(HashGenerator& hashgen) const {
+void Type::generate_hash(HashGenerator& hashgen) const
+{
     hashgen.add_int(m_type);
     if(has_alias()) {
         hashgen.add_string(m_alias);
@@ -74,8 +79,9 @@ void DistributedType::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this class into the hash.
-void Struct::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
+void Struct::generate_hash(HashGenerator& hashgen) const
+{
+    Type::generate_hash(hashgen);
     hashgen.add_string(m_name);
     hashgen.add_int(m_fields.size());
     for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
@@ -84,8 +90,9 @@ void Struct::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this type into the hash.
-void NumericType::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
+void Number::generate_hash(HashGenerator& hashgen) const
+{
+    Type::generate_hash(hashgen);
     hashgen.add_int(m_divisor);
     if(has_modulus()) {
         hashgen.add_int(m_modulus.integer);
@@ -97,8 +104,9 @@ void NumericType::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this method into the hash
-void Method::generate_hash(HashGenerator& hashgen) const {
-    DistributedType::generate_hash(hashgen);
+void Method::generate_hash(HashGenerator& hashgen) const
+{
+    Type::generate_hash(hashgen);
     hashgen.add_int(m_parameters.size());
     for(auto it = m_parameters.begin(); it != m_parameters.end(); ++it) {
         (*it)->generate_hash(hashgen);
@@ -107,7 +115,8 @@ void Method::generate_hash(HashGenerator& hashgen) const {
 
 
 // generate_hash accumulates the properties of these keywords into the hash.
-void KeywordList::generate_hash(HashGenerator& hashgen) const {
+void KeywordList::generate_hash(HashGenerator& hashgen) const
+{
     hashgen.add_int(m_keywords.size());
     for(auto it = m_keywords.begin(); it != m_keywords.end(); ++it) {
         hashgen.add_string(*it);
@@ -115,7 +124,8 @@ void KeywordList::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this field into the hash.
-void Field::generate_hash(HashGenerator& hashgen) const {
+void Field::generate_hash(HashGenerator& hashgen) const
+{
     hashgen.add_int(m_id);
     hashgen.add_string(m_name);
     m_type->generate_hash(hashgen);
@@ -123,17 +133,19 @@ void Field::generate_hash(HashGenerator& hashgen) const {
 }
 
 // generate_hash accumulates the properties of this field into the hash.
-void MolecularField::generate_hash(HashGenerator& hashgen) const {
+void MolecularField::generate_hash(HashGenerator& hashgen) const
+{
     hashgen.add_int(Field::m_id);
     hashgen.add_string(Field::m_name);
     // We aren't the owner of the fields so we only use their id in the hash
     hashgen.add_int(m_fields.size());
     for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
-        hashgen.add_int((*it)->get_id());
+        hashgen.add_int((*it)->id());
     }
 }
 
 // generate_hash accumulates the properties of this type into the hash.
-void Parameter::generate_hash(HashGenerator& hashgen) const {
+void Parameter::generate_hash(HashGenerator& hashgen) const
+{
     m_type->generate_hash(hashgen);
 }

@@ -1,7 +1,8 @@
 // Filename: hashes.h
 #pragma once
 #include <stdint.h>
-namespace bamboo { // open namespace
+namespace bamboo   // open namespace
+{
 
 
 // Forward declarations

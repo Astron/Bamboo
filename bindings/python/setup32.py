@@ -1,6 +1,6 @@
 #!/usr/bin/python
-from distutils.core import setup, Extension
 import os
+from distutils.core import setup, Extension
 
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 buildDir = os.path.join(scriptDir, '../../build')

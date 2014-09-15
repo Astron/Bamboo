@@ -1,11 +1,13 @@
 // Filename: primes.cpp
 #include "primes.h"
 #include <vector> // for std::vector
-namespace bamboo { // open namespace
+namespace bamboo   // open namespace
+{
 
 
 static vector<unsigned int> primes {2};
-unsigned int get_prime(unsigned int n) {
+unsigned int get_prime(unsigned int n)
+{
     // Compute the prime numbers between the last-computed prime number and n.
     unsigned int candidate = primes.back() + 1;
     while(primes.size() <= n) {

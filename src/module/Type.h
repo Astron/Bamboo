@@ -1,19 +1,20 @@
-// Filename: DistributedType.h
+// Filename: Type.h
 #pragma once
 #include <string> // std::string
 #include "../bits/sizetag.h"
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Forward declaration
-class ArrayType;
+class Array;
 class Method;
-class NumericType;
+class Numeric;
 class Struct;
 class HashGenerator;
 
 
-// The Type enum are numeric constants representing the layout of the DistributedType
+// The Type enum are numeric constants representing the layout of the Type
 enum Subtype {
     /* Numeric Types */
     kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
@@ -38,37 +39,41 @@ enum Subtype {
     kTypeInvalid
 };
 
-// A DistributedType is a shared type with a defined layout of data.
-class DistributedType {
+// A Type is a shared type with a defined layout of data.
+class Type
+{
   protected:
-    inline DistributedType();
+    inline Type();
 
   public:
-    static DistributedType *invalid;
-    virtual ~DistributedType();
+    static Type *invalid;
 
-    // get_type returns the type's fundamental type as an integer constant.
-    inline Subtype get_subtype() const;
+    Type(const Type&) = delete;
+    Type& operator=(const Type&) = delete;
+    virtual ~Type();
 
-    // has_fixed_size returns true if the DistributedType has a fixed size in bytes.
+    // subtype returns the type's fundamental type as an integer constant.
+    inline Subtype subtype() const;
+
+    // has_fixed_size returns true if the Type has a fixed size in bytes.
     inline bool has_fixed_size() const;
-    // get_size returns the size of the DistributedType in bytes or 0 if it is variable.
-    inline sizetag_t get_size() const;
+    // fixed_size returns the size of the Type in bytes or 0 if it is variable.
+    inline size_t fixed_size() const;
 
     // has_alias returns true if this type was defined the an aliased name.
     inline bool has_alias() const;
-    // get_alias returns the name used to define the type, or the empty string.
-    inline const std::string& get_alias() const;
+    // alias returns the name used to define the type, or the empty string.
+    inline const std::string& alias() const;
     // set_alias gives this type the alternate name <alias>.
     inline void set_alias(const std::string& alias);
 
-    // as_numeric returns this as a NumericType if it is numeric, or nullptr otherwise.
-    virtual NumericType *as_numeric();
-    virtual const NumericType *as_numeric() const;
+    // as_numeric returns this as a Numeric if it is numeric, or nullptr otherwise.
+    virtual Numeric *as_numeric();
+    virtual const Numeric *as_numeric() const;
 
-    // as_array returns this as an ArrayType if it is an array, or nullptr otherwise.
-    virtual ArrayType *as_array();
-    virtual const ArrayType *as_array() const;
+    // as_array returns this as an Array if it is an array, or nullptr otherwise.
+    virtual Array *as_array();
+    virtual const Array *as_array() const;
 
     // as_struct returns this as a Struct if it is a struct, or nullptr otherwise.
     virtual Struct *as_struct();
@@ -83,10 +88,10 @@ class DistributedType {
 
   protected:
     Subtype m_subtype;
-    sizetag_t m_size;
+    size_t m_size;
     std::string m_alias;
 };
 
 
 } // close namespace bamboo
-#include "DistributedType.ipp"
+#include "Type.ipp"

@@ -87,10 +87,10 @@
 	#include "../dcfile/parser-defs.h"
 	#include "../dcfile/write.h"           // format_type(Subtype);
 	#include "../module/Module.h"
-	#include "../module/DistributedType.h"
+	#include "../module/Type.h"
 	#include "../module/NumericRange.h"
-	#include "../module/NumericType.h"
-	#include "../module/ArrayType.h"
+	#include "../module/Numeric.h"
+	#include "../module/Array.h"
 	#include "../module/Struct.h"
 	#include "../module/Class.h"
 	#include "../module/Field.h"
@@ -133,16 +133,16 @@
 	struct TypeAndDepth
 	{
 		int depth;
-		const DistributedType* type;
-		TypeAndDepth(const DistributedType* t, int d) : depth(d), type(t) {}
+		const Type* type;
+		TypeAndDepth(const Type* t, int d) : depth(d), type(t) {}
 	};
 	static stack<TypeAndDepth> type_stack;
 	static int current_depth;
 
 	// These two types are really common types the parser doesn't need to make new
 	//     duplicates of every time a string or blob is used.
-	static ArrayType* default_string = nullptr;
-	static ArrayType* default_blob = nullptr;
+	static Array* default_string = nullptr;
+	static Array* default_blob = nullptr;
 
 	/* Helper functions */
 	static bool check_depth();
@@ -163,7 +163,7 @@
 	}
 
 	static void dcparser_init_value(istream& in, const string& source,
-	                           const DistributedType* type, vector<uint8_t>& output)
+	                           const Type* type, vector<uint8_t>& output)
 	{
 		parsed_value = &output;
 		current_depth = 0;
@@ -1614,7 +1614,7 @@ yyreduce:
 		if(!type_added)
 		{
 			// Lets be really descriptive about why this failed
-			DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].nametype).name);
+			Type* dtype = parsed_module->type_by_name((yyvsp[0].nametype).name);
 			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding typedef to module.");
@@ -1656,7 +1656,7 @@ yyreduce:
 
     {
 		(yyval.nametype) = (yyvsp[-3].nametype);
-		(yyval.nametype).type = new ArrayType((yyvsp[-3].nametype).type, (yyvsp[-1].range));
+		(yyval.nametype).type = new Array((yyvsp[-3].nametype).type, (yyvsp[-1].range));
 	}
 
     break;
@@ -1675,7 +1675,7 @@ yyreduce:
   case 28:
 
     {
-		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
+		Type* dtype = parsed_module->type_by_name((yyvsp[0].str));
 		if(dtype == nullptr)
 		{
 			dcerror("Subtype '" + string((yyvsp[0].str)) + "' has not been declared.");
@@ -1711,7 +1711,7 @@ yyreduce:
 		if(!class_added)
 		{
 			// Lets be really descriptive about why this failed
-			DistributedType* dtype = parsed_module->get_type_by_name(current_class->get_name());
+			Type* dtype = parsed_module->type_by_name(current_class->name());
 			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding class to module.");
@@ -1721,19 +1721,19 @@ yyreduce:
 			Struct* dstruct = dtype->as_struct();
 			if(dstruct == nullptr)
 			{
-				dcerror("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->name()
 				             + "' to module because a typedef was already declared with that name.");
 				break;
 			}
 
 			if(dstruct->as_class())
 			{
-				dcerror("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->name()
 				             + "' to module because a class was already declared with that name.");
 			}
 			else
 			{
-				dcerror("Cannot add 'dclass " + current_class->get_name()
+				dcerror("Cannot add 'dclass " + current_class->name()
 				             + "' to module because a struct was already declared with that name.");
 			}
 		}
@@ -1766,7 +1766,7 @@ yyreduce:
   case 38:
 
     {
-		DistributedType* dtype = parsed_module->get_type_by_name((yyvsp[0].str));
+		Type* dtype = parsed_module->type_by_name((yyvsp[0].str));
 		if(dtype == nullptr)
 		{
 			dcerror("'dclass " + string((yyvsp[0].str)) + "' has not been declared.");
@@ -1808,13 +1808,13 @@ yyreduce:
 		if(!field_added)
 		{
 			// Lets be really descriptive about why this failed
-			if(current_class->get_field_by_name((yyvsp[-1].dfield)->get_name()))
+			if(current_class->field_by_name((yyvsp[-1].dfield)->name()))
 			{
-				dcerror("Cannot add field '" + (yyvsp[-1].dfield)->get_name()
+				dcerror("Cannot add field '" + (yyvsp[-1].dfield)->name()
 				             + "', a field with that name already exists in 'dclass "
-				             + current_class->get_name() + "'.");
+				             + current_class->name() + "'.");
 			}
-			else if(current_class->get_name() == (yyvsp[-1].dfield)->get_name())
+			else if(current_class->name() == (yyvsp[-1].dfield)->name())
 			{
 				if((yyvsp[-1].dfield)->as_molecular())
 				{
@@ -1844,7 +1844,7 @@ yyreduce:
 			break;
 		}
 
-		if((yyvsp[-1].dfield)->get_name().empty())
+		if((yyvsp[-1].dfield)->name().empty())
 		{
 			dcerror("An unnamed field can't be defined in a class.");
 			(yyval.dfield) = nullptr;
@@ -1885,7 +1885,7 @@ yyreduce:
 		if(!struct_added)
 		{
 			// Lets be really descriptive about why this failed
-			DistributedType* dtype = parsed_module->get_type_by_name(current_struct->get_name());
+			Type* dtype = parsed_module->type_by_name(current_struct->name());
 			if(dtype == nullptr)
 			{
 				dcerror("Unknown error adding struct to module.");
@@ -1895,19 +1895,19 @@ yyreduce:
 			Struct* dstruct = dtype->as_struct();
 			if(dstruct == nullptr)
 			{
-				dcerror("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->name()
 				             + "' to module because a typedef was already declared with that name.");
 				break;
 			}
 
 			if(dstruct->as_class())
 			{
-				dcerror("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->name()
 				             + "' to module because a class was already declared with that name.");
 			}
 			else
 			{
-				dcerror("Cannot add 'struct " + current_struct->get_name()
+				dcerror("Cannot add 'struct " + current_struct->name()
 				             + "' to module because a struct was already declared with that name.");
 			}
 		}
@@ -1918,7 +1918,7 @@ yyreduce:
   case 48:
 
     {
-		if((yyvsp[-1].dfield) == nullptr || (yyvsp[-1].dfield)->get_type() == nullptr)
+		if((yyvsp[-1].dfield) == nullptr || (yyvsp[-1].dfield)->type() == nullptr)
 		{
 			// Ignore this field, it should have already generated a parser error
 			break;
@@ -1927,17 +1927,17 @@ yyreduce:
 		if(!current_struct->add_field((yyvsp[-1].dfield)))
 		{
 			// Lets be really descriptive about why this failed
-			if(current_struct->get_field_by_name((yyvsp[-1].dfield)->get_name()))
+			if(current_struct->field_by_name((yyvsp[-1].dfield)->name()))
 			{
-				dcerror("Cannot add field '" + (yyvsp[-1].dfield)->get_name()
+				dcerror("Cannot add field '" + (yyvsp[-1].dfield)->name()
 				             + "', a field with that name already exists in 'struct "
-				             + current_struct->get_name() + "'.");
+				             + current_struct->name() + "'.");
 			}
-			else if(current_struct->get_name() == (yyvsp[-1].dfield)->get_name())
+			else if(current_struct->name() == (yyvsp[-1].dfield)->name())
 			{
 				dcerror("A constructor can't be defined in a struct.");
 			}
-			else if((yyvsp[-1].dfield)->get_type()->as_method())
+			else if((yyvsp[-1].dfield)->type()->as_method())
 			{
 				dcerror("A method can't be defined in a struct.");
 			}
@@ -1989,7 +1989,7 @@ yyreduce:
   case 59:
 
     {
-		(yyvsp[-3].dfield)->set_type(new ArrayType((yyvsp[-3].dfield)->get_type(), (yyvsp[-1].range)));
+		(yyvsp[-3].dfield)->set_type(new Array((yyvsp[-3].dfield)->type(), (yyvsp[-1].range)));
 		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
 
@@ -1998,7 +1998,7 @@ yyreduce:
   case 60:
 
     {
-		(yyvsp[-3].dfield)->set_type(new ArrayType((yyvsp[-3].dfield)->get_type(), (yyvsp[-1].range)));
+		(yyvsp[-3].dfield)->set_type(new Array((yyvsp[-3].dfield)->type(), (yyvsp[-1].range)));
 		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
 
@@ -2008,7 +2008,7 @@ yyreduce:
 
     {
 		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
+		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->type(), 0));
 	}
 
     break;
@@ -2016,7 +2016,7 @@ yyreduce:
   case 62:
 
     {
-		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->get_name() + "'");
+		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->name() + "'");
 		(yyvsp[-3].dfield)->set_default_value((yyvsp[0].buffer));
 		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
@@ -2027,7 +2027,7 @@ yyreduce:
 
     {
 		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->get_type(), 0));
+		type_stack.push(TypeAndDepth((yyvsp[-1].dfield)->type(), 0));
 	}
 
     break;
@@ -2035,7 +2035,7 @@ yyreduce:
   case 64:
 
     {
-		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->get_name() + "'");
+		if(!type_stack.empty()) depth_error(0, "field '" + (yyvsp[-3].dfield)->name() + "'");
 		(yyvsp[-3].dfield)->set_default_value((yyvsp[0].buffer));
 		(yyval.dfield) = (yyvsp[-3].dfield);
 	}
@@ -2046,7 +2046,7 @@ yyreduce:
 
     {
 		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-2].dfield)->get_type(), 0));
+		type_stack.push(TypeAndDepth((yyvsp[-2].dfield)->type(), 0));
 	}
 
     break;
@@ -2079,7 +2079,7 @@ yyreduce:
 			break;
 		}
 
-		if((yyvsp[0].dtype)->get_subtype() == kTypeMethod)
+		if((yyvsp[0].dtype)->subtype() == kTypeMethod)
 		{
 			dcerror("Cannot use a method type here.");
 			(yyval.dtype) = nullptr;
@@ -2094,7 +2094,7 @@ yyreduce:
   case 71:
 
     {
-		(yyval.dtype) = (DistributedType*)(yyvsp[0].dnumeric);
+		(yyval.dtype) = (Type*)(yyvsp[0].dnumeric);
 	}
 
     break;
@@ -2102,7 +2102,7 @@ yyreduce:
   case 73:
 
     {
-		(yyval.dtype) = new ArrayType((yyvsp[-3].dnumeric), (yyvsp[-1].range));
+		(yyval.dtype) = new Array((yyvsp[-3].dnumeric), (yyvsp[-1].range));
 	}
 
     break;
@@ -2110,7 +2110,7 @@ yyreduce:
   case 74:
 
     {
-		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
+		(yyval.dtype) = new Array((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
 
     break;
@@ -2118,7 +2118,7 @@ yyreduce:
   case 75:
 
     {
-		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
+		(yyval.dtype) = new Array((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
 
     break;
@@ -2126,7 +2126,7 @@ yyreduce:
   case 76:
 
     {
-		(yyval.dtype) = new ArrayType((yyvsp[-3].dtype), (yyvsp[-1].range));
+		(yyval.dtype) = new Array((yyvsp[-3].dtype), (yyvsp[-1].range));
 	}
 
     break;
@@ -2147,11 +2147,11 @@ yyreduce:
 		{
 			if((yyvsp[0].dfield)->as_molecular())
 			{
-				dcerror("Cannot add molecular '" + (yyvsp[0].dfield)->get_name() + "' to a molecular field.");
+				dcerror("Cannot add molecular '" + (yyvsp[0].dfield)->name() + "' to a molecular field.");
 			}
 			else
 			{
-				dcerror("Unkown error adding field " + (yyvsp[0].dfield)->get_name() + " to molecular '"
+				dcerror("Unkown error adding field " + (yyvsp[0].dfield)->name() + " to molecular '"
 				             + (yyvsp[-2].str) + "'.");
 			}
 		}
@@ -2176,17 +2176,17 @@ yyreduce:
 		{
 			if((yyvsp[0].dfield)->as_molecular())
 			{
-				dcerror("Cannot add molecular '" + (yyvsp[0].dfield)->get_name() + "' to a molecular field.");
+				dcerror("Cannot add molecular '" + (yyvsp[0].dfield)->name() + "' to a molecular field.");
 			}
 			else if(!(yyvsp[-2].dmolecule)->has_matching_keywords(*(yyvsp[0].dfield)))
 			{
 				dcerror("Mismatched keywords in molecular between " +
-					(yyvsp[-2].dmolecule)->get_field(0)->get_name() + " and " + (yyvsp[0].dfield)->get_name() + ".");
+					(yyvsp[-2].dmolecule)->get_field(0)->name() + " and " + (yyvsp[0].dfield)->name() + ".");
 			}
 			else
 			{
-				dcerror("Unkown error adding field " + (yyvsp[0].dfield)->get_name() + " to molecular '"
-				             + (yyvsp[-2].dmolecule)->get_name() + "'.");
+				dcerror("Unkown error adding field " + (yyvsp[0].dfield)->name() + " to molecular '"
+				             + (yyvsp[-2].dmolecule)->name() + "'.");
 			}
 		}
 
@@ -2205,7 +2205,7 @@ yyreduce:
 			break;
 		}
 
-		Field *field = current_class->get_field_by_name((yyvsp[0].str));
+		Field *field = current_class->field_by_name((yyvsp[0].str));
 		if(field == nullptr)
 		{
 			dcerror("Field '" + (yyvsp[0].str) + "' not defined in current class.");
@@ -2225,7 +2225,7 @@ yyreduce:
 		{
 			if(default_string == nullptr)
 			{
-				default_string = new ArrayType(new NumericType(kTypeChar));
+				default_string = new Array(new Numeric(kTypeChar));
 				default_string->set_alias("string");
 			}
 
@@ -2235,7 +2235,7 @@ yyreduce:
 		{
 			if(default_blob == nullptr)
 			{
-				default_blob = new ArrayType(new NumericType(kTypeUint8));
+				default_blob = new Array(new Numeric(kTypeUint8));
 				default_blob->set_alias("blob");
 			}
 
@@ -2243,7 +2243,7 @@ yyreduce:
 		}
 		else
 		{
-			dcerror("Found builtin ArrayType not handled by parser.");
+			dcerror("Found builtin Array not handled by parser.");
 			(yyval.dtype) = nullptr;
 		}
 	}
@@ -2255,19 +2255,19 @@ yyreduce:
     {
 		if((yyvsp[-3].subtype) == kTypeString)
 		{
-			ArrayType* arr = new ArrayType(new NumericType(kTypeChar), (yyvsp[-1].range));
+			Array* arr = new Array(new Numeric(kTypeChar), (yyvsp[-1].range));
 			arr->set_alias("string");
 			(yyval.dtype) = arr;
 		}
 		else if((yyvsp[-3].subtype) == kTypeBlob)
 		{
-			ArrayType* arr = new ArrayType(new NumericType(kTypeUint8), (yyvsp[-1].range));
+			Array* arr = new Array(new Numeric(kTypeUint8), (yyvsp[-1].range));
 			arr->set_alias("blob");
 			(yyval.dtype) = arr;
 		}
 		else
 		{
-			dcerror("Found builtin ArrayType not handled by parser.");
+			dcerror("Found builtin Array not handled by parser.");
 			(yyval.dtype) = nullptr;
 		}
 	}
@@ -2276,7 +2276,7 @@ yyreduce:
 
   case 86:
 
-    { (yyval.dnumeric) = new NumericType((yyvsp[0].subtype)); }
+    { (yyval.dnumeric) = new Numeric((yyvsp[0].subtype)); }
 
     break;
 
@@ -2390,7 +2390,7 @@ yyreduce:
 		bool param_added = (yyvsp[-2].dmethod)->add_parameter((yyvsp[0].dparam));
 		if(!param_added)
 		{
-			dcerror("Cannot add parameter '" + (yyvsp[0].dparam)->get_name()
+			dcerror("Cannot add parameter '" + (yyvsp[0].dparam)->name()
 			             + "', a parameter with that name is already used in this method.");
 		}
 		(yyval.dmethod) = (yyvsp[-2].dmethod);
@@ -2437,7 +2437,7 @@ yyreduce:
   case 104:
 
     {
-		(yyvsp[-3].dparam)->set_type(new ArrayType((yyvsp[-3].dparam)->get_type(), (yyvsp[-1].range)));
+		(yyvsp[-3].dparam)->set_type(new Array((yyvsp[-3].dparam)->type(), (yyvsp[-1].range)));
 		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
 
@@ -2446,7 +2446,7 @@ yyreduce:
   case 105:
 
     {
-		(yyvsp[-3].dparam)->set_type(new ArrayType((yyvsp[-3].dparam)->get_type(), (yyvsp[-1].range)));
+		(yyvsp[-3].dparam)->set_type(new Array((yyvsp[-3].dparam)->type(), (yyvsp[-1].range)));
 		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
 
@@ -2456,7 +2456,7 @@ yyreduce:
 
     {
 		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
+		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->type(), 0));
 	}
 
     break;
@@ -2464,7 +2464,7 @@ yyreduce:
   case 107:
 
     {
-		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->get_name() + "'");
+		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->name() + "'");
 		(yyvsp[-3].dparam)->set_default_value((yyvsp[0].buffer));
 		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
@@ -2475,7 +2475,7 @@ yyreduce:
 
     {
 		current_depth = 0;
-		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->get_type(), 0));
+		type_stack.push(TypeAndDepth((yyvsp[-1].dparam)->type(), 0));
 	}
 
     break;
@@ -2483,7 +2483,7 @@ yyreduce:
   case 109:
 
     {
-		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->get_name() + "'");
+		if(!type_stack.empty()) depth_error(0, "parameter '" + (yyvsp[-3].dparam)->name() + "'");
 		(yyvsp[-3].dparam)->set_default_value((yyvsp[0].buffer));
 		(yyval.dparam) = (yyvsp[-3].dparam);
 	}
@@ -2586,7 +2586,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("signed integer");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2594,7 +2594,7 @@ yyreduce:
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].int64));
+		(yyval.buffer) = number_value(dtype->subtype(), (yyvsp[0].int64));
 	}
 
     break;
@@ -2604,7 +2604,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("unsigned integer");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2612,7 +2612,7 @@ yyreduce:
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].uint64));
+		(yyval.buffer) = number_value(dtype->subtype(), (yyvsp[0].uint64));
 	}
 
     break;
@@ -2622,7 +2622,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("floating point");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2630,7 +2630,7 @@ yyreduce:
 		}
 		type_stack.pop(); // Remove numeric type from stack
 
-		(yyval.buffer) = number_value(dtype->get_subtype(), (yyvsp[0].real));
+		(yyval.buffer) = number_value(dtype->subtype(), (yyvsp[0].real));
 	}
 
     break;
@@ -2640,7 +2640,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("string");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2648,13 +2648,13 @@ yyreduce:
 		}
 		type_stack.pop(); // Remove string type from stack
 
-		if(dtype->get_subtype() == kTypeString || dtype->get_subtype() == kTypeBlob) {
-			if((yyvsp[0].str).length() != dtype->get_size()) {
+		if(dtype->subtype() == kTypeString || dtype->subtype() == kTypeBlob) {
+			if((yyvsp[0].str).length() != dtype->fixed_size()) {
 				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
-		} else if(dtype->get_subtype() == kTypeVarstring || dtype->get_subtype() == kTypeVarblob) {
+		} else if(dtype->subtype() == kTypeVarstring || dtype->subtype() == kTypeVarblob) {
 			// TODO: Check for range limits
 			// Prepend length tag
 			sizetag_t length = (yyvsp[0].str).length();
@@ -2664,7 +2664,7 @@ yyreduce:
 		}
 		else {
 			dcerror("Cannot use string value for non-string type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
 		}
 	}
@@ -2676,7 +2676,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("hex-string");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2684,18 +2684,18 @@ yyreduce:
 		}
 		type_stack.pop(); // Remove type from stack
 
-		if(dtype->get_subtype() == kTypeBlob) {
-			if((yyvsp[0].str).length() != dtype->get_size()) {
+		if(dtype->subtype() == kTypeBlob) {
+			if((yyvsp[0].str).length() != dtype->fixed_size()) {
 				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
-		} else if(dtype->get_subtype() == kTypeVarblob) {
+		} else if(dtype->subtype() == kTypeVarblob) {
 			// TODO: Check for range limits
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
 		} else {
 			dcerror("Cannot use hex value for non-blob type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 			(yyval.buffer) = as_buffer((yyvsp[0].str));
 		}
 	}
@@ -2707,7 +2707,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("method");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
@@ -2717,16 +2717,16 @@ yyreduce:
 			current_depth++;
 			const Method* method = dtype->as_method();
 
-			size_t num_params = method->get_num_parameters();
+			size_t num_params = method->num_parameters();
 			for(unsigned int i = 1; i <= num_params; ++i) {
 				// Reverse iteration
 				const Parameter* param = method->get_parameter(num_params-i);
 				// Add parameter types to stack such that the first is on top
-				type_stack.push(TypeAndDepth(param->get_type(), current_depth));
+				type_stack.push(TypeAndDepth(param->type(), current_depth));
 			}
 		} else {
 			dcerror("Cannot use method-value for non-method type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 		}
 	}
 
@@ -2759,7 +2759,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("struct");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
@@ -2769,16 +2769,16 @@ yyreduce:
 			current_depth++;
 			const Struct* dstruct = dtype->as_struct();
 
-			size_t num_fields = dstruct->get_num_fields();
+			size_t num_fields = dstruct->num_fields();
 			for(unsigned int i = 1; i <= num_fields; ++i) {
 				// Reverse iteration
 				const Field* field = dstruct->get_field(num_fields-i);
 				// Add field types to stack such that the first is on top
-				type_stack.push(TypeAndDepth(field->get_type(), current_depth));
+				type_stack.push(TypeAndDepth(field->type(), current_depth));
 			}
 		} else {
 			dcerror("Cannot use struct-composition for non-struct type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 		}
 	}
 
@@ -2821,7 +2821,7 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("array");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();;
@@ -2830,22 +2830,22 @@ yyreduce:
 		type_stack.pop();
 		if(!dtype->as_array()) {
 			dcerror("Cannot use array-composition for non-array type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 			(yyval.buffer) = vector<uint8_t>();;
 			break;
 		}
-		const ArrayType* array = dtype->as_array();
+		const Array* array = dtype->as_array();
 
-		if(array->get_array_size() > 0) {
+		if(array->array_size() > 0) {
 			// For fixed size arrays, an empty array is an error
 			dcerror("Fixed-sized array of size "
-			             + to_string(array->get_array_size())
+			             + to_string(array->array_size())
 			             + " can't have 0 elements.");
 		} else if(array->has_range()) {
 			// If we have a range, 0 elements must be valid in the range
-			if(0 < array->get_range().min.uinteger) {
+			if(0 < array->range().min.uinteger) {
 				dcerror("Too few elements in array value, minimum "
-				             + to_string(array->get_range().min.uinteger) + ".");
+				             + to_string(array->range().min.uinteger) + ".");
 			}
 		}
 
@@ -2861,24 +2861,24 @@ yyreduce:
     {
 		if(!check_depth()) depth_error("array");
 
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
 
 		if(dtype->as_array()) {
-			const ArrayType* array = dtype->as_array();
+			const Array* array = dtype->as_array();
 
 			// For arrays we're going to do something pretty hacky:
 			//    For every element we had we are going to increment the depth,
 			//    and after we finish the element_values production we will compare
 			//    the current_depth to the depth of our original symbol to check
 			//    if the array size is proper.
-			type_stack.push(TypeAndDepth(array->get_element_type(), current_depth));
+			type_stack.push(TypeAndDepth(array->element_type(), current_depth));
 		} else {
 			dcerror("Cannot use array-composition for non-array type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 		}
 	}
 
@@ -2890,25 +2890,25 @@ yyreduce:
 		if(type_stack.top().type->as_array()) {
 			uint64_t actual_size = current_depth - type_stack.top().depth;
 
-			const DistributedType* dtype = type_stack.top().type;
+			const Type* dtype = type_stack.top().type;
 			if(dtype == nullptr) {
 				// Ignore this field, it should have already generated an error
 				(yyval.buffer) = vector<uint8_t>();
 				break;
 			}
 
-			const ArrayType* array = dtype->as_array();
+			const Array* array = dtype->as_array();
 			if(array->has_range()) {
-				if(actual_size > array->get_range().max.uinteger) {
+				if(actual_size > array->range().max.uinteger) {
 					dcerror("Too many elements in array value, maximum "
-					             + to_string(array->get_range().max.uinteger) + ".");
-				} else if(actual_size < array->get_range().min.uinteger) {
+					             + to_string(array->range().max.uinteger) + ".");
+				} else if(actual_size < array->range().min.uinteger) {
 					dcerror("Too few elements in array value, minimum "
-					             + to_string(array->get_range().min.uinteger) + ".");
+					             + to_string(array->range().min.uinteger) + ".");
 				}
 			}
 
-			if(array->get_array_size() == 0) {
+			if(array->array_size() == 0) {
 				vector<uint8_t> buf = as_buffer(sizetag_t((yyvsp[-1].buffer).size()));
 				pack_value((yyvsp[-1].buffer), buf);
 				(yyval.buffer) = buf;
@@ -2929,13 +2929,13 @@ yyreduce:
 		// We popped off the only element we added, so we're back to the array
 		// Don't increment the depth; the array_expansion will add to
 		// the current_depth depending on the number of elements it adds.
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			break;
 		}
-		const ArrayType* array = dtype->as_array();
-		type_stack.push(TypeAndDepth(array->get_element_type(), current_depth));
+		const Array* array = dtype->as_array();
+		type_stack.push(TypeAndDepth(array->element_type(), current_depth));
 	}
 
     break;
@@ -2963,7 +2963,7 @@ yyreduce:
   case 148:
 
     {
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2973,7 +2973,7 @@ yyreduce:
 		current_depth += (yyvsp[0].uint32); // For arrays, we add 1 to the depth per element
 
 		vector<uint8_t> buf;
-		vector<uint8_t> base = number_value(dtype->get_subtype(), (yyvsp[-2].int64));
+		vector<uint8_t> base = number_value(dtype->subtype(), (yyvsp[-2].int64));
 		buf.reserve(base.size() * (yyvsp[0].uint32));
 		for(unsigned int i = 0; i < (yyvsp[0].uint32); ++i) {
 			pack_value(base, buf);
@@ -2986,7 +2986,7 @@ yyreduce:
   case 149:
 
     {
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -2996,7 +2996,7 @@ yyreduce:
 		current_depth += (yyvsp[0].uint32); // For arrays, we add 1 to the depth per element
 
 		vector<uint8_t> buf;
-		vector<uint8_t> base = number_value(dtype->get_subtype(), (yyvsp[-2].uint64));
+		vector<uint8_t> base = number_value(dtype->subtype(), (yyvsp[-2].uint64));
 		buf.reserve(base.size() * (yyvsp[0].uint32));
 		for(unsigned int i = 0; i < (yyvsp[0].uint32); ++i) {
 			pack_value(base, buf);
@@ -3009,7 +3009,7 @@ yyreduce:
   case 150:
 
     {
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -3019,7 +3019,7 @@ yyreduce:
 		current_depth += (yyvsp[0].uint32); // For arrays, we add 1 to the depth per element
 
 		vector<uint8_t> buf;
-		vector<uint8_t> base = number_value(dtype->get_subtype(), (yyvsp[-2].real));
+		vector<uint8_t> base = number_value(dtype->subtype(), (yyvsp[-2].real));
 		buf.reserve(base.size() * (yyvsp[0].uint32));
 		for(unsigned int i = 0; i < (yyvsp[0].uint32); ++i) {
 			pack_value(base, buf);
@@ -3032,7 +3032,7 @@ yyreduce:
   case 151:
 
     {
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -3041,8 +3041,8 @@ yyreduce:
 		type_stack.pop(); // Pop that array element type
 		current_depth += (yyvsp[0].uint32); // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_subtype() == kTypeString) {
-			if((yyvsp[-2].str).length() != dtype->get_size()) {
+		if(dtype->subtype() == kTypeString) {
+			if((yyvsp[-2].str).length() != dtype->fixed_size()) {
 				dcerror("Value for fixed-length string has incorrect length.");
 			}
 
@@ -3052,7 +3052,7 @@ yyreduce:
 				pack_value((yyvsp[-2].str), buf);
 			}
 			(yyval.buffer) = buf;
-		} else if(dtype->get_subtype() == kTypeVarstring) {
+		} else if(dtype->subtype() == kTypeVarstring) {
 			// Prepend length tag
 			vector<uint8_t> buf = as_buffer((yyvsp[-2].str).length());
 			vector<uint8_t> base = as_buffer((yyvsp[-2].str));
@@ -3066,7 +3066,7 @@ yyreduce:
 
 		} else {
 			dcerror("Cannot use string value for non-string type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 
 			vector<uint8_t> buf;
 			buf.reserve((yyvsp[-2].str).length() * (yyvsp[0].uint32));
@@ -3082,7 +3082,7 @@ yyreduce:
   case 152:
 
     {
-		const DistributedType* dtype = type_stack.top().type;
+		const Type* dtype = type_stack.top().type;
 		if(dtype == nullptr) {
 			// Ignore this field, it should have already generated an error
 			(yyval.buffer) = vector<uint8_t>();
@@ -3091,8 +3091,8 @@ yyreduce:
 		type_stack.pop(); // Pop that array element type
 		current_depth += (yyvsp[0].uint32); // For arrays, we add 1 to the depth per element
 
-		if(dtype->get_subtype() == kTypeBlob) {
-			if((yyvsp[-2].str).length() != dtype->get_size()) {
+		if(dtype->subtype() == kTypeBlob) {
+			if((yyvsp[-2].str).length() != dtype->fixed_size()) {
 				dcerror("Value for fixed-length blob has incorrect length.");
 			}
 
@@ -3102,7 +3102,7 @@ yyreduce:
 				pack_value((yyvsp[-2].str), buf);
 			}
 			(yyval.buffer) = buf;
-		} else if(dtype->get_subtype() == kTypeVarblob) {
+		} else if(dtype->subtype() == kTypeVarblob) {
 			// Prepend length tag
 			vector<uint8_t> buf = as_buffer((yyvsp[-2].str).length());
 			vector<uint8_t> base = as_buffer((yyvsp[-2].str));
@@ -3116,7 +3116,7 @@ yyreduce:
 
 		} else {
 			dcerror("Cannot use hex value for non-blob type '"
-			             + format_type(dtype->get_subtype()) + "'.");
+			             + format_type(dtype->subtype()) + "'.");
 
 			vector<uint8_t> buf;
 			buf.reserve((yyvsp[-2].str).length() * (yyvsp[0].uint32));
@@ -3509,12 +3509,12 @@ bool parse_dcfile(Module *m, const string& filename) {
     }
     return parse_dcfile(m, in, filename);
 }
-vector<uint8_t> parse_dcvalue(const DistributedType *dtype, const string& formatted, bool& err) {
+vector<uint8_t> parse_dcvalue(const Type *dtype, const string& formatted, bool& err) {
     istringstream strm(formatted);
     return parse_dcvalue(dtype, strm, err);
 
 }
-vector<uint8_t> parse_dcvalue(const DistributedType *dtype, istream& in, bool& err) {
+vector<uint8_t> parse_dcvalue(const Type *dtype, istream& in, bool& err) {
     vector<uint8_t> value;
     try {
         dcparser_init_value(in, "parse_value()", dtype, value);
@@ -3545,7 +3545,7 @@ void depth_error(string what)
 	if(type_stack.empty() || current_depth < type_stack.top().depth) {
 		dcerror("Too many nested values while parsing value for " + what + ".");
 	} else {
-		dcerror("Too few nested values while parsing value for " + what + ".");	
+		dcerror("Too few nested values while parsing value for " + what + ".");
 	}
 }
 

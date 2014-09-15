@@ -1,8 +1,9 @@
-// Filename: lexerDefs.h
+// Filename: lex.h
 #pragma once
 #include <iostream> // for std::istream
 #include <string>   // for std::string
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 /* Published interface */

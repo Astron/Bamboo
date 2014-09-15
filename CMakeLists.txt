@@ -112,22 +112,10 @@ endif()
 set(BITS_SOURCES src/bits/bits.cpp)
 
 # depends: bits
-set(VALUES_SOURCES
-  src/values/Value.cpp
-  src/values/ValueInterface.cpp
-  src/values/IntValue.cpp
-  src/values/FloatValue.cpp
-  src/values/StringValue.cpp
-  src/values/BlobValue.cpp
-  src/values/ArrayValue.cpp
-  src/values/StructValue.cpp
-  src/values/MethodValue.cpp)
-
-# depends: bits, values
 set(MODULE_SOURCES
-  src/module/DistributedType.cpp
-  src/module/NumericType.cpp
-  src/module/ArrayType.cpp
+  src/module/Type.cpp
+  src/module/Numeric.cpp
+  src/module/Array.cpp
   src/module/Struct.cpp
   src/module/Class.cpp
   src/module/Method.cpp
@@ -135,7 +123,8 @@ set(MODULE_SOURCES
   src/module/Module.cpp
   src/module/Field.cpp
   src/module/MolecularField.cpp
-  src/module/Parameter.cpp)
+  src/module/Parameter.cpp
+  src/module/Value.cpp)
 
 # depends: module
 set(TRAITS_SOURCES

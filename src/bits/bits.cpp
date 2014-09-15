@@ -1,7 +1,8 @@
 // Filename: bits.cpp
 #include "sizetag.h"
 #include "byteorder.h"
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Compile sizetag width into binary

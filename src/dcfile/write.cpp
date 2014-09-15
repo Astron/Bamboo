@@ -1,62 +1,65 @@
 // Filename: write.cpp
-#include "../module/DistributedType.h"
+#include "../module/Type.h"
 
 #include "write.h"
 using namespace std;
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
-ostream& indent(ostream& out, unsigned int indent_level) {
+ostream& indent(ostream& out, unsigned int indent_level)
+{
     for(unsigned int i = 0; i < indent_level; i++) {
         out << ' ';
     }
     return out;
 }
 
-string format_type(unsigned int type) {
+string format_type(unsigned int type)
+{
     switch(type) {
-        case kTypeChar:
-            return "char";
-        case kTypeInt8:
-            return "int8";
-        case kTypeInt16:
-            return "int16";
-        case kTypeInt32:
-            return "int32";
-        case kTypeInt64:
-            return "int64";
-        case kTypeUint8:
-            return "uint8";
-        case kTypeUint16:
-            return "uint16";
-        case kTypeUint32:
-            return "uint32";
-        case kTypeUint64:
-            return "uint64";
-        case kTypeFloat32:
-            return "float32";
-        case kTypeFloat64:
-            return "float64";
-        case kTypeString:
-            return "string";
-        case kTypeVarstring:
-            return "varstring";
-        case kTypeBlob:
-            return "blob";
-        case kTypeVarblob:
-            return "varblob";
-        case kTypeArray:
-            return "array";
-        case kTypeVararray:
-            return "vararray";
-        case kTypeStruct:
-            return "struct";
-        case kTypeMethod:
-            return "method";
-        case kTypeInvalid:
-            return "invalid";
-        default:
-            return "error";
+    case kTypeChar:
+        return "char";
+    case kTypeInt8:
+        return "int8";
+    case kTypeInt16:
+        return "int16";
+    case kTypeInt32:
+        return "int32";
+    case kTypeInt64:
+        return "int64";
+    case kTypeUint8:
+        return "uint8";
+    case kTypeUint16:
+        return "uint16";
+    case kTypeUint32:
+        return "uint32";
+    case kTypeUint64:
+        return "uint64";
+    case kTypeFloat32:
+        return "float32";
+    case kTypeFloat64:
+        return "float64";
+    case kTypeString:
+        return "string";
+    case kTypeVarstring:
+        return "varstring";
+    case kTypeBlob:
+        return "blob";
+    case kTypeVarblob:
+        return "varblob";
+    case kTypeArray:
+        return "array";
+    case kTypeVararray:
+        return "vararray";
+    case kTypeStruct:
+        return "struct";
+    case kTypeMethod:
+        return "method";
+    case kTypeInvalid:
+        return "invalid";
+    default:
+        return "error";
     }
 }
 
@@ -126,7 +129,7 @@ void KeywordList::output_keywords(ostream &out) const
 {
     for(auto it = m_keywords.begin(); it != m_keywords.end(); ++it)
     {
-        out << " " << (*it)->get_name();
+        out << " " << (*it)->name();
     }
 }
 
@@ -149,7 +152,7 @@ void Parameter::output(ostream &out, bool brief) const
     string name;
     if(!brief)
     {
-        name = get_name();
+        name = name();
     }
     output_instance(out, brief, "", name, "");
 }
@@ -158,9 +161,9 @@ void Parameter::output(ostream &out, bool brief) const
 void Parameter::write(ostream &out, bool brief, int indent_level) const
 {
     // we must always output the name when the parameter occurs by
-    // itself within a class, so we pass get_name() even if brief is
+    // itself within a class, so we pass name() even if brief is
     // true.
-    write_instance(out, brief, indent_level, "", get_name(), "");
+    write_instance(out, brief, indent_level, "", name(), "");
 }
 
 // write_instance formats the parameter in the C++-like dc syntax as a typename and identifier.
@@ -183,7 +186,7 @@ void Parameter::write_instance(ostream &out, bool brief, int indent_level,
 void Parameter::output_typedef_name(ostream &out, bool, const string &prename,
                                     const string &name, const string &postname) const
 {
-    out << get_typedef()->get_name();
+    out << typedef()->name();
     if(!prename.empty() || !name.empty() || !postname.empty())
     {
         out << " " << prename << name << postname;
@@ -195,7 +198,7 @@ void Parameter::write_typedef_name(ostream &out, bool brief, int indent_level,
                                    const string &prename, const string &name,
                                    const string &postname) const
 {
-    indent(out, indent_level) << get_typedef()->get_name();
+    indent(out, indent_level) << typedef()->name();
     if(!prename.empty() || !name.empty() || !postname.empty())
     {
         out << " " << prename << name << postname;
@@ -214,7 +217,7 @@ void Parameter::write_typedef_name(ostream &out, bool brief, int indent_level,
 void SimpleParameter::output_instance(ostream &out, bool brief, const string &prename,
                                       const string &name, const string &postname) const
 {
-    if(get_typedef() != nullptr)
+    if(typedef() != nullptr)
     {
         output_typedef_name(out, brief, prename, name, postname);
 
@@ -317,7 +320,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
 void ArrayParameter::output_instance(ostream &out, bool brief, const string &prename,
                                      const string &name, const string &postname) const
 {
-    if(get_typedef() != nullptr)
+    if(typedef() != nullptr)
     {
         output_typedef_name(out, brief, prename, name, postname);
 
@@ -418,7 +421,7 @@ void Struct::write(ostream &out, bool brief, int indent_level) const
         //if (true || (*fi)->has_default_value()) {
         //  indent(out, indent_level + 2) << "// = ";
         //  Packer packer;
-        //  packer.set_unpack_data((*fi)->get_default_value());
+        //  packer.set_unpack_data((*fi)->default_value());
         //  packer.begin_unpack(*fi);
         //  packer.unpack_and_format(out, false);
         //  if (!packer.end_unpack()) {
@@ -531,7 +534,7 @@ void AtomicField::output_element(ostream &out, bool brief, Parameter *element) c
     if(!brief && element->has_default_value())
     {
         out << " = ";
-        format_value(element, element->get_default_value(), out);
+        format_value(element, element->default_value(), out);
     }
 }
 
@@ -540,7 +543,7 @@ void AtomicField::refresh_default_value()
     m_default_value = string();
     for(auto it = m_elements.begin(); it != m_elements.end(); ++it)
     {
-        m_default_value += (*it)->get_default_value();
+        m_default_value += (*it)->default_value();
     }
     m_default_value_stale = false;
 }
@@ -553,11 +556,11 @@ void MolecularField::output(ostream &out, bool brief) const
     if(!m_fields.empty())
     {
         auto field_it = m_fields.begin();
-        out << " : " << (*field_it)->get_name();
+        out << " : " << (*field_it)->name();
         ++field_it;
         while(field_it != m_fields.end())
         {
-            out << ", " << (*field_it)->get_name();
+            out << ", " << (*field_it)->name();
             ++field_it;
         }
     }

@@ -1,0 +1,18 @@
+# Line Length
+max-code-length=100
+
+# Brackets
+style=linux
+
+# Indentation
+indent=spaces=4
+indent-modifiers
+indent-col1-comments
+indent-labels
+
+# Whitespace
+pad-oper
+unpad-paren
+align-pointer=name
+align-reference=type
+convert-tabs

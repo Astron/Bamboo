@@ -2,11 +2,13 @@
 #pragma once
 #include <stdint.h> // for fixed-with integers
 #include <string>   // for std::string
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // A HashGenerator generates an arbitrary hash number from a sequence of ints.
-class HashGenerator {
+class HashGenerator
+{
   public:
     HashGenerator();
 
@@ -16,7 +18,7 @@ class HashGenerator {
     // add_string adds a string to the hash, by breaking it down into a sequence of integers.
     void add_string(const std::string& str);
 
-    uint32_t get_hash() const;
+    uint32_t hash() const;
 
   private:
     uint32_t m_hash;

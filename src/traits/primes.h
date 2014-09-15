@@ -1,7 +1,8 @@
 // Filename: primes.h
 #pragma once
 using namespace std;
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // get_prime returns the nth prime number.  This[0] returns 2, this[1] returns 3;

@@ -3,26 +3,27 @@
 #include <string>        // std::string
 #include <vector>        // std::vector
 #include <unordered_set> // std::unordered_set
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Forward declaration
 class HashGenerator;
 
 // KeywordList this is a list of keywords (see Keyword) that may be set on a particular field.
-class KeywordList {
+class KeywordList
+{
   public:
-    // empty list constructor
     KeywordList();
-    // copy constructor
-    KeywordList(const KeywordList& copy);
-    // copy assignment operator
-    void operator = (const KeywordList& copy);
+    KeywordList(const KeywordList&);
+    KeywordList& operator=(KeywordList);
+    friend void swap(KeywordList& lhs, KeywordList& rhs);
+    ~KeywordList() = default;
 
     // has_keyword returns true if this list includes the indicated keyword, false otherwise.
     bool has_keyword(const std::string& name) const;
-    // get_num_keywords returns the number of keywords in the list.
-    size_t get_num_keywords() const;
+    // num_keywordsnum_keywords returns the number of keywords in the list.
+    size_t num_keywords() const;
     // get_keyword returns the nth keyword in the list.
     const std::string& get_keyword(unsigned int n) const;
 
@@ -41,6 +42,9 @@ class KeywordList {
     std::vector<std::string> m_keywords; // the actual list of keywords
     std::unordered_set<std::string> m_keywords_by_name; // a map of name to keywords in list
 };
+
+
+void swap(KeywordList& lhs, KeywordList& rhs);
 
 
 } // close namespace bamboo

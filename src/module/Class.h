@@ -2,29 +2,34 @@
 #pragma once
 #include <unordered_map>
 #include "../module/Struct.h"
-namespace bamboo { // open namespace
+namespace bamboo   // open namespace
+{
 
 
 // A Class is a special type of struct that have a couple advanced object-oriented features:
 //     Classes can inherit from other classes (ie. have super-/sub-classes).
 //     Classes can have methods including a special constructor method.
 //     Unlike other structs, classes cannot have anonymous fields.
-class Class : public Struct {
+// Class's constructor throws null_error if the module is null.
+class Class : public Struct
+{
   public:
-    Class(Module *module, const std::string& name);
+    Class(Module *module, const std::string& name); // TODO: Throw null_error
+    Class(const Class&) = delete;
+    Class& operator=(const Class&) = delete;
     virtual ~Class();
 
     // as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
-    virtual Class *as_class();
-    virtual const Class *as_class() const;
+    Class *as_class() override;
+    const Class *as_class() const override;
 
-    // get_num_parents returns the number of superclasses this class inherits from.
-    inline size_t get_num_parents() const;
+    // num_parents returns the number of superclasses this class inherits from.
+    inline size_t num_parents() const;
     // get_parent returns the <n>th parent-/super-class this class inherits from.
     inline Class *get_parent(unsigned int n);
     inline const Class *get_parent(unsigned int n) const;
-    // get_num_children returns the number of subclasses that inherit from this class.
-    inline size_t get_num_children() const;
+    // num_children returns the number of subclasses that inherit from this class.
+    inline size_t num_children() const;
     // get_child returns the <n>th child-/sub-class that inherits this class.
     inline Class *get_child(unsigned int n);
     inline const Class *get_child(unsigned int n) const;
@@ -32,13 +37,13 @@ class Class : public Struct {
     // has_constructor returns true if this class has a constructor method,
     //     or false if it just uses the default constructor.
     inline bool has_constructor() const;
-    // get_constructor returns the constructor method for this class if it is defined,
+    // constructor returns the constructor method for this class if it is defined,
     //     or nullptr if the class uses the default constructor.
-    inline Field *get_constructor();
-    inline const Field *get_constructor() const;
+    inline Field *constructor();
+    inline const Field *constructor() const;
 
-    // get_num_base_fields returns the number of fields declared directly in this class.
-    inline size_t get_num_base_fields() const;
+    // num_base_fields returns the number of fields declared directly in this class.
+    inline size_t num_base_fields() const;
     // get_base_field returns the <n>th field from the class excluding any inherited fields.
     inline Field *get_base_field(unsigned int n);
     inline const Field *get_base_field(unsigned int n) const;
@@ -47,7 +52,7 @@ class Class : public Struct {
     void add_parent(Class *parent);
 
     // add_field adds a new Field to the class.
-    virtual bool add_field(Field *field);
+    bool add_field(Field *field) override; // TODO: Transition to unique_ptr<Field>
 
   private:
     // add_child marks a class as a child of this class.
@@ -58,7 +63,7 @@ class Class : public Struct {
     //     so that another field with the same name can be inserted.
     void shadow_field(Field *field);
 
-    Field *m_constructor;
+    Field *m_constructor = nullptr;
     std::vector<Field *> m_base_fields;
     std::unordered_map<std::string, Field *> m_base_fields_by_name;
 

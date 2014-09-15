@@ -2,9 +2,10 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
-#include "../module/DistributedType.h"
+#include "../module/Type.h"
 #include "../module/NumericRange.h"
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 // Foward declarations
@@ -13,7 +14,8 @@ class Field;
 class MolecularField;
 class Parameter;
 
-class DCToken {
+class DCToken
+{
   public:
     union {
         int8_t int8;
@@ -34,8 +36,8 @@ class DCToken {
         MolecularField *dmolecule;
         Method *dmethod;
         Parameter *dparam;
-        DistributedType *dtype;
-        NumericType *dnumeric;
+        Type *dtype;
+        Numeric *dnumeric;
     };
 
     std::string str;
@@ -44,7 +46,7 @@ class DCToken {
     NumericRange range;
     struct NameType {
         std::string name;
-        DistributedType *type;
+        Type *type;
     } nametype;
 };
 

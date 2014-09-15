@@ -2,36 +2,38 @@
 #pragma once
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
-#include "DistributedType.h"
-namespace bamboo { // open namespace
+#include "Type.h"
+namespace bamboo   // open namespace
+{
 
 // Forward declarations
 class Parameter;
 
 // A Method is a field for a distributed Class that typically represents a remote procedure call.
-class Method : public DistributedType {
+class Method : public Type
+{
   public:
     Method();
+    Method(const Method&) = delete;
+    Method& operator=(const Method&) = delete;
     virtual ~Method();
 
     // as_method returns this as a Method if it is a method, or nullptr otherwise.
-    virtual Method *as_method();
-    virtual const Method *as_method() const;
+    Method *as_method() override;
+    const Method *as_method() const override;
 
-    // get_num_parameters returns the number of parameters/arguments of the method.
-    inline size_t get_num_parameters() const;
+    // num_parameters returns the number of parameters/arguments of the method.
+    inline size_t num_parameters() const;
     // get_parameter returns the <n>th parameter of the method.
     inline Parameter *get_parameter(unsigned int n);
     inline const Parameter *get_parameter(unsigned int n) const;
-    // get_parameter_names returns a mapping of param names to param number in the method.
-    inline const std::unordered_map<std::string, unsigned int>& get_parameter_names() const;
-    // get_parameter_by_name returns the requested parameter or nullptr if there is no such param.
-    inline Parameter *get_parameter_by_name(const std::string& name);
-    inline const Parameter *get_parameter_by_name(const std::string& name) const;
+    // parameter_by_name returns the requested parameter or nullptr if there is no such param.
+    inline Parameter *parameter_by_name(const std::string& name);
+    inline const Parameter *parameter_by_name(const std::string& name) const;
 
     // add_parameter adds a new parameter to the method.
     //     Returns false if the parameter could not be added to the method.
-    bool add_parameter(Parameter *param);
+    bool add_parameter(Parameter *param); // TODO: Transition to unique_ptr<Parameter>
 
   private:
     std::vector<Parameter *> m_parameters; // the "arguments" or parameters of the method

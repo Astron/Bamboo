@@ -29,20 +29,20 @@ altnames = {
     'pack':        ['pack'],
 
     # Module
-    'get_num_classes':   ['get_num_classes',   'getNumClasses'],
-    'get_num_structs':   ['get_num_structs',   'getNumStructs'],
+    'num_classes':   ['num_classes',   'getNumClasses'],
+    'num_structs':   ['num_structs',   'getNumStructs'],
     'get_class':         ['get_class',         'getClass'],
     'get_struct':        ['get_struct',        'getStruct'],
-    'get_class_by_id':   ['get_class_by_id',   'getClassById'],
-    'get_class_by_name': ['get_class_by_name', 'getClassByName'],
-    'get_num_types':     ['get_num_types',     'getNumTypes'],
-    'get_type_by_id':    ['get_type_by_id',    'getTypeById'],
-    'get_type_by_name':  ['get_type_by_name',  'getTypeByName'],
-    'get_field_by_id':   ['get_field_by_id',   'getFieldById'],
-    'get_num_imports':   ['get_num_imports',   'getNumImports'],
+    'class_by_id':   ['class_by_id',   'getClassById'],
+    'class_by_name': ['class_by_name', 'getClassByName'],
+    'num_tyoes':     ['num_tyoes',     'getNumTypes'],
+    'type_by_id':    ['type_by_id',    'getTypeById'],
+    'type_by_name':  ['type_by_name',  'getTypeByName'],
+    'field_by_id':   ['field_by_id',   'getFieldById'],
+    'num_imports':   ['num_imports',   'getNumImports'],
     'get_import':        ['get_import',        'getImport'],
     'has_keyword':       ['has_keyword',       'hasKeyword'],
-    'get_num_keywords':  ['get_num_keywords',  'getNumKeywords'],
+    'num_keywords':  ['num_keywords',  'getNumKeywords'],
     'get_keyword':       ['get_keyword',       'getKeyword'],
     'add_class':         ['add_class',         'addClass'],
     'add_struct':        ['add_struct',        'addStruct'],
@@ -50,78 +50,78 @@ altnames = {
     'add_typedef':       ['add_typedef',       'addTypedef'],
     'add_keyword':       ['add_keyword',       'addKeyword'],
 
-    # DistributedType
-    'get_subtype':    ['get_subtype',    'getSubtype'],
+    # Type
+    'subtype':    ['subtype',    'getSubtype'],
     'has_fixed_size': ['has_fixed_size', 'hasFixedSize'],
-    'get_size':       ['get_size',       'getSize'],
+    'fixed_size':       ['fixed_size',       'getSize'],
     'has_alias':      ['has_alias',      'hasAlias'],
     'as_numeric':     ['as_numeric',     'asNumeric'],
     'as_array':       ['as_array',       'asArray'],
     'as_struct':      ['as_struct',      'asStruct'],
     'as_method':      ['as_method',      'asMethod'],
-    'get_alias':      ['get_alias',      'getAlias'],
+    'alias':      ['alias',      'getAlias'],
     'set_alias':      ['set_alias',      'setAlias'],
 
-    # NumericType
-    'get_divisor': ['get_divisor', 'getDivisor'],
+    # Numeric
+    'divisor': ['divisor', 'getDivisor'],
     'has_modulus': ['has_modulus', 'hasModulus'],
-    'get_modulus': ['get_modulus', 'getModulus'],
+    'modulus': ['modulus', 'getModulus'],
     'has_range':   ['has_range',   'hasRange'],
-    'get_range':   ['get_range',   'getRange'],
+    'range':   ['range',   'getRange'],
     'set_divisor': ['set_divisor', 'setDivisor'],
     'set_modulus': ['set_modulus', 'setModulus'],
     'set_range':   ['set_range',   'setRange'],
 
-    # ArrayType
-    'get_element_type': ['get_element_type', 'getElementType'],
-    'get_array_size':   ['get_array_size',   'getArraySize'],
+    # Array
+    'element_type': ['element_type', 'getElementType'],
+    'array_size':   ['array_size',   'getArraySize'],
     #'has_range':       ['has_range',        'hasRange'],
-    #'get_range':       ['get_range',        'getRange'],
+    #'range':       ['range',        'getRange'],
 
     # Method
-    'get_num_parameters':    ['get_num_parameters',    'getNumParameters'],
+    'num_parameters':    ['num_parameters',    'getNumParameters'],
     'get_parameter':         ['get_parameter',         'getParameter'],
-    'get_parameter_by_name': ['get_parameter_by_name', 'getParameterByName'],
+    'parameter_by_name': ['parameter_by_name', 'getParameterByName'],
     'add_parameter':         ['add_parameter',         'addParameter'],
 
     # Struct
-    'get_id':            ['get_id',            'getId'],
-    'get_name':          ['get_name',          'getName'],
-    'get_module':        ['get_module',        'getModule'],
-    'get_num_fields':    ['get_num_fields',    'getNumFields'],
+    'id':                ['id',                'getId'],
+    'name':          ['name',          'getName'],
+    'module':        ['module',        'getModule'],
+    'num_fields':    ['num_fields',    'getNumFields'],
     'get_field':         ['get_field',         'getField'],
-    'get_field_by_id':   ['get_field_by_id',   'getFieldById'],
-    'get_field_by_name': ['get_field_by_name', 'getFieldByName'],
+    'field_by_id':   ['field_by_id',   'getFieldById'],
+    'field_by_name': ['field_by_name', 'getFieldByName'],
     'add_field':         ['add_field',         'addField'],
 
     # Class
-    'get_num_parents':     ['get_num_parents',     'getNumParents'],
+    'num_parents':     ['num_parents',     'getNumParents'],
     'get_parent':          ['get_parent',          'getParent'],
-    'get_num_children':    ['get_num_children',    'getNumChildren'],
+    'num_children':    ['num_children',    'getNumChildren'],
     'get_child':           ['get_child',           'getChild'],
     'has_constructor':     ['has_constructor',     'hasConstructor'],
-    'get_constructor':     ['get_constructor',     'getConstructor'],
-    'get_num_base_fields': ['get_num_base_fields', 'getNumBaseFields'],
+    'constructor':     ['constructor',     'getConstructor'],
+    'num_base_fields': ['num_base_fields', 'getNumBaseFields'],
     'get_base_field':      ['get_base_field',      'getBaseField'],
     'add_parent':          ['add_parent',          'addParent'],
 
     # Parameter
-    #'get_name':         ['get_name',          'getName'],
-    'get_type':          ['get_type',          'getType'],
+    #'name':         ['name',          'getName'],
+    'type':          ['type',          'getType'],
     'get_method':        ['get_method',        'getMethod'],
     'has_default_value': ['has_default_value', 'hasDefaultValue'],
-    'get_default_value': ['get_default_value', 'getDefaultValue'],
+    'default_value': ['default_value', 'getDefaultValue'],
     'set_name':          ['set_name',          'setName'],
     'set_type':          ['set_type',          'setType'],
     'set_default_value': ['set_default_value', 'setDefaultValue'],
 
     # Field
-    #'get_id':            ['get_id',            'getId'],
-    #'get_name':          ['get_name',          'getName'],
-    #'get_type':          ['get_type',          'getType'],
-    #'get_struct':        ['get_struct',        'getStruct'],
+    #'id':                ['id',                'getId'],
+    #'name':          ['name',          'getName'],
+    #'type':              ['type',              'getType'],
+    'record':            ['record'],
     #'has_default_value': ['has_default_value', 'hasDefaultValue'],
-    #'get_default_value': ['get_default_value', 'getDefaultValue'],
+    #'default_value':     ['default_value',     'getDefaultValue'],
     #'set_name':          ['set_name',          'setName'],
     #'set_type':          ['set_type',          'setType'],
     #'set_default_value': ['set_default_value', 'setDefaultValue'],
@@ -167,7 +167,7 @@ altnames = {
     'read_remainder': ['read_remainder', 'readRemainder'],
     'read_value':     ['read_value',     'readValue'],
     'read_packed':    ['read_packed',    'readPacked'],
-    'get_remaining':  ['get_remaining',  'getRemaining'],
+    'remaining':  ['remaining',  'getRemaining'],
     'skip_type':      ['skip_type',      'skipType'],
 
     # traits/hashes.h
@@ -183,15 +183,15 @@ classDocstrings = {
     'Module':
 'A Module represents the complete list of Distributed Class definitions that define a particular ' +
 'protocol. Typically, parsed from one or more \\".dc\\" or other bamboo protocol description files.',
-    'DistributedType':
-'A DistributedType represents any bamboo type. DistributedTypes have a defined layout of data.',
-    'NumericType':
-'A NumericType can represent any of the basic number types (ie. integers, floats, etc).  ' +
-'A NumericType may also have a range and/or modulus to limit its possible values, '        +
+    'Type':
+'A Type represents any bamboo type. Types have a defined layout of data.',
+    'Numeric':
+'A Numeric can represent any of the basic number types (ie. integers, floats, etc).  ' +
+'A Numeric may also have a range and/or modulus to limit its possible values, '        +
 'and/or a divisor representing a fixed-point numeric convention.  '                        +
 'A divisor scales up any range or modulus to constrain up to (constraint * divisor).',
-    'ArrayType':
-'An ArrayType represents an array of some other kind of object, meaning ' +
+    'Array':
+'An Array represents an array of some other kind of object, meaning ' +
 'this parameter type accepts an arbitrary (or possibly fixed) number of ' +
 ' nested fields, all of which are of the same type.  '                    +
 'Strings and blobs are arrays with char and uint8 elements respectively.',
@@ -240,7 +240,7 @@ functionDocstrings = {
 'When appending from a stream, a filename is optional only used to report errors.',
         'parse_dcvalue':
 'Reads a .dc-formatted parameter value and outputs the data in wire form matching ' +
-'the appropriate DistributedType and suitable for a default parameter value.  '     +
+'the appropriate Type and suitable for a default parameter value.  '     +
 'If an error occurs, the error reason is returned instead of the parsed value.',
     },
 }
@@ -260,33 +260,33 @@ methodDocstrings = {
     },
 
     'Module': {
-        'get_num_classes':
+        'num_classes':
 'Returns the number of classes in the module.',
-        'get_num_structs':
+        'num_structs':
 'Returns the number of structs in the module.',
         'get_class':
 'Returns the <n>th Class in the module.',
         'get_struct':
 'Returns the <n>th Struct in the module.',
-        'get_class_by_id':
+        'class_by_id':
 'Returns the requested Class or None if there is no such class.',
-        'get_class_by_name':
+        'class_by_name':
 'Returns the requested Class or None if there is no such class.',
-        'get_num_types':
+        'num_tyoes':
 'Returns the number of types in the module (classes, structs, typedefs).',
-        'get_type_by_id':
-'Returns the requested DistributedType or None if there is no such type.',
-        'get_type_by_name':
-'Returns the requested DistributedType or None if there is no such type.',
-        'get_field_by_id':
+        'type_by_id':
+'Returns the requested Type or None if there is no such type.',
+        'type_by_name':
+'Returns the requested Type or None if there is no such type.',
+        'field_by_id':
 'Returns the requested Field or None if there is no such type.',
-        'get_num_imports':
+        'num_imports':
 'Returns the number of imports in the module.',
         'get_import':
 'Returns the <n>th import in the module.',
         'has_keyword':
 'Returns true if a keyword with the name <keyword> is declared in the module.',
-        'get_num_keywords':
+        'num_keywords':
 'Returns the number of keywords declared in the module.',
         'get_keyword':
 'Returns the <n>th keyword declared in the module.',
@@ -302,39 +302,39 @@ methodDocstrings = {
 'Adds the keyword to the list of keywords accepted by the module.'
     },
 
-    'DistributedType': {
-        'get_subtype':
+    'Type': {
+        'subtype':
 'Returns the type\'s fundamental type as an integer constant.',
         'has_fixed_size':
-'Returns true if the DistributedType has a fixed size in bytes.',
-        'get_size':
-'Returns the size of the DistributedType in bytes or 0 if it is variable.',
+'Returns true if the Type has a fixed size in bytes.',
+        'fixed_size':
+'Returns the size of the Type in bytes or 0 if it is variable.',
         'has_alias':
 'Returns true if this type was defined the an aliased name.',
         'as_numeric':
-'Returns this as a NumericType if it is numeric, or None otherwise.',
+'Returns this as a Numeric if it is numeric, or None otherwise.',
         'as_array':
-'Returns this as an ArrayType if it is an array, or None otherwise.',
+'Returns this as an Array if it is an array, or None otherwise.',
         'as_struct':
 'Returns this as a Struct if it is a struct, or None otherwise.',
         'as_method':
 'Returns this as a Method if it is a method, or None otherwise.',
-        'get_alias':
+        'alias':
 'Returns the name used to define the type, or the empty string.',
         'set_alias':
 'Gives this type an alternate name <alias>.'
     },
 
-    'NumericType': {
-        'get_divisor':
+    'Numeric': {
+        'divisor':
 'Retuns the divisior of the numeric, with a default value of one.',
        'has_modulus':
 'Returns true if the numeric is constrained by a modulus.',
-        'get_modulus':
+        'modulus':
 'Returns a double precision floating-point representation of the modulus value.',
        'has_range':
 'Returns true if the numeric is constrained by a range.',
-        'get_range':
+        'range':
 'Returns the NumericRange that constrains this type\'s values.',
         'set_divisor':
 'Sets a divisor for the numeric type, typically to represent fixed point.  ' +
@@ -347,65 +347,65 @@ methodDocstrings = {
 'Returns false if the range is not valid for this type.'
     },
 
-    'ArrayType': {
-        'get_element_type':
+    'Array': {
+        'element_type':
 'Returns the type of the individual elements of this array.',
-        'get_array_size':
+        'array_size':
 'Returns the fixed number of elements in this array, or 0 ' +
 'if the array may contain a variable number of elements.',
         'has_range':
 'Returns true if there is a constraint on the range of valid array sizes.  ' +
 'This is always true for fixed-size arrays.',
-        'get_range':
+        'range':
 'Returns the range of sizes that the array may have.'
     },
 
     'Method': {
-        'get_num_parameters':
+        'num_parameters':
 'Returns the number of parameters/arguments of the method.',
         'get_parameter':
 'Returns the <n>th parameter of the method.',
-        'get_parameter_by_name':
+        'parameter_by_name':
 'Returns the requested parameter or None if there is no such param.',
         'add_parameter':
 'Gives ownership of the Parameter to the Method returning false if there is a name conflict.',
     },
 
     'Struct': {
-        'get_id':
+        'id':
 'Returns a unique index number associated with this struct.',
-        'get_name':
+        'name':
 'Returns the name of this struct.',
-        'get_module':
+        'module':
 'Returns the Module object that contains the struct.',
-        'get_num_fields':
+        'num_fields':
 'Returns the number of fields in the struct.',
         'get_field':
 'Returns the <n>th field of the struct.',
-        'get_field_by_id':
+        'field_by_id':
 'Returns the field with the index <id>, or None if no such field exists.',
-        'get_field_by_name':
+        'field_by_name':
 'Returns the field with <name>, or None if no such field exists.',
         'add_field':
 'Gives ownership of the Field to the Struct returning false if there is a name conflict.',
     },
 
     'Class': {
-        'get_num_parents':
+        'num_parents':
 'Returns the number of superclasses this class inherits from.',
         'get_parent':
 'Returns the <n>th parent-/super-class this class inherits from.',
-        'get_num_children':
+        'num_children':
 'Returns the number of subclasses that inherit from this class.',
         'get_child':
 'Returns the <n>th child-/sub-class that inherits this class.',
         'has_constructor':
 'Returns true if this class has a constructor method, ' +
 'or false if it just uses the default constructor.',
-        'get_constructor':
+        'constructor':
 'Returns the constructor method for this class if it is defined, ' +
 'or nullptr if the class uses the default constructor.',
-        'get_num_base_fields':
+        'num_base_fields':
 'Returns the number of fields declared directly in this class.',
         'get_base_field':
 'Returns the <n>th field from the class excluding any inherited fields.',
@@ -414,22 +414,22 @@ methodDocstrings = {
     },
 
     'Parameter': {
-        'get_name':
+        'name':
 'Returns the parameter\'s name.  An unnamed parameter returns the empty string.',
-        'get_type':
-'Returns the DistributedType of the Parameter.',
+        'type':
+'Returns the Type of the Parameter.',
         'get_method':
 'Returns the Method that contains the Parameter.',
         'has_default_value':
 'Returns true if a default value was defined for this parameter.',
-        'get_default_value':
+        'default_value':
 'Returns the default value for this parameter.  ' +
 'If a default value hasn\'t been set, returns an implicit default.',
         'set_name':
 'Sets the name of this parameter.  Returns false if a parameter with ' +
 'the same name already exists in the containing method.',
         'set_type':
-'Sets the DistributedType of the parameter and clear\'s the default value.  ' +
+'Sets the Type of the parameter and clear\'s the default value.  ' +
 'Returns false if a parameter cannot represent <type>.',
         'set_default_value':
 'Defines a default value for this parameter.  ' +
@@ -437,24 +437,24 @@ methodDocstrings = {
     },
 
     'Field': {
-        'get_id':
+        'id':
 'Returns a unique index number associated with this field.',
-        'get_name':
+        'name':
 'Returns the field\'s name.  An unnamed field returns the empty string.',
-        'get_type':
-'Returns the DistributedType of the field.',
-        'get_struct':
-'Returns the Struct that contains this field.',
+        'type':
+'Returns the Type of the field.',
+        'record':
+'Returns the Class or Struct that contains this field.',
         'has_default_value':
 'Returns true if a default value was defined for this field.',
-        'get_default_value':
+        'default_value':
 'Returns the default value for this field.  ' +
 'If a default value hasn\'t been set, returns an implicit default.',
         'set_name':
 'Sets the name of this field.  Returns false if a field with ' +
 'the same name already exists in the containing method.',
         'set_type':
-'Sets the DistributedType of the field and clear\'s the default value.  ' +
+'Sets the Type of the field and clear\'s the default value.  ' +
 'Returns false if a field cannot represent <type>.',
         'set_default_value':
 'Defines a default value for this field.  ' +
@@ -548,10 +548,10 @@ methodDocstrings = {
         'read_remainder':
 'Reads the remainder of the datagram.',
         'read_value':
-'Reads the Value for a DistributedType from the datagram.',
+'Reads the Value for a Type from the datagram.',
         'read_packed':
-'Reads a Value for a DistributedType and returns it as a buffer converted to native endianness.',
-        'get_remaining':
+'Reads a Value for a Type and returns it as a buffer converted to native endianness.',
+        'remaining':
 'Returns the number of unread bytes left in the Datagram.',
         'tell':
 'Returns the current offset in bytes of the DatagramIterator into the datagram,.',
@@ -561,7 +561,7 @@ methodDocstrings = {
 'Increments the current offset into the datagram by N.  ' +
 'Throws DatagramIteratorEOF if it skips past the end of the datagram.',
         'skip_type':
-'Seeks past the packed data for a DistributedType.  ' +
+'Seeks past the packed data for a Type.  ' +
 'Throws DatagramIteratorEOF if it skips past the end of the datagram.',
     },
 }

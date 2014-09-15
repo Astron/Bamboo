@@ -2,37 +2,40 @@
 #include "Field.h"
 #include "../module/Module.h"
 #include "../module/Struct.h"
-#include "../values/Value.h"
+#include "Value.h"
 using namespace std;
-namespace bamboo { // open namespace
+namespace bamboo   // open namespace
+{
 
 // constructor
-Field::Field(DistributedType *type, const string& name) :
-    m_struct(nullptr), m_id(0), m_name(name), m_type(type),
-    m_default_value(Value::from_type(type, m_has_default_value)) {
-    if(m_type == nullptr) {
-        m_type = DistributedType::invalid;
-    }
+Field::Field(Type *type, const string& name) : m_type(type), m_name(name)
+{
+    if(m_type == nullptr) { m_type = Type::invalid; }
 }
 
 // destructor
-Field::~Field() {
+Field::~Field()
+{
     delete m_type;
+    delete m_default_value;
 }
 
 // as_molecular returns this as a MolecularField if it is molecular, or nullptr otherwise.
-MolecularField *Field::as_molecular() {
+MolecularField *Field::as_molecular()
+{
     return nullptr;
 }
-const MolecularField *Field::as_molecular() const {
+const MolecularField *Field::as_molecular() const
+{
     return nullptr;
 }
 
 // set_name sets the name of this field.  Returns false if a field with
 //     the same name already exists in the containing struct.
-bool Field::set_name(const string& name) {
+bool Field::set_name(const string& name)
+{
     // Check to make sure no other fields in our struct have this name
-    if(m_struct != nullptr && m_struct->get_field_by_name(name) != nullptr) {
+    if(m_struct != nullptr && m_struct->field_by_name(name) != nullptr) {
         return false;
     }
 
@@ -41,33 +44,47 @@ bool Field::set_name(const string& name) {
 }
 
 // set_type sets the distributed type of the field and clear's the default value.
-void Field::set_type(DistributedType *type) {
+void Field::set_type(Type *type)
+{
     m_type = type;
-    m_default_value = Value::from_type(type, m_has_default_value);
+
+    // Reset our default value, if we had one
+    if(m_default_value != nullptr) {
+        delete m_default_value;
+        m_default_value = nullptr;
+    }
 }
 
 // set_default_value establishes a default value for this field.
 //     Returns false if the value is invalid for the field.
-bool Field::set_default_value(const Value default_value) {
+bool Field::set_default_value(const Value& default_value)
+{
     // TODO: Validate default value
-    m_has_default_value = true;
-    m_default_value = default_value;
+    if(m_default_value != nullptr) { delete m_default_value; }
+    m_default_value = new Value(default_value);
     return true;
 }
-bool Field::set_default_value(const vector<uint8_t>& default_value) {
+bool Field::set_default_value(const Value *default_value)
+{
+    return set_default_value(*default_value);
+}
+bool Field::set_default_value(const vector<uint8_t>& default_value)
+{
     // TODO: Validate default value
-    m_has_default_value = true;
-    m_default_value = Value::from_packed(m_type, default_value);
+    if(m_default_value != nullptr) { delete m_default_value; }
+    m_default_value = new Value(m_type, default_value);
     return true;
 }
 
 // set_id sets the unique index number associated with the field.
-void Field::set_id(unsigned int id) {
+void Field::set_id(unsigned int id)
+{
     m_id = id;
 }
 
 // set_struct sets a pointer to the struct containing the field.
-void Field::set_struct(Struct *strct) {
+void Field::set_struct(Struct *strct)
+{
     m_struct = strct;
 }
 

@@ -1,7 +1,8 @@
 // Filename: traits.h
 #pragma once
 #include <stdint.h>
-namespace bamboo { // open namespace bamboo
+namespace bamboo   // open namespace bamboo
+{
 
 
 #ifdef BAMBOO_32BIT_SIZETAG
