@@ -124,7 +124,7 @@ def generate(file_):
     clsModule.add_constructor([])
     add_method(clsModule, 'num_classes', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_structs', retval('size_t'), [], is_const = True)
-    add_method(clsModule, 'num_tyoes', retval('size_t'), [], is_const = True)
+    add_method(clsModule, 'num_types', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_class',
                retval_child('bamboo::Class *'),
                [param('unsigned int', 'n')])

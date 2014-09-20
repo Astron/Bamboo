@@ -876,19 +876,19 @@ _wrap_PyBambooModule_getNumTypes(PyBambooModule *self)
     PyObject *py_retval;
     size_t retval;
 
-    retval = self->obj->num_tyoes();
+    retval = self->obj->num_types();
     py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
     return py_retval;
 }
 
 
 PyObject *
-_wrap_PyBambooModule_num_tyoes(PyBambooModule *self)
+_wrap_PyBambooModule_num_types(PyBambooModule *self)
 {
     PyObject *py_retval;
     size_t retval;
 
-    retval = self->obj->num_tyoes();
+    retval = self->obj->num_types();
     py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
     return py_retval;
 }
@@ -1486,7 +1486,7 @@ static PyMethodDef PyBambooModule_methods[] = {
     {(char *) "class_by_id", (PyCFunction) _wrap_PyBambooModule_class_by_id, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
     {(char *) "get_keyword", (PyCFunction) _wrap_PyBambooModule_get_keyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword declared in the module." },
     {(char *) "getNumTypes", (PyCFunction) _wrap_PyBambooModule_getNumTypes, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
-    {(char *) "num_tyoes", (PyCFunction) _wrap_PyBambooModule_num_tyoes, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
+    {(char *) "num_types", (PyCFunction) _wrap_PyBambooModule_num_types, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
     {(char *) "num_imports", (PyCFunction) _wrap_PyBambooModule_num_imports, METH_NOARGS, "Returns the number of imports in the module." },
     {(char *) "addImport", (PyCFunction) _wrap_PyBambooModule_addImport, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Import to the Module, merging it with any duplicate modules." },
     {(char *) "add_class", (PyCFunction) _wrap_PyBambooModule_add_class, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Class to the Module returning false if there is a name conflict." },

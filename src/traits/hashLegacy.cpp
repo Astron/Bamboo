@@ -61,7 +61,7 @@ void hash_module(HashGenerator& hashgen, const Module *file)
     hashgen.add_int(1); // (dc_virtual_inheritance && dc_sort_inheritance_by_file)
     hashgen.add_int(file->num_structs() + file->num_classes());
 
-    size_t num_types = file->num_tyoes();
+    size_t num_types = file->num_types();
     for(unsigned int i = 0; i < num_types; ++i) {
         const Type *type = file->type_by_id(i);
         if(!type->as_struct()) {

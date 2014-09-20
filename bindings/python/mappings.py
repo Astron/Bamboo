@@ -35,7 +35,7 @@ altnames = {
     'get_struct':        ['get_struct',        'getStruct'],
     'class_by_id':   ['class_by_id',   'getClassById'],
     'class_by_name': ['class_by_name', 'getClassByName'],
-    'num_tyoes':     ['num_tyoes',     'getNumTypes'],
+    'num_types':     ['num_types',     'getNumTypes'],
     'type_by_id':    ['type_by_id',    'getTypeById'],
     'type_by_name':  ['type_by_name',  'getTypeByName'],
     'field_by_id':   ['field_by_id',   'getFieldById'],
@@ -272,7 +272,7 @@ methodDocstrings = {
 'Returns the requested Class or None if there is no such class.',
         'class_by_name':
 'Returns the requested Class or None if there is no such class.',
-        'num_tyoes':
+        'num_types':
 'Returns the number of types in the module (classes, structs, typedefs).',
         'type_by_id':
 'Returns the requested Type or None if there is no such type.',
