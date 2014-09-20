@@ -18,8 +18,8 @@
 	using namespace bamboo;
 
 	static int yyinput(void); // declared by flex.
-	extern int bamboo::dclex();
 	extern "C" int should_lexer_wrap();
+  namespace bamboo { extern int dclex(); }
 
 	#define YY_DECL int bamboo::dclex(void)
 	#define yywrap should_lexer_wrap

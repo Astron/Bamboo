@@ -1,6 +1,5 @@
 // Filename: primes.h
 #pragma once
-using namespace std;
 namespace bamboo   // open namespace bamboo
 {
 

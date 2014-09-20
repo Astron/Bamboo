@@ -6,7 +6,7 @@ namespace bamboo   // open namespace bamboo
 
 
 // Forward declarations
-class Value;
+struct Value;
 
 // format_value steps through a Value and outputs it as a .dc file parameter value.
 std::string format_value(const Value& value);

@@ -9,7 +9,7 @@ namespace bamboo   // open namespace bamboo
 // Foward declarations
 class Type;
 class Method;
-class Value;
+struct Value;
 class HashGenerator;
 
 // A Parameter is a single argument/parameter of a Method.

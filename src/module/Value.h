@@ -12,7 +12,7 @@ namespace bamboo   // open namespace bamboo
 
 
 // Foward declarations
-struct Type;
+class Type;
 
 // A Value is a variant that can represent the value of any Bamboo::Type.
 // Value's constructor throws null_error if the type is null or invalid_type if the type is invalid.

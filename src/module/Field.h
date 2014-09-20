@@ -9,7 +9,7 @@ class Type;
 class Module;
 class Class;
 class Struct;
-class Value;
+struct Value;
 class MolecularField;
 class HashGenerator;
 

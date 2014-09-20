@@ -12,7 +12,7 @@ namespace bamboo    // close namespace bamboo
 
 // Foward Declarations
 class Type;
-class Value;
+struct Value;
 
 // A DatagramOverflow is an exception which occurs when an add_<value> method is called which would
 // increase the size of the datagram past DGSIZE_MAX (preventing integer and buffer overflow).
