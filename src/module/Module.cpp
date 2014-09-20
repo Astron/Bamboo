@@ -14,28 +14,6 @@ Module::Module()
 {
 }
 
-//destructor
-Module::~Module()
-{
-    for(auto it = m_classes.begin(); it != m_classes.end(); ++it) {
-        delete(*it);
-    }
-    for(auto it = m_structs.begin(); it != m_structs.end(); ++it) {
-        delete(*it);
-    }
-    for(auto it = m_imports.begin(); it != m_imports.end(); ++it) {
-        delete(*it);
-    }
-
-    m_classes.clear();
-    m_structs.clear();
-    m_imports.clear();
-    m_types_by_id.clear();
-    m_types_by_name.clear();
-    m_fields_by_id.clear();
-    m_keywords.clear();
-}
-
 // class_by_id returns the requested class or nullptr if there is no such class.
 Class *Module::class_by_id(unsigned int id)
 {
@@ -86,44 +64,48 @@ const Class *Module::class_by_name(const std::string& name) const
 // add_class adds the newly-allocated class to the module.
 //     Returns false if there is a name conflict.
 //     The Module becomes the owner of the pointer and will delete it when it destructs.
-bool Module::add_class(Class *cls)
+bool Module::add_class(std::unique_ptr<Class> cls)
 {
+    Class *ref = cls.get();
+
     // Classes have to have a name
     if(cls->name().empty()) {
         return false;
     }
 
     // A Class can't share a name with any other type.
-    bool inserted = m_types_by_name.insert(TypeName(cls->name(), cls)).second;
+    bool inserted = m_types_by_name.insert(TypeName(cls->name(), ref)).second;
     if(!inserted) {
         return false;
     }
 
     cls->set_id(m_types_by_id.size());
-    m_types_by_id.push_back(cls);
-    m_classes.push_back(cls);
+    m_types_by_id.push_back(ref);
+    m_classes.push_back(move(cls));
     return true;
 }
 
 // add_struct adds the newly-allocated struct to the module.
 //     Returns false if there is a name conflict.
 //     The Module becomes the owner of the pointer and will delete it when it destructs.
-bool Module::add_struct(Struct *strct)
+bool Module::add_struct(std::unique_ptr<Struct> record)
 {
+    Struct *ref = record.get();
+
     // Structs have to have a name
-    if(strct->name().empty()) {
+    if(record->name().empty()) {
         return false;
     }
 
     // A Struct can't share a name with any other type.
-    bool inserted = m_types_by_name.insert(TypeName(strct->name(), strct)).second;
+    bool inserted = m_types_by_name.insert(TypeName(record->name(), ref)).second;
     if(!inserted) {
         return false;
     }
 
-    strct->set_id(m_types_by_id.size());
-    m_types_by_id.push_back(strct);
-    m_structs.push_back(strct);
+    record->set_id(m_types_by_id.size());
+    m_types_by_id.push_back(ref);
+    m_structs.push_back(move(record));
     return true;
 }
 
@@ -142,10 +124,10 @@ bool Module::add_typedef(const std::string& name, Type *type)
 
 // add_import adds a newly-allocated import to the module.
 //     Imports with duplicate modules are combined.
-void Module::add_import(Import *import)
+void Module::add_import(std::unique_ptr<Import> import)
 {
     // TODO: Combine duplicates
-    m_imports.push_back(import);
+    m_imports.push_back(move(import));
 }
 
 // add_keyword adds a keyword with the name <keyword> to the list of declared keywords.

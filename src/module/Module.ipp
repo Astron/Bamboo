@@ -12,10 +12,10 @@ inline size_t Module::num_classes() const {
 }
 // get_class returns the <n>th class read from the dcfile(s).
 inline Class *Module::get_class(unsigned int n) {
-    return m_classes.at(n);
+    return m_classes.at(n).get();
 }
 inline const Class *Module::get_class(unsigned int n) const {
-    return m_classes.at(n);
+    return m_classes.at(n).get();
 }
 
 // num_structs returns the number of structs in the module.
@@ -24,15 +24,15 @@ inline size_t Module::num_structs() const {
 }
 // get_struct returns the <n>th struct in the module.
 inline Struct *Module::get_struct(unsigned int n) {
-    return m_structs.at(n);
+    return m_structs.at(n).get();
 }
 inline const Struct *Module::get_struct(unsigned int n) const {
-    return m_structs.at(n);
+    return m_structs.at(n).get();
 }
 
-// num_tyoes returns the number of types in the module.
-//     All type ids will be within the range 0 <= id < num_tyoes().
-inline size_t Module::num_tyoes() const {
+// num_types returns the number of types in the module.
+//     All type ids will be within the range 0 <= id < num_types().
+inline size_t Module::num_types() const {
     return m_types_by_id.size();
 }
 
@@ -91,10 +91,10 @@ inline size_t Module::num_imports() const {
 }
 // get_import retuns the <n>th import in the module.
 inline Import *Module::get_import(unsigned int n) {
-    return m_imports.at(n);
+    return m_imports.at(n).get();
 }
 inline const Import *Module::get_import(unsigned int n) const {
-    return m_imports.at(n);
+    return m_imports.at(n).get();
 }
 
 // has_keyword returns true if a keyword with the name <keyword> is declared in the module.

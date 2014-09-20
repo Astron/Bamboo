@@ -3,6 +3,7 @@
 #include <string>        // std::string
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
+#include <memory>        // std::unique_ptr
 namespace bamboo   // open namespace
 {
 
@@ -30,7 +31,6 @@ class Module
     Module(); // constructor
     Module(const Module&) = delete;
     Module& operator=(const Module&) = delete;
-    ~Module(); // destructor
 
     // num_classes returns the number of classes in the module.
     inline size_t num_classes() const;
@@ -51,9 +51,9 @@ class Module
     Class *class_by_name(const std::string& name);
     const Class *class_by_name(const std::string& name) const;
 
-    // num_tyoes returns the number of types in the module.
-    //     All type ids will be within the range 0 <= id < num_tyoes().
-    inline size_t num_tyoes() const;
+    // num_types returns the number of types in the module.
+    //     All type ids will be within the range 0 <= id < num_types().
+    inline size_t num_types() const;
     // type_by_id returns the requested type or nullptr if there is no such type.
     inline Type *type_by_id(unsigned int id);
     inline const Type *type_by_id(unsigned int id) const;
@@ -80,15 +80,15 @@ class Module
 
     // add_class adds the newly-allocated class to the module.
     //     Returns false if there is a name conflict.
-    bool add_class(Class *dclass); // TODO: Transition to unique_ptr<Class>
+    bool add_class(std::unique_ptr<Class> dclass);
 
     // add_struct adds the newly-allocated struct definition to the module.
     //     Returns false if there is a name conflict.
-    bool add_struct(Struct *dstruct); // TODO: Transition to unique_ptr<Struct>
+    bool add_struct(std::unique_ptr<Struct> dstruct);
 
     // add_import adds a newly-allocated import to the module.
     //     Imports with duplicate modules are combined.
-    void add_import(Import *import); // TODO: Transition to unique_ptr<Import>
+    void add_import(std::unique_ptr<Import> import);
 
     // add_typedef adds the alias <name> to the module for the type <type>.
     //     Returns false if there is a name conflict.
@@ -103,9 +103,9 @@ class Module
     friend class Class;
     friend class Struct;
 
-    std::vector<Struct *> m_structs;
-    std::vector<Class *> m_classes;
-    std::vector<Import *> m_imports; // list of python imports in the module
+    std::vector<std::unique_ptr<Struct> > m_structs;
+    std::vector<std::unique_ptr<Class> > m_classes;
+    std::vector<std::unique_ptr<Import> > m_imports; // list of python imports in the module
     std::vector<std::string> m_keywords;
 
     std::vector<Field *> m_fields_by_id;
