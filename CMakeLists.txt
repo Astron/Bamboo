@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 project(Bamboo)
-include_directories(src)
 
 ## Compiler-specific flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
@@ -108,53 +107,88 @@ if(GENERATE_PARSER)
   endif(FLEX_FOUND)
 endif()
 
+## Source files
+include_directories(src)
+
 # no dependencies
-set(BITS_SOURCES src/bits/bits.cpp)
+set(BITS_FILES
+  src/bits/byteorder.h
+  src/bits/errors.h
+  src/bits/sizetag.h
+  src/bits/buffers.h
+  src/bits/bits.cpp)
+source_group("Bits" FILES ${BITS_FILES})
 
 # depends: bits
-set(MODULE_SOURCES
+set(MODULE_FILES
+  src/module/Type.h
+  src/module/Type.ipp
   src/module/Type.cpp
+  src/module/Numeric.h
+  src/module/Numeric.ipp
   src/module/Numeric.cpp
+  src/module/Array.h
+  src/module/Array.ipp
   src/module/Array.cpp
+  src/module/Struct.h
+  src/module/Struct.ipp
   src/module/Struct.cpp
+  src/module/Class.h
+  src/module/Class.ipp
   src/module/Class.cpp
+  src/module/Method.h
+  src/module/Method.ipp
   src/module/Method.cpp
+  src/module/KeywordList.h
   src/module/KeywordList.cpp
+  src/module/Module.h
+  src/module/Module.ipp
   src/module/Module.cpp
+  src/module/Field.h
+  src/module/Field.ipp
   src/module/Field.cpp
+  src/module/MolecularField.h
   src/module/MolecularField.cpp
+  src/module/Parameter.h
+  src/module/Parameter.ipp
   src/module/Parameter.cpp
+  src/module/Value.h
   src/module/Value.cpp)
+source_group("Module" FILES ${MODULE_FILES})
 
 # depends: module
-set(TRAITS_SOURCES
+set(TRAITS_FILES
+  src/traits/hashes.h
   src/traits/hashLegacy.cpp
+  src/traits/HashGenerator.h
   src/traits/HashGenerator.cpp
+  src/traits/primes.h
   src/traits/primes.cpp)
-
-# depends: module
-set(OBJECTS_SOURCES)
+source_group("Traits" FILES ${TRAITS_FILES})
 
 # depends: bits, module
-set(DCFILE_SOURCES
+set(DCFILE_FILES
   src/dcfile/parser.cpp
   src/dcfile/lexer.cpp
   src/dcfile/write.cpp
   src/dcfile/format.cpp)
+source_group("DCFile" FILES ${DCFILE_FILES})
 
 # depends: bits, module
-set(WIRE_SOURCES
+set(WIRE_FILES
+  src/wire/Datagram.h
   src/wire/Datagram.cpp
+  src/wire/DatagramIterator.h
   src/wire/DatagramIterator.cpp)
+source_group("Wire" FILES ${WIRE_FILES})
 
 set(BAMBOO_SOURCES
-  ${BITS_SOURCES}
-  ${VALUES_SOURCES}
-  ${MODULE_SOURCES}
-  ${DCFILE_SOURCES}
-  ${TRAITS_SOURCES}
-  ${OBJECTS_SOURCES}
-  ${WIRE_SOURCES})
+  ${BITS_FILES}
+  ${VALUES_FILES}
+  ${MODULE_FILES}
+  ${DCFILE_FILES}
+  ${TRAITS_FILES}
+  ${WIRE_FILES})
 
 option(BUILD_SHARED_LIBS "Builds shared libraries instead of static libraries.")
 option(BUILD_SHARED_AND_STATIC "Build both shared and static libraries.")
