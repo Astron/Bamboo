@@ -90,7 +90,7 @@ def generate(file_):
     enumNumtype = structNumber.add_enum('Type', ['kNaN', 'kInt', 'kUint', 'kFloat'])
 
     # Wrap STL containers
-    module.add_container('std::vector<std::string>', 'std::string', 'vector')
+    bits.add_container('std::vector<std::string>', 'std::string', 'vector', custom_name = 'StringCollection')
 
     # Declare member variables
     structImport.add_copy_constructor()
