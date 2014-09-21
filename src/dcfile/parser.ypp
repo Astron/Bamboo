@@ -252,13 +252,13 @@ import
 	: KW_IMPORT import_module
 	{
 		Import* import = new Import($2);
-		parsed_module->add_import(import);
+		parsed_module->add_import(unique_ptr<Import>(import));
 	}
 	| KW_FROM import_module KW_IMPORT import_symbols
 	{
 		Import* import = new Import($2);
 		import->symbols.assign($4.begin(), $4.end());
-		parsed_module->add_import(import);
+		parsed_module->add_import(unique_ptr<Import>(import));
 	}
 	;
 
@@ -399,7 +399,7 @@ dclass
 	}
 	  class_inheritance '{' class_fields '}'
 	{
-		bool class_added = parsed_module->add_class(current_class);
+		bool class_added = parsed_module->add_class(unique_ptr<Class>(current_class));
 		if(!class_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -496,7 +496,7 @@ class_fields
 			break;
 		}
 
-		bool field_added = current_class->add_field($2);
+		bool field_added = current_class->add_field(unique_ptr<Field>($2));
 		if(!field_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -563,7 +563,7 @@ dstruct
 	}
 	  '{' struct_fields '}'
 	{
-		bool struct_added = parsed_module->add_struct(current_struct);
+		bool struct_added = parsed_module->add_struct(unique_ptr<Struct>(current_struct));
 		if(!struct_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -607,7 +607,7 @@ struct_fields
 			break;
 		}
 
-		if(!current_struct->add_field($2))
+		if(!current_struct->add_field(unique_ptr<Field>($2)))
 		{
 			// Lets be really descriptive about why this failed
 			if(current_struct->field_by_name($2->name()))
@@ -992,7 +992,7 @@ method_body
 	: '(' parameter
 	{
 		Method* fn = new Method();
-		bool param_added = fn->add_parameter($2);
+		bool param_added = fn->add_parameter(unique_ptr<Parameter>($2));
 		if(!param_added)
 		{
 			dcerror("Unknown error adding parameter to method.");
@@ -1001,7 +1001,7 @@ method_body
 	}
 	| method_body ',' parameter
 	{
-		bool param_added = $1->add_parameter($3);
+		bool param_added = $1->add_parameter(unique_ptr<Parameter>($3));
 		if(!param_added)
 		{
 			dcerror("Cannot add parameter '" + $3->name()

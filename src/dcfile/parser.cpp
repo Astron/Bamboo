@@ -1524,7 +1524,7 @@ yyreduce:
 
     {
 		Import* import = new Import((yyvsp[0].str));
-		parsed_module->add_import(import);
+		parsed_module->add_import(unique_ptr<Import>(import));
 	}
 
     break;
@@ -1534,7 +1534,7 @@ yyreduce:
     {
 		Import* import = new Import((yyvsp[-2].str));
 		import->symbols.assign((yyvsp[0].strings).begin(), (yyvsp[0].strings).end());
-		parsed_module->add_import(import);
+		parsed_module->add_import(unique_ptr<Import>(import));
 	}
 
     break;
@@ -1707,7 +1707,7 @@ yyreduce:
   case 33:
 
     {
-		bool class_added = parsed_module->add_class(current_class);
+		bool class_added = parsed_module->add_class(unique_ptr<Class>(current_class));
 		if(!class_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -1804,7 +1804,7 @@ yyreduce:
 			break;
 		}
 
-		bool field_added = current_class->add_field((yyvsp[-1].dfield));
+		bool field_added = current_class->add_field(unique_ptr<Field>((yyvsp[-1].dfield)));
 		if(!field_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -1881,7 +1881,7 @@ yyreduce:
   case 45:
 
     {
-		bool struct_added = parsed_module->add_struct(current_struct);
+		bool struct_added = parsed_module->add_struct(unique_ptr<Struct>(current_struct));
 		if(!struct_added)
 		{
 			// Lets be really descriptive about why this failed
@@ -1924,7 +1924,7 @@ yyreduce:
 			break;
 		}
 
-		if(!current_struct->add_field((yyvsp[-1].dfield)))
+		if(!current_struct->add_field(unique_ptr<Field>((yyvsp[-1].dfield))))
 		{
 			// Lets be really descriptive about why this failed
 			if(current_struct->field_by_name((yyvsp[-1].dfield)->name()))
@@ -2374,7 +2374,7 @@ yyreduce:
 
     {
 		Method* fn = new Method();
-		bool param_added = fn->add_parameter((yyvsp[0].dparam));
+		bool param_added = fn->add_parameter(unique_ptr<Parameter>((yyvsp[0].dparam)));
 		if(!param_added)
 		{
 			dcerror("Unknown error adding parameter to method.");
@@ -2387,7 +2387,7 @@ yyreduce:
   case 96:
 
     {
-		bool param_added = (yyvsp[-2].dmethod)->add_parameter((yyvsp[0].dparam));
+		bool param_added = (yyvsp[-2].dmethod)->add_parameter(unique_ptr<Parameter>((yyvsp[0].dparam)));
 		if(!param_added)
 		{
 			dcerror("Cannot add parameter '" + (yyvsp[0].dparam)->name()
