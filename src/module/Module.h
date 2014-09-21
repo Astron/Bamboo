@@ -41,6 +41,7 @@ class Module
     // num_structs returns the number of structs in the module.
     inline size_t num_structs() const;
     // get_struct returns the <n>th struct in the module.
+    //     Throws std::out_of_range
     inline Struct *get_struct(unsigned int n);
     inline const Struct *get_struct(unsigned int n) const;
 
@@ -68,6 +69,7 @@ class Module
     // num_imports returns the number of imports in the module.
     inline size_t num_imports() const;
     // get_import retuns the <n>th import in the module.
+    //     Throws std::out_of_range
     inline Import *get_import(unsigned int n);
     inline const Import *get_import(unsigned int n) const;
 
@@ -76,6 +78,7 @@ class Module
     // num_keywords returns the number of keywords declared in the module.
     inline size_t num_keywords() const;
     // get_keyword returns the <n>th keyword declared in the module.
+    //     Throws std::out_of_range
     inline const std::string& get_keyword(unsigned int n) const;
 
     // add_class adds the newly-allocated class to the module.

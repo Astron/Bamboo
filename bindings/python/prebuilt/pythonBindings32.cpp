@@ -77,6 +77,7 @@ typedef enum _PyBindGenWrapperFlags {
 
 #include "bits/byteorder.h"
 #include "bits/sizetag.h"
+#include "bits/errors.h"
 #include "module/Array.h"
 #include "module/Class.h"
 #include "module/Type.h"
@@ -271,6 +272,12 @@ typedef struct {
 extern PyTypeObject PyBambooDatagramIterator_Type;
 
 
+extern PyTypeObject *Pybamboo__DatagramOverflow_Type;
+
+
+extern PyTypeObject *Pybamboo__DatagramIteratorEOF_Type;
+
+
 int _wrap_convert_py2c__std__string(PyObject *value, std::string *address);
 
 
@@ -338,7 +345,13 @@ _wrap_PyBambooModule_getClass(PyBambooModule *self, PyObject *args, PyObject *kw
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_class(n);
+    try
+    {
+        retval = self->obj->get_class(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -428,7 +441,13 @@ _wrap_PyBambooModule_get_class(PyBambooModule *self, PyObject *args, PyObject *k
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_class(n);
+    try
+    {
+        retval = self->obj->get_class(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -473,7 +492,13 @@ _wrap_PyBambooModule_get_import(PyBambooModule *self, PyObject *args, PyObject *
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_import(n);
+    try
+    {
+        retval = self->obj->get_import(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -720,7 +745,13 @@ _wrap_PyBambooModule_getImport(PyBambooModule *self, PyObject *args, PyObject *k
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_import(n);
+    try
+    {
+        retval = self->obj->get_import(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -777,7 +808,13 @@ _wrap_PyBambooModule_getStruct(PyBambooModule *self, PyObject *args, PyObject *k
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_struct(n);
+    try
+    {
+        retval = self->obj->get_struct(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -864,7 +901,13 @@ _wrap_PyBambooModule_get_keyword(PyBambooModule *self, PyObject *args, PyObject 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_keyword(n);
+    try
+    {
+        retval = self->obj->get_keyword(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
@@ -1067,7 +1110,13 @@ _wrap_PyBambooModule_get_struct(PyBambooModule *self, PyObject *args, PyObject *
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_struct(n);
+    try
+    {
+        retval = self->obj->get_struct(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -1202,7 +1251,13 @@ _wrap_PyBambooModule_getKeyword(PyBambooModule *self, PyObject *args, PyObject *
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_keyword(n);
+    try
+    {
+        retval = self->obj->get_keyword(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
@@ -2634,7 +2689,13 @@ _wrap_PyBambooMethod_getParameter(PyBambooMethod *self, PyObject *args, PyObject
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_parameter(n);
+    try
+    {
+        retval = self->obj->get_parameter(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -2713,7 +2774,13 @@ _wrap_PyBambooMethod_get_parameter(PyBambooMethod *self, PyObject *args, PyObjec
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_parameter(n);
+    try
+    {
+        retval = self->obj->get_parameter(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3019,7 +3086,13 @@ _wrap_PyBambooStruct_getField(PyBambooStruct *self, PyObject *args, PyObject *kw
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_field(n);
+    try
+    {
+        retval = self->obj->get_field(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3240,7 +3313,13 @@ _wrap_PyBambooStruct_get_field(PyBambooStruct *self, PyObject *args, PyObject *k
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_field(n);
+    try
+    {
+        retval = self->obj->get_field(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3529,13 +3608,17 @@ _wrap_PyBambooClass_getParent(PyBambooClass *self, PyObject *args, PyObject *kwa
     unsigned int n;
     const char *keywords[] = {"n", NULL};
     PyBambooClass *py_Class;
-    PyObject *wards;
-    PyObject *wards2;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_parent(n);
+    try
+    {
+        retval = self->obj->get_parent(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3543,25 +3626,7 @@ _wrap_PyBambooClass_getParent(PyBambooClass *self, PyObject *args, PyObject *kwa
     py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
     py_Class->obj = retval;
     py_Class->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Class) && !PySequence_Contains(wards, ((PyObject *) py_Class)))
-        PyList_Append(wards, ((PyObject *) py_Class));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Class);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -3586,13 +3651,17 @@ _wrap_PyBambooClass_get_parent(PyBambooClass *self, PyObject *args, PyObject *kw
     unsigned int n;
     const char *keywords[] = {"n", NULL};
     PyBambooClass *py_Class;
-    PyObject *wards;
-    PyObject *wards2;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_parent(n);
+    try
+    {
+        retval = self->obj->get_parent(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3600,25 +3669,7 @@ _wrap_PyBambooClass_get_parent(PyBambooClass *self, PyObject *args, PyObject *kw
     py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
     py_Class->obj = retval;
     py_Class->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Class) && !PySequence_Contains(wards, ((PyObject *) py_Class)))
-        PyList_Append(wards, ((PyObject *) py_Class));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Class);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -3649,7 +3700,13 @@ _wrap_PyBambooClass_get_base_field(PyBambooClass *self, PyObject *args, PyObject
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_base_field(n);
+    try
+    {
+        retval = self->obj->get_base_field(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3765,7 +3822,13 @@ _wrap_PyBambooClass_getBaseField(PyBambooClass *self, PyObject *args, PyObject *
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_base_field(n);
+    try
+    {
+        retval = self->obj->get_base_field(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3828,13 +3891,17 @@ _wrap_PyBambooClass_getChild(PyBambooClass *self, PyObject *args, PyObject *kwar
     unsigned int n;
     const char *keywords[] = {"n", NULL};
     PyBambooClass *py_Class;
-    PyObject *wards;
-    PyObject *wards2;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_child(n);
+    try
+    {
+        retval = self->obj->get_child(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3842,25 +3909,7 @@ _wrap_PyBambooClass_getChild(PyBambooClass *self, PyObject *args, PyObject *kwar
     py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
     py_Class->obj = retval;
     py_Class->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Class) && !PySequence_Contains(wards, ((PyObject *) py_Class)))
-        PyList_Append(wards, ((PyObject *) py_Class));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Class);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -3913,13 +3962,17 @@ _wrap_PyBambooClass_get_child(PyBambooClass *self, PyObject *args, PyObject *kwa
     unsigned int n;
     const char *keywords[] = {"n", NULL};
     PyBambooClass *py_Class;
-    PyObject *wards;
-    PyObject *wards2;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
         return NULL;
     }
-    retval = self->obj->get_child(n);
+    try
+    {
+        retval = self->obj->get_child(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -3927,25 +3980,7 @@ _wrap_PyBambooClass_get_child(PyBambooClass *self, PyObject *args, PyObject *kwa
     py_Class = PyObject_New(PyBambooClass, &PyBambooClass_Type);
     py_Class->obj = retval;
     py_Class->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Class) && !PySequence_Contains(wards, ((PyObject *) py_Class)))
-        PyList_Append(wards, ((PyObject *) py_Class));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Class), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Class), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Class);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -7314,7 +7349,13 @@ _wrap_PyBambooDatagram_add_int32(PyBambooDatagram *self, PyObject *args, PyObjec
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_int32(value);
+    try
+    {
+        self->obj->add_int32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7335,7 +7376,13 @@ _wrap_PyBambooDatagram_addInt8(PyBambooDatagram *self, PyObject *args, PyObject 
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_int8(value);
+    try
+    {
+        self->obj->add_int8(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7362,7 +7409,13 @@ _custom_wrap_PyBambooDatagram_add_data(PyBambooDatagram *self, PyObject *args,
         return NULL;
     }
 
-    self->obj->add_data((const uint8_t *)value, value_len);
+    try
+    {
+        self->obj->add_data((const uint8_t *)value, value_len);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
 
     Py_INCREF(Py_None);
     py_retval = Py_None;
@@ -7402,7 +7455,13 @@ _wrap_PyBambooDatagram_addUint8(PyBambooDatagram *self, PyObject *args, PyObject
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_uint8(value);
+    try
+    {
+        self->obj->add_uint8(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7419,7 +7478,13 @@ _wrap_PyBambooDatagram_addChar(PyBambooDatagram *self, PyObject *args, PyObject 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "c", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_char(value);
+    try
+    {
+        self->obj->add_char(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7436,7 +7501,13 @@ _wrap_PyBambooDatagram_addFloat32(PyBambooDatagram *self, PyObject *args, PyObje
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_float32(value);
+    try
+    {
+        self->obj->add_float32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7453,7 +7524,13 @@ _wrap_PyBambooDatagram_add_uint32(PyBambooDatagram *self, PyObject *args, PyObje
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_uint32(value);
+    try
+    {
+        self->obj->add_uint32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7472,7 +7549,13 @@ _wrap_PyBambooDatagram_addBool(PyBambooDatagram *self, PyObject *args, PyObject 
         return NULL;
     }
     value = (bool) PyObject_IsTrue(py_value);
-    self->obj->add_bool(value);
+    try
+    {
+        self->obj->add_bool(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7493,7 +7576,13 @@ _wrap_PyBambooDatagram_add_uint16(PyBambooDatagram *self, PyObject *args, PyObje
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_uint16(value);
+    try
+    {
+        self->obj->add_uint16(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7526,7 +7615,13 @@ _wrap_PyBambooDatagram_addUint16(PyBambooDatagram *self, PyObject *args, PyObjec
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_uint16(value);
+    try
+    {
+        self->obj->add_uint16(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7543,7 +7638,13 @@ _wrap_PyBambooDatagram_addInt64(PyBambooDatagram *self, PyObject *args, PyObject
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_int64(value);
+    try
+    {
+        self->obj->add_int64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7560,7 +7661,13 @@ _wrap_PyBambooDatagram_addUint32(PyBambooDatagram *self, PyObject *args, PyObjec
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_uint32(value);
+    try
+    {
+        self->obj->add_uint32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7577,7 +7684,13 @@ _wrap_PyBambooDatagram_add_float32(PyBambooDatagram *self, PyObject *args, PyObj
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "f", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_float32(value);
+    try
+    {
+        self->obj->add_float32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7596,7 +7709,13 @@ _wrap_PyBambooDatagram_add_bool(PyBambooDatagram *self, PyObject *args, PyObject
         return NULL;
     }
     value = (bool) PyObject_IsTrue(py_value);
-    self->obj->add_bool(value);
+    try
+    {
+        self->obj->add_bool(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7616,7 +7735,13 @@ _wrap_PyBambooDatagram_addString(PyBambooDatagram *self, PyObject *args, PyObjec
         return NULL;
     }
     value_std = std::string(value, value_len);
-    self->obj->add_string(value_std);
+    try
+    {
+        self->obj->add_string(value_std);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7637,7 +7762,13 @@ _wrap_PyBambooDatagram_add_int8(PyBambooDatagram *self, PyObject *args, PyObject
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_int8(value);
+    try
+    {
+        self->obj->add_int8(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7670,7 +7801,13 @@ _wrap_PyBambooDatagram_add_int16(PyBambooDatagram *self, PyObject *args, PyObjec
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_int16(value);
+    try
+    {
+        self->obj->add_int16(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7687,7 +7824,13 @@ _wrap_PyBambooDatagram_add_int64(PyBambooDatagram *self, PyObject *args, PyObjec
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "L", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_int64(value);
+    try
+    {
+        self->obj->add_int64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7708,7 +7851,13 @@ _wrap_PyBambooDatagram_add_uint8(PyBambooDatagram *self, PyObject *args, PyObjec
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_uint8(value);
+    try
+    {
+        self->obj->add_uint8(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7725,7 +7874,13 @@ _wrap_PyBambooDatagram_addInt32(PyBambooDatagram *self, PyObject *args, PyObject
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "i", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_int32(value);
+    try
+    {
+        self->obj->add_int32(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7746,7 +7901,13 @@ _wrap_PyBambooDatagram_addInt16(PyBambooDatagram *self, PyObject *args, PyObject
         PyErr_SetString(PyExc_ValueError, "Out of range");
         return NULL;
     }
-    self->obj->add_int16(value);
+    try
+    {
+        self->obj->add_int16(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7763,7 +7924,13 @@ _wrap_PyBambooDatagram_addUint64(PyBambooDatagram *self, PyObject *args, PyObjec
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_uint64(value);
+    try
+    {
+        self->obj->add_uint64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7813,7 +7980,13 @@ _wrap_PyBambooDatagram_addFloat64(PyBambooDatagram *self, PyObject *args, PyObje
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_float64(value);
+    try
+    {
+        self->obj->add_float64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7830,7 +8003,13 @@ _wrap_PyBambooDatagram_add_uint64(PyBambooDatagram *self, PyObject *args, PyObje
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_uint64(value);
+    try
+    {
+        self->obj->add_uint64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7869,7 +8048,13 @@ _custom_wrap_PyBambooDatagram_addData(PyBambooDatagram *self, PyObject *args,
         return NULL;
     }
 
-    self->obj->add_data((const uint8_t *)value, value_len);
+    try
+    {
+        self->obj->add_data((const uint8_t *)value, value_len);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
 
     Py_INCREF(Py_None);
     py_retval = Py_None;
@@ -7905,7 +8090,13 @@ _wrap_PyBambooDatagram_add_float64(PyBambooDatagram *self, PyObject *args, PyObj
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "d", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_float64(value);
+    try
+    {
+        self->obj->add_float64(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7922,7 +8113,13 @@ _wrap_PyBambooDatagram_add_char(PyBambooDatagram *self, PyObject *args, PyObject
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "c", (char **) keywords, &value)) {
         return NULL;
     }
-    self->obj->add_char(value);
+    try
+    {
+        self->obj->add_char(value);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -7942,7 +8139,13 @@ _wrap_PyBambooDatagram_add_string(PyBambooDatagram *self, PyObject *args, PyObje
         return NULL;
     }
     value_std = std::string(value, value_len);
-    self->obj->add_string(value_std);
+    try
+    {
+        self->obj->add_string(value_std);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -8225,7 +8428,13 @@ _wrap_PyBambooDatagramIterator_read_uint64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint64_t retval;
 
-    retval = self->obj->read_uint64();
+    try
+    {
+        retval = self->obj->read_uint64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "K", retval);
     return py_retval;
 }
@@ -8241,7 +8450,13 @@ _wrap_PyBambooDatagramIterator_skip(PyBambooDatagramIterator *self, PyObject *ar
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "K", (char **) keywords, &length)) {
         return NULL;
     }
-    self->obj->skip(length);
+    try
+    {
+        self->obj->skip(length);
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -8254,7 +8469,13 @@ _wrap_PyBambooDatagramIterator_readBool(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     bool retval;
 
-    retval = self->obj->read_bool();
+    try
+    {
+        retval = self->obj->read_bool();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
@@ -8266,7 +8487,13 @@ _wrap_PyBambooDatagramIterator_read_int16(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int16_t retval;
 
-    retval = self->obj->read_int16();
+    try
+    {
+        retval = self->obj->read_int16();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8278,7 +8505,13 @@ _wrap_PyBambooDatagramIterator_read_int32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int32_t retval;
 
-    retval = self->obj->read_int32();
+    try
+    {
+        retval = self->obj->read_int32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8307,7 +8540,13 @@ _wrap_PyBambooDatagramIterator_readInt8(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int8_t retval;
 
-    retval = self->obj->read_int8();
+    try
+    {
+        retval = self->obj->read_int8();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8319,7 +8558,13 @@ _wrap_PyBambooDatagramIterator_read_bool(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     bool retval;
 
-    retval = self->obj->read_bool();
+    try
+    {
+        retval = self->obj->read_bool();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
@@ -8331,7 +8576,13 @@ _wrap_PyBambooDatagramIterator_read_int8(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int8_t retval;
 
-    retval = self->obj->read_int8();
+    try
+    {
+        retval = self->obj->read_int8();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8343,7 +8594,13 @@ _wrap_PyBambooDatagramIterator_readFloat32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     float retval;
 
-    retval = self->obj->read_float32();
+    try
+    {
+        retval = self->obj->read_float32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "f", retval);
     return py_retval;
 }
@@ -8355,7 +8612,13 @@ _wrap_PyBambooDatagramIterator_readInt64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int64_t retval;
 
-    retval = self->obj->read_int64();
+    try
+    {
+        retval = self->obj->read_int64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "L", retval);
     return py_retval;
 }
@@ -8367,7 +8630,13 @@ _wrap_PyBambooDatagramIterator_readUint8(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint8_t retval;
 
-    retval = self->obj->read_uint8();
+    try
+    {
+        retval = self->obj->read_uint8();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", (int)retval);
     return py_retval;
 }
@@ -8379,7 +8648,13 @@ _wrap_PyBambooDatagramIterator_readString(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     std::string retval;
 
-    retval = self->obj->read_string();
+    try
+    {
+        retval = self->obj->read_string();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
@@ -8391,7 +8666,13 @@ _wrap_PyBambooDatagramIterator_read_size(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     size_t retval;
 
-    retval = self->obj->read_size();
+    try
+    {
+        retval = self->obj->read_size();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
     return py_retval;
 }
@@ -8403,7 +8684,13 @@ _wrap_PyBambooDatagramIterator_read_uint32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint32_t retval;
 
-    retval = self->obj->read_uint32();
+    try
+    {
+        retval = self->obj->read_uint32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
     return py_retval;
 }
@@ -8427,7 +8714,13 @@ _wrap_PyBambooDatagramIterator_readUint64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint64_t retval;
 
-    retval = self->obj->read_uint64();
+    try
+    {
+        retval = self->obj->read_uint64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "K", retval);
     return py_retval;
 }
@@ -8439,7 +8732,13 @@ _wrap_PyBambooDatagramIterator_read_uint16(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint16_t retval;
 
-    retval = self->obj->read_uint16();
+    try
+    {
+        retval = self->obj->read_uint16();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8449,9 +8748,16 @@ PyObject *
 _wrap_PyBambooDatagramIterator_read_datagram(PyBambooDatagramIterator *self)
 {
     PyObject *py_retval;
+    bamboo::Datagram retval;
     PyBambooDatagram *py_Datagram;
 
-    bamboo::Datagram retval = self->obj->read_datagram();
+    try
+    {
+        retval = self->obj->read_datagram();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_Datagram = PyObject_New(PyBambooDatagram, &PyBambooDatagram_Type);
     py_Datagram->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Datagram->obj = new bamboo::Datagram(retval);
@@ -8464,9 +8770,16 @@ PyObject *
 _wrap_PyBambooDatagramIterator_readDatagram(PyBambooDatagramIterator *self)
 {
     PyObject *py_retval;
+    bamboo::Datagram retval;
     PyBambooDatagram *py_Datagram;
 
-    bamboo::Datagram retval = self->obj->read_datagram();
+    try
+    {
+        retval = self->obj->read_datagram();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_Datagram = PyObject_New(PyBambooDatagram, &PyBambooDatagram_Type);
     py_Datagram->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
     py_Datagram->obj = new bamboo::Datagram(retval);
@@ -8487,7 +8800,13 @@ _wrap_PyBambooDatagramIterator_skip_type(PyBambooDatagramIterator *self, PyObjec
         return NULL;
     }
     type_ptr = (type ? type->obj : NULL);
-    self->obj->skip_type(type_ptr);
+    try
+    {
+        self->obj->skip_type(type_ptr);
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -8500,7 +8819,13 @@ _wrap_PyBambooDatagramIterator_read_char(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     char retval;
 
-    retval = self->obj->read_char();
+    try
+    {
+        retval = self->obj->read_char();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "c", (int) retval);
     return py_retval;
 }
@@ -8512,7 +8837,13 @@ _wrap_PyBambooDatagramIterator_readFloat64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     double retval;
 
-    retval = self->obj->read_float64();
+    try
+    {
+        retval = self->obj->read_float64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "d", retval);
     return py_retval;
 }
@@ -8524,7 +8855,13 @@ _wrap_PyBambooDatagramIterator_read_int64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int64_t retval;
 
-    retval = self->obj->read_int64();
+    try
+    {
+        retval = self->obj->read_int64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "L", retval);
     return py_retval;
 }
@@ -8536,7 +8873,13 @@ _wrap_PyBambooDatagramIterator_read_uint8(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint8_t retval;
 
-    retval = self->obj->read_uint8();
+    try
+    {
+        retval = self->obj->read_uint8();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", (int)retval);
     return py_retval;
 }
@@ -8548,7 +8891,13 @@ _wrap_PyBambooDatagramIterator_readChar(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     char retval;
 
-    retval = self->obj->read_char();
+    try
+    {
+        retval = self->obj->read_char();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "c", (int) retval);
     return py_retval;
 }
@@ -8560,7 +8909,13 @@ _wrap_PyBambooDatagramIterator_read_string(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     std::string retval;
 
-    retval = self->obj->read_string();
+    try
+    {
+        retval = self->obj->read_string();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
@@ -8578,7 +8933,13 @@ _wrap_PyBambooDatagramIterator_skipType(PyBambooDatagramIterator *self, PyObject
         return NULL;
     }
     type_ptr = (type ? type->obj : NULL);
-    self->obj->skip_type(type_ptr);
+    try
+    {
+        self->obj->skip_type(type_ptr);
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     Py_INCREF(Py_None);
     py_retval = Py_None;
     return py_retval;
@@ -8591,7 +8952,13 @@ _wrap_PyBambooDatagramIterator_read_float64(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     double retval;
 
-    retval = self->obj->read_float64();
+    try
+    {
+        retval = self->obj->read_float64();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "d", retval);
     return py_retval;
 }
@@ -8603,7 +8970,13 @@ _wrap_PyBambooDatagramIterator_readInt32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int32_t retval;
 
-    retval = self->obj->read_int32();
+    try
+    {
+        retval = self->obj->read_int32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8615,7 +8988,13 @@ _wrap_PyBambooDatagramIterator_readInt16(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     int16_t retval;
 
-    retval = self->obj->read_int16();
+    try
+    {
+        retval = self->obj->read_int16();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8639,7 +9018,13 @@ _wrap_PyBambooDatagramIterator_read_float32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     float retval;
 
-    retval = self->obj->read_float32();
+    try
+    {
+        retval = self->obj->read_float32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "f", retval);
     return py_retval;
 }
@@ -8663,7 +9048,13 @@ _wrap_PyBambooDatagramIterator_readUint32(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint32_t retval;
 
-    retval = self->obj->read_uint32();
+    try
+    {
+        retval = self->obj->read_uint32();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "N", PyLong_FromUnsignedLong(retval));
     return py_retval;
 }
@@ -8675,7 +9066,13 @@ _wrap_PyBambooDatagramIterator_readSize(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     size_t retval;
 
-    retval = self->obj->read_size();
+    try
+    {
+        retval = self->obj->read_size();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
     return py_retval;
 }
@@ -8687,7 +9084,13 @@ _wrap_PyBambooDatagramIterator_readUint16(PyBambooDatagramIterator *self)
     PyObject *py_retval;
     uint16_t retval;
 
-    retval = self->obj->read_uint16();
+    try
+    {
+        retval = self->obj->read_uint16();
+    } catch (bamboo::DatagramIteratorEOF const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramIteratorEOF_Type, exc.what());
+        return NULL;
+    }
     py_retval = Py_BuildValue((char *) "i", retval);
     return py_retval;
 }
@@ -8841,6 +9244,14 @@ PyTypeObject PyBambooDatagramIterator_Type = {
 };
 
 
+/* --- exceptions --- */
+
+
+PyTypeObject *Pybamboo__DatagramOverflow_Type;
+
+
+PyTypeObject *Pybamboo__DatagramIteratorEOF_Type;
+
 #if PY_VERSION_HEX >= 0x03000000
 static struct PyModuleDef bamboo_wire_moduledef = {
     PyModuleDef_HEAD_INIT,
@@ -8873,6 +9284,18 @@ initbamboo_wire(void)
         return NULL;
     }
     PyModule_AddObject(m, (char *) "DatagramIterator", (PyObject *) &PyBambooDatagramIterator_Type);
+    /* Register the 'bamboo::DatagramOverflow' exception */
+    if ((Pybamboo__DatagramOverflow_Type = (PyTypeObject*) PyErr_NewException((char*)"bamboo.wire.DatagramOverflow", NULL, NULL)) == NULL) {
+        return NULL;
+    }
+    Py_INCREF((PyObject *) Pybamboo__DatagramOverflow_Type);
+    PyModule_AddObject(m, (char *) "DatagramOverflow", (PyObject *) Pybamboo__DatagramOverflow_Type);
+    /* Register the 'bamboo::DatagramIteratorEOF' exception */
+    if ((Pybamboo__DatagramIteratorEOF_Type = (PyTypeObject*) PyErr_NewException((char*)"bamboo.wire.DatagramIteratorEOF", NULL, NULL)) == NULL) {
+        return NULL;
+    }
+    Py_INCREF((PyObject *) Pybamboo__DatagramIteratorEOF_Type);
+    PyModule_AddObject(m, (char *) "DatagramIteratorEOF", (PyObject *) Pybamboo__DatagramIteratorEOF_Type);
     return m;
 }
 static PyMethodDef bamboo_functions[] = {

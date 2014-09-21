@@ -42,8 +42,8 @@ class Numeric : public Type
     //     Throws range error if the number violates the Numeric's range constraints.
     Value to_value(Number);
     // to_number decompresses the Value (frequently from fixed-point) into the expected number.
-    //     Throws range error if the number violates the Numeric's range constraints.
-    //     Throws domain error if the value isn't a numeric type.
+    //     Throws range_error if the number violates the Numeric's range constraints.
+    //     Throws domain_error if the value isn't a numeric type.
     double to_floating(const Value&);
     int64_t to_integer(const Value&);
     uint64_t to_uinteger(const Value&);

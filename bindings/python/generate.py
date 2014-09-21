@@ -19,6 +19,7 @@ def generate(file_):
     # Declare includes
     bits.add_include('"bits/byteorder.h"')
     bits.add_include('"bits/sizetag.h"')
+    bits.add_include('"bits/errors.h"')
     module.add_include('"module/Array.h"')
     module.add_include('"module/Class.h"')
     module.add_include('"module/Type.h"')
@@ -45,10 +46,10 @@ def generate(file_):
         foreign_cpp_namespace = 'std',
         message_rvalue = 'exc.what()',
         is_standard_error = True)
-    typeError = bamboo.add_exception('invalid_argument',
+    nullError = bamboo.add_exception('invalid_argument',
         custom_name = 'TypeError',
         foreign_cpp_namespace = 'std',
-        message_rvalue = 'exc.what()',
+        message_rvalue = "'\"NoneType' object\" + exc.reason()",
         is_standard_error = True)
     clsModule = module.add_class('Module',
         docstring = classDocstrings['Module'])
@@ -74,6 +75,8 @@ def generate(file_):
     structNumericRange = module.add_struct('NumericRange')
     #structValue = module.add_struct('Value',
     #    docstring = classDocstrings['Value'])
+    dgOverflowError = wire.add_exception('DatagramOverflow', message_rvalue = 'exc.what()')
+    dgiEOFError = wire.add_exception('DatagramIteratorEOF', message_rvalue = 'exc.what()')
     clsDatagram = wire.add_class('Datagram',
         docstring = classDocstrings['Datagram'])
     clsDgIter = wire.add_class('DatagramIterator',
@@ -128,10 +131,12 @@ def generate(file_):
     add_method(clsModule, 'num_types', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_class',
                retval_child('bamboo::Class *'),
-               [param('unsigned int', 'n')])
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsModule, 'get_struct',
                retval_child('bamboo::Struct *'),
-               [param('unsigned int', 'n')])
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsModule, 'class_by_id',
                retval_child('bamboo::Class *'),
                [param('unsigned int', 'id')])
@@ -150,12 +155,14 @@ def generate(file_):
     add_method(clsModule, 'num_imports', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_import',
                retval_child('bamboo::Import *'),
-               [param('unsigned int', 'n')])
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsModule, 'has_keyword', retval('bool'),
                [param('const std::string&', 'keyword')], is_const = True)
     add_method(clsModule, 'num_keywords', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_keyword', retval('const std::string'),
-               [param('unsigned int', 'n')], is_const = True)
+               [param('unsigned int', 'n')],
+               is_const = True, throw = [indexError])
     add_method(clsModule, 'add_class', retval('bool'),
                [param('std::unique_ptr<Class>', 'dclass')])
     add_method(clsModule, 'add_struct', retval('bool'),
@@ -171,10 +178,6 @@ def generate(file_):
     add_method(clsType, 'has_fixed_size', retval('bool'), [], is_const = True)
     add_method(clsType, 'fixed_size', retval('size_t'), [], is_const = True)
     add_method(clsType, 'has_alias', retval('bool'), [], is_const = True)
-#    add_method(clsType, 'as_numeric', retval_self('bamboo::Numeric *'), [], is_virtual = True)
-#    add_method(clsType, 'as_array', retval_self('bamboo::Array *'), [], is_virtual = True)
-#    add_method(clsType, 'as_struct', retval_self('bamboo::Struct*'), [], is_virtual = True)
-#    add_method(clsType, 'as_method', retval_self('bamboo::Method *'), [], is_virtual = True)
     add_method(clsType, 'alias', retval('const std::string'), [], is_const = True)
     add_method(clsType, 'set_alias', None, [param('const std::string&', 'alias')])
     clsNumType.add_constructor([param('bamboo::Subtype', 'subtype')])
@@ -196,7 +199,8 @@ def generate(file_):
     clsMethod.add_constructor([])
     add_method(clsMethod, 'num_parameters', retval('size_t'), [], is_const = True)
     add_method(clsMethod, 'get_parameter', retval_child('bamboo::Parameter *'),
-               [param('unsigned int', 'n')])
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsMethod, 'parameter_by_name', retval_child('bamboo::Parameter *'),
                [param('const std::string&', 'name')]),
     add_method(clsMethod, 'add_parameter', retval('bool'), [param('std::unique_ptr<Parameter>', 'param')])
@@ -208,7 +212,8 @@ def generate(file_):
     add_method(clsStruct, 'module', retval_parent('bamboo::Module *'), [])
     add_method(clsStruct, 'num_fields', retval('size_t'), [], is_const = True)
     add_method(clsStruct, 'get_field', retval_child('bamboo::Field *'),
-               [param('unsigned int', 'n')])
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsStruct, 'field_by_id', retval_child('bamboo::Field *'),
                [param('unsigned int', 'id')])
     add_method(clsStruct, 'field_by_name', retval_child('bamboo::Field *'),
@@ -218,13 +223,19 @@ def generate(file_):
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('const std::string&', 'name')])
     add_method(clsClass, 'num_parents', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_parent', retval_child('bamboo::Class *'), [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_parent', retval_parent('bamboo::Class *'),
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsClass, 'num_children', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_child', retval_child('bamboo::Class *'), [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_child', retval_parent('bamboo::Class *'),
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsClass, 'has_constructor', retval('bool'), [], is_const = True)
     add_method(clsClass, 'constructor', retval_child('bamboo::Field *'), [])
     add_method(clsClass, 'num_base_fields', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_base_field', retval_child('bamboo::Field *'), [param('unsigned int', 'n')])
+    add_method(clsClass, 'get_base_field', retval_child('bamboo::Field *'),
+               [param('unsigned int', 'n')],
+               throw = [indexError])
     add_method(clsClass, 'add_parent', retval('bool'),
                [param('bamboo::Class *', 'parent', transfer_ownership = False)])
     clsParam.add_constructor([
@@ -262,21 +273,21 @@ def generate(file_):
     add_custom_method(clsDatagram, 'data', ('METH_NOARGS',))
     add_method(clsDatagram, 'size', retval('size_t'), [], is_const = True)
     add_method(clsDatagram, 'cap', retval('size_t'), [], is_const = True)
-    add_method(clsDatagram, 'add_bool', None, [param('bool', 'value')])
-    add_method(clsDatagram, 'add_char', None, [param('char', 'value')])
-    add_method(clsDatagram, 'add_int8', None, [param('int8_t', 'value')])
-    add_method(clsDatagram, 'add_int16', None, [param('int16_t', 'value')])
-    add_method(clsDatagram, 'add_int32', None, [param('int32_t', 'value')])
-    add_method(clsDatagram, 'add_int64', None, [param('int64_t', 'value')])
-    add_method(clsDatagram, 'add_uint8', None, [param('uint8_t', 'value')])
-    add_method(clsDatagram, 'add_uint16', None, [param('uint16_t', 'value')])
-    add_method(clsDatagram, 'add_uint32', None, [param('uint32_t', 'value')])
-    add_method(clsDatagram, 'add_uint64', None, [param('uint64_t', 'value')])
-    add_method(clsDatagram, 'add_float32', None, [param('float', 'value')])
-    add_method(clsDatagram, 'add_float64', None, [param('double', 'value')])
+    add_method(clsDatagram, 'add_bool', None, [param('bool', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_char', None, [param('char', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_int8', None, [param('int8_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_int16', None, [param('int16_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_int32', None, [param('int32_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_int64', None, [param('int64_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_uint8', None, [param('uint8_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_uint16', None, [param('uint16_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_uint32', None, [param('uint32_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_uint64', None, [param('uint64_t', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_float32', None, [param('float', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_float64', None, [param('double', 'value')], throw = [dgOverflowError])
     add_custom_method(clsDatagram, 'add_data')
     #add_method(clsDatagram, 'add_data', None, [param('const bamboo::Buffer&', 'value')])
-    add_method(clsDatagram, 'add_string', None, [param('const std::string&', 'value')])
+    add_method(clsDatagram, 'add_string', None, [param('const std::string&', 'value')], throw = [dgOverflowError])
     #add_method(clsDatagram, 'add_blob', None, [param('const bamboo::Buffer&', 'value')])
     #add_method(clsDatagram, 'add_value', None,
     #           [param('const bamboo::Type *', 'type', transfer_ownership = False),
@@ -291,27 +302,27 @@ def generate(file_):
     clsDgIter.add_copy_constructor()
     add_method(clsDgIter, 'tell', retval('size_t'), [], is_const = True)
     add_method(clsDgIter, 'seek', None, [param('size_t', 'offset')])
-    add_method(clsDgIter, 'skip', None, [param('size_t', 'length')])
+    add_method(clsDgIter, 'skip', None, [param('size_t', 'length')], throw = [dgiEOFError])
     add_method(clsDgIter, 'skip_type', None,
-               [param('const bamboo::Type *', 'type', transfer_ownership = False)])
+               [param('const bamboo::Type *', 'type', transfer_ownership = False)], throw = [dgiEOFError])
     add_method(clsDgIter, 'remaining', retval('size_t'), [], is_const = True)
     #add_method(clsDgIter, 'read_remainder', retval('bamboo::Buffer'), [])
-    add_method(clsDgIter, 'read_bool', retval('bool'), [])
-    add_method(clsDgIter, 'read_char', retval('char'), [])
-    add_method(clsDgIter, 'read_int8', retval('int8_t'), [])
-    add_method(clsDgIter, 'read_int16', retval('int16_t'), [])
-    add_method(clsDgIter, 'read_int32', retval('int32_t'), [])
-    add_method(clsDgIter, 'read_int64', retval('int64_t'), [])
-    add_method(clsDgIter, 'read_uint8', retval('uint8_t'), [])
-    add_method(clsDgIter, 'read_uint16', retval('uint16_t'), [])
-    add_method(clsDgIter, 'read_uint32', retval('uint32_t'), [])
-    add_method(clsDgIter, 'read_uint64', retval('uint64_t'), [])
-    add_method(clsDgIter, 'read_float32', retval('float'), [])
-    add_method(clsDgIter, 'read_float64', retval('double'), [])
-    add_method(clsDgIter, 'read_size', retval('size_t'), [])
-    add_method(clsDgIter, 'read_string', retval('std::string'), [])
+    add_method(clsDgIter, 'read_bool', retval('bool'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_char', retval('char'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_int8', retval('int8_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_int16', retval('int16_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_int32', retval('int32_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_int64', retval('int64_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_uint8', retval('uint8_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_uint16', retval('uint16_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_uint32', retval('uint32_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_uint64', retval('uint64_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_float32', retval('float'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_float64', retval('double'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_size', retval('size_t'), [], throw = [dgiEOFError])
+    add_method(clsDgIter, 'read_string', retval('std::string'), [], throw = [dgiEOFError])
     #add_method(clsDgIter, 'read_blob', retval('bamboo::Buffer'), [])
-    add_method(clsDgIter, 'read_datagram', retval('bamboo::Datagram'), [])
+    add_method(clsDgIter, 'read_datagram', retval('bamboo::Datagram'), [], throw = [dgiEOFError])
     #add_method(clsDgIter, 'read_data', retval('bamboo::Buffer'), [param('size_t', 'length')])
     #add_method(clsDgIter, 'read_value', retval('bamboo::Value'),
     #           [param('const bamboo::Type *', 'type', transfer_ownership = False)])

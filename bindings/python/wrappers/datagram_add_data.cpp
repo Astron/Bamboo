@@ -17,7 +17,13 @@ _custom_wrap_PyBambooDatagram_%s(PyBambooDatagram *self, PyObject *args,
         return NULL;
     }
 
-    self->obj->add_data((const uint8_t *)value, value_len);
+    try
+    {
+        self->obj->add_data((const uint8_t *)value, value_len);
+    } catch (bamboo::DatagramOverflow const &exc) {
+        PyErr_SetString((PyObject *) Pybamboo__DatagramOverflow_Type, exc.what());
+        return NULL;
+    }
 
     Py_INCREF(Py_None);
     py_retval = Py_None;

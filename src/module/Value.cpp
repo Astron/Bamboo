@@ -11,7 +11,7 @@ namespace bamboo   // open namespace bamboo
 
 Value::Value(const Type *type) : type(type)
 {
-    if(type == nullptr) throw null_error {"type cannot be null"};
+    if(type == nullptr) throw null_error("is not a valid Type");
     switch(type->subtype()) {
     case kTypeInt8:
     case kTypeInt16:
@@ -93,7 +93,7 @@ Value::Value(const Type *type) : type(type)
 Value::Value(const Type *type, const vector<uint8_t>&) : type(type)
 {
     // TODO: Implement
-    if(type == nullptr) throw null_error {"type cannot be null"};
+    if(type == nullptr) throw null_error("is not a valid Type");
     switch(type->subtype()) {
     case kTypeInt8:
     case kTypeInt16:

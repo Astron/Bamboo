@@ -45,6 +45,7 @@ class Struct : public Type
     // num_fields returns the number of fields in the struct.
     inline size_t num_fields() const;
     // get_field returns the <n>th field of the struct.
+    //     Throws std::out_of_range
     inline Field *get_field(unsigned int n);
     inline const Field *get_field(unsigned int n) const;
 

@@ -27,11 +27,13 @@ class Class : public Struct
     // num_parents returns the number of superclasses this class inherits from.
     inline size_t num_parents() const;
     // get_parent returns the <n>th parent-/super-class this class inherits from.
+    //     Throws std::out_of_range
     inline Class *get_parent(unsigned int n);
     inline const Class *get_parent(unsigned int n) const;
     // num_children returns the number of subclasses that inherit from this class.
     inline size_t num_children() const;
     // get_child returns the <n>th child-/sub-class that inherits this class.
+    //     Throws std::out_of_range
     inline Class *get_child(unsigned int n);
     inline const Class *get_child(unsigned int n) const;
 
@@ -46,6 +48,7 @@ class Class : public Struct
     // num_base_fields returns the number of fields declared directly in this class.
     inline size_t num_base_fields() const;
     // get_base_field returns the <n>th field from the class excluding any inherited fields.
+    //     Throws std::out_of_range
     inline Field *get_base_field(unsigned int n);
     inline const Field *get_base_field(unsigned int n) const;
 
