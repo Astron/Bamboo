@@ -57,6 +57,12 @@ bool MolecularField::add_field(Field *field)
     return true;
 }
 
+// add_field with a unique_ptr always returns false; molecular fields don't own fields.
+bool MolecularField::add_field(unique_ptr<Field>)
+{
+    return false;
+}
+
 // set_default_value always returns false; molecular fields don't have default values.
 bool MolecularField::set_default_value(const Value&)
 {

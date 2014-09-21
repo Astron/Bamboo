@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from pybindgen.module import Module, SubModule
+
 from pybindgen import retval, param
 from mappings import *
 from wrappers import *
@@ -156,11 +157,11 @@ def generate(file_):
     add_method(clsModule, 'get_keyword', retval('const std::string'),
                [param('unsigned int', 'n')], is_const = True)
     add_method(clsModule, 'add_class', retval('bool'),
-               [param('bamboo::Class *', 'dclass', transfer_ownership = True)])
+               [param('std::unique_ptr<Class>', 'dclass')])
     add_method(clsModule, 'add_struct', retval('bool'),
-               [param('bamboo::Struct *', 'dstruct', transfer_ownership = True)])
+               [param('std::unique_ptr<Struct>', 'dstruct')])
     add_method(clsModule, 'add_import', None,
-               [param('bamboo::Import *', 'import', transfer_ownership = True)])
+               [param('std::unique_ptr<Import>', 'import')])
     add_method(clsModule, 'add_typedef', retval('bool'),
                [param('const std::string&', 'name'),
                 param('Type *', 'type', transfer_ownership = False)])
@@ -198,8 +199,7 @@ def generate(file_):
                [param('unsigned int', 'n')])
     add_method(clsMethod, 'parameter_by_name', retval_child('bamboo::Parameter *'),
                [param('const std::string&', 'name')]),
-    add_method(clsMethod, 'add_parameter', retval('bool'),
-               [param('bamboo::Parameter *', 'param', transfer_ownership = True)])
+    add_method(clsMethod, 'add_parameter', retval('bool'), [param('std::unique_ptr<Parameter>', 'param')])
     clsStruct.add_constructor([
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('const std::string&', 'name')])
@@ -213,8 +213,7 @@ def generate(file_):
                [param('unsigned int', 'id')])
     add_method(clsStruct, 'field_by_name', retval_child('bamboo::Field *'),
                [param('const std::string&', 'name')])
-    add_method(clsStruct, 'add_field', retval('bool'),
-               [param('bamboo::Field *', 'field', transfer_ownership = True)])
+    add_method(clsStruct, 'add_field', retval('bool'), [param('std::unique_ptr<Field>', 'field')])
     clsClass.add_constructor([
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('const std::string&', 'name')])
@@ -226,7 +225,7 @@ def generate(file_):
     add_method(clsClass, 'constructor', retval_child('bamboo::Field *'), [])
     add_method(clsClass, 'num_base_fields', retval('size_t'), [], is_const = True)
     add_method(clsClass, 'get_base_field', retval_child('bamboo::Field *'), [param('unsigned int', 'n')])
-    add_method(clsClass, 'add_parent', None,
+    add_method(clsClass, 'add_parent', retval('bool'),
                [param('bamboo::Class *', 'parent', transfer_ownership = False)])
     clsParam.add_constructor([
                param('bamboo::Type *', 'type', transfer_ownership = False),
@@ -355,13 +354,13 @@ def retval_self(typestr, **kwargs):
     # N.B. Currently this is an alias for retval_child, but we may consider
     #      changing it to have different behavior to make memory management cleaner.
     #      For now its ok, because usage of this pattern tends to be cleaned-up fairly quickly.
-    return retval_child(typestr, **kwargs)
+    return retval(typestr, caller_owns_return = False, **kwargs)
 
 def retval_parent(typestr, **kwargs):
     # FIXME: Currently this is an alias for retval_child, but it needs to be
     #        changed to have the returned object be the custodian of the child
     #        to reduce the amount of reference-loops that are generated
-    return retval_child(typestr, **kwargs)
+    return retval(typestr, caller_owns_return = False, **kwargs)
 
 def retval_child(typestr, **kwargs):
     return retval(typestr, custodian = -1, caller_owns_return = False, return_internal_reference = True, **kwargs)

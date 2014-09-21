@@ -690,14 +690,14 @@ _wrap_PyBambooModule_add_struct(PyBambooModule *self, PyObject *args, PyObject *
     PyObject *py_retval;
     bool retval;
     PyBambooStruct *dstruct;
-    bamboo::Struct *dstruct_ptr;
+    std::unique_ptr< bamboo::Struct > dstruct_ptr;
     const char *keywords[] = {"dstruct", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooStruct_Type, &dstruct)) {
         return NULL;
     }
-    dstruct_ptr = (dstruct ? dstruct->obj : NULL);
-    retval = self->obj->add_struct(dstruct_ptr);
+    dstruct_ptr = (dstruct ? std::unique_ptr< bamboo::Struct >(dstruct->obj) : NULL);
+    retval = self->obj->add_struct(move(dstruct_ptr));
     if (dstruct) {
         dstruct->obj = NULL;
     }
@@ -883,18 +883,6 @@ _wrap_PyBambooModule_getNumTypes(PyBambooModule *self)
 
 
 PyObject *
-_wrap_PyBambooModule_num_types(PyBambooModule *self)
-{
-    PyObject *py_retval;
-    size_t retval;
-
-    retval = self->obj->num_types();
-    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooModule_num_imports(PyBambooModule *self)
 {
     PyObject *py_retval;
@@ -911,14 +899,14 @@ _wrap_PyBambooModule_addImport(PyBambooModule *self, PyObject *args, PyObject *k
 {
     PyObject *py_retval;
     PyBambooImport *import;
-    bamboo::Import *import_ptr;
+    std::unique_ptr< bamboo::Import > import_ptr;
     const char *keywords[] = {"import", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooImport_Type, &import)) {
         return NULL;
     }
-    import_ptr = (import ? import->obj : NULL);
-    self->obj->add_import(import_ptr);
+    import_ptr = (import ? std::unique_ptr< bamboo::Import >(import->obj) : NULL);
+    self->obj->add_import(move(import_ptr));
     if (import) {
         import->obj = NULL;
     }
@@ -934,14 +922,14 @@ _wrap_PyBambooModule_add_class(PyBambooModule *self, PyObject *args, PyObject *k
     PyObject *py_retval;
     bool retval;
     PyBambooClass *dclass;
-    bamboo::Class *dclass_ptr;
+    std::unique_ptr< bamboo::Class > dclass_ptr;
     const char *keywords[] = {"dclass", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooClass_Type, &dclass)) {
         return NULL;
     }
-    dclass_ptr = (dclass ? dclass->obj : NULL);
-    retval = self->obj->add_class(dclass_ptr);
+    dclass_ptr = (dclass ? std::unique_ptr< bamboo::Class >(dclass->obj) : NULL);
+    retval = self->obj->add_class(move(dclass_ptr));
     if (dclass) {
         dclass->obj = NULL;
     }
@@ -956,14 +944,14 @@ _wrap_PyBambooModule_addClass(PyBambooModule *self, PyObject *args, PyObject *kw
     PyObject *py_retval;
     bool retval;
     PyBambooClass *dclass;
-    bamboo::Class *dclass_ptr;
+    std::unique_ptr< bamboo::Class > dclass_ptr;
     const char *keywords[] = {"dclass", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooClass_Type, &dclass)) {
         return NULL;
     }
-    dclass_ptr = (dclass ? dclass->obj : NULL);
-    retval = self->obj->add_class(dclass_ptr);
+    dclass_ptr = (dclass ? std::unique_ptr< bamboo::Class >(dclass->obj) : NULL);
+    retval = self->obj->add_class(move(dclass_ptr));
     if (dclass) {
         dclass->obj = NULL;
     }
@@ -1111,20 +1099,23 @@ _wrap_PyBambooModule_get_struct(PyBambooModule *self, PyObject *args, PyObject *
 
 
 PyObject *
-_wrap_PyBambooModule_getClassById(PyBambooModule *self, PyObject *args, PyObject *kwargs)
+_wrap_PyBambooModule_getClassByName(PyBambooModule *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
     bamboo::Class *retval;
-    unsigned int id;
-    const char *keywords[] = {"id", NULL};
+    const char *name;
+    Py_ssize_t name_len;
+    std::string name_std;
+    const char *keywords[] = {"name", NULL};
     PyBambooClass *py_Class;
     PyObject *wards;
     PyObject *wards2;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &id)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
         return NULL;
     }
-    retval = self->obj->class_by_id(id);
+    name_std = std::string(name, name_len);
+    retval = self->obj->class_by_name(name_std);
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -1242,6 +1233,18 @@ _wrap_PyBambooModule_num_classes(PyBambooModule *self)
 
 
 PyObject *
+_wrap_PyBambooModule_num_types(PyBambooModule *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->num_types();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
 _wrap_PyBambooModule_num_structs(PyBambooModule *self)
 {
     PyObject *py_retval;
@@ -1254,23 +1257,20 @@ _wrap_PyBambooModule_num_structs(PyBambooModule *self)
 
 
 PyObject *
-_wrap_PyBambooModule_getClassByName(PyBambooModule *self, PyObject *args, PyObject *kwargs)
+_wrap_PyBambooModule_getClassById(PyBambooModule *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
     bamboo::Class *retval;
-    const char *name;
-    Py_ssize_t name_len;
-    std::string name_std;
-    const char *keywords[] = {"name", NULL};
+    unsigned int id;
+    const char *keywords[] = {"id", NULL};
     PyBambooClass *py_Class;
     PyObject *wards;
     PyObject *wards2;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &name, &name_len)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &id)) {
         return NULL;
     }
-    name_std = std::string(name, name_len);
-    retval = self->obj->class_by_name(name_std);
+    retval = self->obj->class_by_id(id);
     if (!(retval)) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -1355,14 +1355,14 @@ _wrap_PyBambooModule_addStruct(PyBambooModule *self, PyObject *args, PyObject *k
     PyObject *py_retval;
     bool retval;
     PyBambooStruct *dstruct;
-    bamboo::Struct *dstruct_ptr;
+    std::unique_ptr< bamboo::Struct > dstruct_ptr;
     const char *keywords[] = {"dstruct", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooStruct_Type, &dstruct)) {
         return NULL;
     }
-    dstruct_ptr = (dstruct ? dstruct->obj : NULL);
-    retval = self->obj->add_struct(dstruct_ptr);
+    dstruct_ptr = (dstruct ? std::unique_ptr< bamboo::Struct >(dstruct->obj) : NULL);
+    retval = self->obj->add_struct(move(dstruct_ptr));
     if (dstruct) {
         dstruct->obj = NULL;
     }
@@ -1376,14 +1376,14 @@ _wrap_PyBambooModule_add_import(PyBambooModule *self, PyObject *args, PyObject *
 {
     PyObject *py_retval;
     PyBambooImport *import;
-    bamboo::Import *import_ptr;
+    std::unique_ptr< bamboo::Import > import_ptr;
     const char *keywords[] = {"import", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooImport_Type, &import)) {
         return NULL;
     }
-    import_ptr = (import ? import->obj : NULL);
-    self->obj->add_import(import_ptr);
+    import_ptr = (import ? std::unique_ptr< bamboo::Import >(import->obj) : NULL);
+    self->obj->add_import(move(import_ptr));
     if (import) {
         import->obj = NULL;
     }
@@ -1486,7 +1486,6 @@ static PyMethodDef PyBambooModule_methods[] = {
     {(char *) "class_by_id", (PyCFunction) _wrap_PyBambooModule_class_by_id, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
     {(char *) "get_keyword", (PyCFunction) _wrap_PyBambooModule_get_keyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword declared in the module." },
     {(char *) "getNumTypes", (PyCFunction) _wrap_PyBambooModule_getNumTypes, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
-    {(char *) "num_types", (PyCFunction) _wrap_PyBambooModule_num_types, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
     {(char *) "num_imports", (PyCFunction) _wrap_PyBambooModule_num_imports, METH_NOARGS, "Returns the number of imports in the module." },
     {(char *) "addImport", (PyCFunction) _wrap_PyBambooModule_addImport, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Import to the Module, merging it with any duplicate modules." },
     {(char *) "add_class", (PyCFunction) _wrap_PyBambooModule_add_class, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Class to the Module returning false if there is a name conflict." },
@@ -1494,13 +1493,14 @@ static PyMethodDef PyBambooModule_methods[] = {
     {(char *) "type_by_name", (PyCFunction) _wrap_PyBambooModule_type_by_name, METH_KEYWORDS|METH_VARARGS, "Returns the requested Type or None if there is no such type." },
     {(char *) "field_by_id", (PyCFunction) _wrap_PyBambooModule_field_by_id, METH_KEYWORDS|METH_VARARGS, "Returns the requested Field or None if there is no such type." },
     {(char *) "get_struct", (PyCFunction) _wrap_PyBambooModule_get_struct, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th Struct in the module." },
-    {(char *) "getClassById", (PyCFunction) _wrap_PyBambooModule_getClassById, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
+    {(char *) "getClassByName", (PyCFunction) _wrap_PyBambooModule_getClassByName, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
     {(char *) "getFieldById", (PyCFunction) _wrap_PyBambooModule_getFieldById, METH_KEYWORDS|METH_VARARGS, "Returns the requested Field or None if there is no such type." },
     {(char *) "getKeyword", (PyCFunction) _wrap_PyBambooModule_getKeyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword declared in the module." },
     {(char *) "getNumKeywords", (PyCFunction) _wrap_PyBambooModule_getNumKeywords, METH_NOARGS, "Returns the number of keywords declared in the module." },
     {(char *) "num_classes", (PyCFunction) _wrap_PyBambooModule_num_classes, METH_NOARGS, "Returns the number of classes in the module." },
+    {(char *) "num_types", (PyCFunction) _wrap_PyBambooModule_num_types, METH_NOARGS, "Returns the number of types in the module (classes, structs, typedefs)." },
     {(char *) "num_structs", (PyCFunction) _wrap_PyBambooModule_num_structs, METH_NOARGS, "Returns the number of structs in the module." },
-    {(char *) "getClassByName", (PyCFunction) _wrap_PyBambooModule_getClassByName, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
+    {(char *) "getClassById", (PyCFunction) _wrap_PyBambooModule_getClassById, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
     {(char *) "class_by_name", (PyCFunction) _wrap_PyBambooModule_class_by_name, METH_KEYWORDS|METH_VARARGS, "Returns the requested Class or None if there is no such class." },
     {(char *) "addStruct", (PyCFunction) _wrap_PyBambooModule_addStruct, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Struct to the Module returning false if there is a name conflict." },
     {(char *) "add_import", (PyCFunction) _wrap_PyBambooModule_add_import, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Import to the Module, merging it with any duplicate modules." },
@@ -2872,14 +2872,14 @@ _wrap_PyBambooMethod_add_parameter(PyBambooMethod *self, PyObject *args, PyObjec
     PyObject *py_retval;
     bool retval;
     PyBambooParameter *param;
-    bamboo::Parameter *param_ptr;
+    std::unique_ptr< bamboo::Parameter > param_ptr;
     const char *keywords[] = {"param", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooParameter_Type, &param)) {
         return NULL;
     }
-    param_ptr = (param ? param->obj : NULL);
-    retval = self->obj->add_parameter(param_ptr);
+    param_ptr = (param ? std::unique_ptr< bamboo::Parameter >(param->obj) : NULL);
+    retval = self->obj->add_parameter(move(param_ptr));
     if (param) {
         param->obj = NULL;
     }
@@ -3011,14 +3011,14 @@ _wrap_PyBambooMethod_addParameter(PyBambooMethod *self, PyObject *args, PyObject
     PyObject *py_retval;
     bool retval;
     PyBambooParameter *param;
-    bamboo::Parameter *param_ptr;
+    std::unique_ptr< bamboo::Parameter > param_ptr;
     const char *keywords[] = {"param", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooParameter_Type, &param)) {
         return NULL;
     }
-    param_ptr = (param ? param->obj : NULL);
-    retval = self->obj->add_parameter(param_ptr);
+    param_ptr = (param ? std::unique_ptr< bamboo::Parameter >(param->obj) : NULL);
+    retval = self->obj->add_parameter(move(param_ptr));
     if (param) {
         param->obj = NULL;
     }
@@ -3493,14 +3493,14 @@ _wrap_PyBambooStruct_add_field(PyBambooStruct *self, PyObject *args, PyObject *k
     PyObject *py_retval;
     bool retval;
     PyBambooField *field;
-    bamboo::Field *field_ptr;
+    std::unique_ptr< bamboo::Field > field_ptr;
     const char *keywords[] = {"field", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
         return NULL;
     }
-    field_ptr = (field ? field->obj : NULL);
-    retval = self->obj->add_field(field_ptr);
+    field_ptr = (field ? std::unique_ptr< bamboo::Field >(field->obj) : NULL);
+    retval = self->obj->add_field(move(field_ptr));
     if (field) {
         field->obj = NULL;
     }
@@ -3645,14 +3645,14 @@ _wrap_PyBambooStruct_addField(PyBambooStruct *self, PyObject *args, PyObject *kw
     PyObject *py_retval;
     bool retval;
     PyBambooField *field;
-    bamboo::Field *field_ptr;
+    std::unique_ptr< bamboo::Field > field_ptr;
     const char *keywords[] = {"field", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
         return NULL;
     }
-    field_ptr = (field ? field->obj : NULL);
-    retval = self->obj->add_field(field_ptr);
+    field_ptr = (field ? std::unique_ptr< bamboo::Field >(field->obj) : NULL);
+    retval = self->obj->add_field(move(field_ptr));
     if (field) {
         field->obj = NULL;
     }
@@ -3874,6 +3874,7 @@ PyObject *
 _wrap_PyBambooClass_addParent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
+    bool retval;
     PyBambooClass *parent;
     bamboo::Class *parent_ptr;
     const char *keywords[] = {"parent", NULL};
@@ -3882,9 +3883,8 @@ _wrap_PyBambooClass_addParent(PyBambooClass *self, PyObject *args, PyObject *kwa
         return NULL;
     }
     parent_ptr = (parent ? parent->obj : NULL);
-    self->obj->add_parent(parent_ptr);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
+    retval = self->obj->add_parent(parent_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -4104,6 +4104,7 @@ PyObject *
 _wrap_PyBambooClass_add_parent(PyBambooClass *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
+    bool retval;
     PyBambooClass *parent;
     bamboo::Class *parent_ptr;
     const char *keywords[] = {"parent", NULL};
@@ -4112,9 +4113,8 @@ _wrap_PyBambooClass_add_parent(PyBambooClass *self, PyObject *args, PyObject *kw
         return NULL;
     }
     parent_ptr = (parent ? parent->obj : NULL);
-    self->obj->add_parent(parent_ptr);
-    Py_INCREF(Py_None);
-    py_retval = Py_None;
+    retval = self->obj->add_parent(parent_ptr);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -6063,14 +6063,14 @@ _wrap_PyBambooMolecularField_add_field(PyBambooMolecularField *self, PyObject *a
     PyObject *py_retval;
     bool retval;
     PyBambooField *field;
-    bamboo::Field *field_ptr;
+    std::unique_ptr< bamboo::Field > field_ptr;
     const char *keywords[] = {"field", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
         return NULL;
     }
-    field_ptr = (field ? field->obj : NULL);
-    retval = self->obj->add_field(field_ptr);
+    field_ptr = (field ? std::unique_ptr< bamboo::Field >(field->obj) : NULL);
+    retval = self->obj->add_field(move(field_ptr));
     if (field) {
         field->obj = NULL;
     }
@@ -6310,14 +6310,14 @@ _wrap_PyBambooMolecularField_addField(PyBambooMolecularField *self, PyObject *ar
     PyObject *py_retval;
     bool retval;
     PyBambooField *field;
-    bamboo::Field *field_ptr;
+    std::unique_ptr< bamboo::Field > field_ptr;
     const char *keywords[] = {"field", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooField_Type, &field)) {
         return NULL;
     }
-    field_ptr = (field ? field->obj : NULL);
-    retval = self->obj->add_field(field_ptr);
+    field_ptr = (field ? std::unique_ptr< bamboo::Field >(field->obj) : NULL);
+    retval = self->obj->add_field(move(field_ptr));
     if (field) {
         field->obj = NULL;
     }

@@ -31,7 +31,6 @@ class Module
     Module(); // constructor
     Module(const Module&) = delete;
     Module& operator=(const Module&) = delete;
-    virtual ~Module();
 
     // num_classes returns the number of classes in the module.
     inline size_t num_classes() const;
