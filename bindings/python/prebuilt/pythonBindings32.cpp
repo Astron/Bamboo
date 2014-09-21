@@ -1622,86 +1622,6 @@ _wrap_PyBambooType_getSize(PyBambooType *self)
 
 
 PyObject *
-_wrap_PyBambooType_as_array(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Array *retval;
-    PyBambooArray *py_Array;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_array();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Array = PyObject_New(PyBambooArray, &PyBambooArray_Type);
-    py_Array->obj = retval;
-    py_Array->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Array) && !PySequence_Contains(wards, ((PyObject *) py_Array)))
-        PyList_Append(wards, ((PyObject *) py_Array));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Array);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooType_asMethod(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Method *retval;
-    PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_method();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
-    py_Method->obj = retval;
-    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooType_hasFixedSize(PyBambooType *self)
 {
     PyObject *py_retval;
@@ -1714,41 +1634,13 @@ _wrap_PyBambooType_hasFixedSize(PyBambooType *self)
 
 
 PyObject *
-_wrap_PyBambooType_as_struct(PyBambooType *self)
+_wrap_PyBambooType_alias(PyBambooType *self)
 {
     PyObject *py_retval;
-    bamboo::Struct *retval;
-    PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
+    std::string retval;
 
-    retval = self->obj->as_struct();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
-    py_Struct->obj = retval;
-    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
+    retval = self->obj->alias();
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
 
@@ -1781,86 +1673,6 @@ _wrap_PyBambooType_setAlias(PyBambooType *self, PyObject *args, PyObject *kwargs
     self->obj->set_alias(alias_std);
     Py_INCREF(Py_None);
     py_retval = Py_None;
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooType_as_numeric(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Numeric *retval;
-    PyBambooNumeric *py_Numeric;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_numeric();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
-    py_Numeric->obj = retval;
-    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Numeric) && !PySequence_Contains(wards, ((PyObject *) py_Numeric)))
-        PyList_Append(wards, ((PyObject *) py_Numeric));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Numeric);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooType_asArray(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Array *retval;
-    PyBambooArray *py_Array;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_array();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Array = PyObject_New(PyBambooArray, &PyBambooArray_Type);
-    py_Array->obj = retval;
-    py_Array->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Array) && !PySequence_Contains(wards, ((PyObject *) py_Array)))
-        PyList_Append(wards, ((PyObject *) py_Array));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Array);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -1902,18 +1714,6 @@ _wrap_PyBambooType_subtype(PyBambooType *self)
 
 
 PyObject *
-_wrap_PyBambooType_alias(PyBambooType *self)
-{
-    PyObject *py_retval;
-    std::string retval;
-
-    retval = self->obj->alias();
-    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooType_has_alias(PyBambooType *self)
 {
     PyObject *py_retval;
@@ -1938,46 +1738,6 @@ _wrap_PyBambooType_has_fixed_size(PyBambooType *self)
 
 
 PyObject *
-_wrap_PyBambooType_as_method(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Method *retval;
-    PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_method();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
-    py_Method->obj = retval;
-    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-
-PyObject *
 _wrap_PyBambooType_hasAlias(PyBambooType *self)
 {
     PyObject *py_retval;
@@ -1985,86 +1745,6 @@ _wrap_PyBambooType_hasAlias(PyBambooType *self)
 
     retval = self->obj->has_alias();
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooType_asNumeric(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Numeric *retval;
-    PyBambooNumeric *py_Numeric;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_numeric();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
-    py_Numeric->obj = retval;
-    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Numeric) && !PySequence_Contains(wards, ((PyObject *) py_Numeric)))
-        PyList_Append(wards, ((PyObject *) py_Numeric));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Numeric);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-
-PyObject *
-_wrap_PyBambooType_asStruct(PyBambooType *self)
-{
-    PyObject *py_retval;
-    bamboo::Struct *retval;
-    PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_struct();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
-    py_Struct->obj = retval;
-    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -2090,24 +1770,16 @@ _wrap_PyBambooType_set_alias(PyBambooType *self, PyObject *args, PyObject *kwarg
 
 static PyMethodDef PyBambooType_methods[] = {
     {(char *) "getSize", (PyCFunction) _wrap_PyBambooType_getSize, METH_NOARGS, "Returns the size of the Type in bytes or 0 if it is variable." },
-    {(char *) "as_array", (PyCFunction) _wrap_PyBambooType_as_array, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
-    {(char *) "asMethod", (PyCFunction) _wrap_PyBambooType_asMethod, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "hasFixedSize", (PyCFunction) _wrap_PyBambooType_hasFixedSize, METH_NOARGS, "Returns true if the Type has a fixed size in bytes." },
-    {(char *) "as_struct", (PyCFunction) _wrap_PyBambooType_as_struct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
+    {(char *) "alias", (PyCFunction) _wrap_PyBambooType_alias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
     {(char *) "fixed_size", (PyCFunction) _wrap_PyBambooType_fixed_size, METH_NOARGS, "Returns the size of the Type in bytes or 0 if it is variable." },
     {(char *) "setAlias", (PyCFunction) _wrap_PyBambooType_setAlias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
-    {(char *) "as_numeric", (PyCFunction) _wrap_PyBambooType_as_numeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
-    {(char *) "asArray", (PyCFunction) _wrap_PyBambooType_asArray, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
     {(char *) "getAlias", (PyCFunction) _wrap_PyBambooType_getAlias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
     {(char *) "getSubtype", (PyCFunction) _wrap_PyBambooType_getSubtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
     {(char *) "subtype", (PyCFunction) _wrap_PyBambooType_subtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
-    {(char *) "alias", (PyCFunction) _wrap_PyBambooType_alias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
     {(char *) "has_alias", (PyCFunction) _wrap_PyBambooType_has_alias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
     {(char *) "has_fixed_size", (PyCFunction) _wrap_PyBambooType_has_fixed_size, METH_NOARGS, "Returns true if the Type has a fixed size in bytes." },
-    {(char *) "as_method", (PyCFunction) _wrap_PyBambooType_as_method, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "hasAlias", (PyCFunction) _wrap_PyBambooType_hasAlias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
-    {(char *) "asNumeric", (PyCFunction) _wrap_PyBambooType_asNumeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
-    {(char *) "asStruct", (PyCFunction) _wrap_PyBambooType_asStruct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
     {(char *) "set_alias", (PyCFunction) _wrap_PyBambooType_set_alias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
     {NULL, NULL, 0, NULL}
 };
@@ -3441,8 +3113,6 @@ _wrap_PyBambooStruct_module(PyBambooStruct *self)
     PyObject *py_retval;
     bamboo::Module *retval;
     PyBambooModule *py_Module;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->module();
     if (!(retval)) {
@@ -3452,25 +3122,7 @@ _wrap_PyBambooStruct_module(PyBambooStruct *self)
     py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
     py_Module->obj = retval;
     py_Module->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Module) && !PySequence_Contains(wards, ((PyObject *) py_Module)))
-        PyList_Append(wards, ((PyObject *) py_Module));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Module);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -3560,8 +3212,6 @@ _wrap_PyBambooStruct_getModule(PyBambooStruct *self)
     PyObject *py_retval;
     bamboo::Module *retval;
     PyBambooModule *py_Module;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->module();
     if (!(retval)) {
@@ -3571,25 +3221,7 @@ _wrap_PyBambooStruct_getModule(PyBambooStruct *self)
     py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
     py_Module->obj = retval;
     py_Module->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Module) && !PySequence_Contains(wards, ((PyObject *) py_Module)))
-        PyList_Append(wards, ((PyObject *) py_Module));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Module);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -4603,8 +4235,6 @@ _wrap_PyBambooParameter_getMethod(PyBambooParameter *self)
     PyObject *py_retval;
     bamboo::Method *retval;
     PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->get_method();
     if (!(retval)) {
@@ -4614,25 +4244,7 @@ _wrap_PyBambooParameter_getMethod(PyBambooParameter *self)
     py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
     py_Method->obj = retval;
     py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -4714,8 +4326,6 @@ _wrap_PyBambooParameter_get_method(PyBambooParameter *self)
     PyObject *py_retval;
     bamboo::Method *retval;
     PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->get_method();
     if (!(retval)) {
@@ -4725,25 +4335,7 @@ _wrap_PyBambooParameter_get_method(PyBambooParameter *self)
     py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
     py_Method->obj = retval;
     py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -5065,8 +4657,6 @@ _wrap_PyBambooField_record(PyBambooField *self)
     PyObject *py_retval;
     bamboo::Struct *retval;
     PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->record();
     if (!(retval)) {
@@ -5076,25 +4666,7 @@ _wrap_PyBambooField_record(PyBambooField *self)
     py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
     py_Struct->obj = retval;
     py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -5304,84 +4876,6 @@ _wrap_PyBambooMolecularField__tp_init(PyBambooMolecularField *self, PyObject *ar
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_as_struct(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Struct *retval;
-    PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_struct();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
-    py_Struct->obj = retval;
-    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_as_array(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Array *retval;
-    PyBambooArray *py_Array;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_array();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Array = PyObject_New(PyBambooArray, &PyBambooArray_Type);
-    py_Array->obj = retval;
-    py_Array->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Array) && !PySequence_Contains(wards, ((PyObject *) py_Array)))
-        PyList_Append(wards, ((PyObject *) py_Array));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Array);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
 _wrap_PyBambooMolecularField_num_fields(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -5393,91 +4887,11 @@ _wrap_PyBambooMolecularField_num_fields(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_as_method(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Method *retval;
-    PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_method();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
-    py_Method->obj = retval;
-    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_as_numeric(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Numeric *retval;
-    PyBambooNumeric *py_Numeric;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_numeric();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
-    py_Numeric->obj = retval;
-    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Numeric) && !PySequence_Contains(wards, ((PyObject *) py_Numeric)))
-        PyList_Append(wards, ((PyObject *) py_Numeric));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Numeric);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
 _wrap_PyBambooMolecularField_module(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
     bamboo::Module *retval;
     PyBambooModule *py_Module;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->module();
     if (!(retval)) {
@@ -5487,25 +4901,7 @@ _wrap_PyBambooMolecularField_module(PyBambooMolecularField *self)
     py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
     py_Module->obj = retval;
     py_Module->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Module) && !PySequence_Contains(wards, ((PyObject *) py_Module)))
-        PyList_Append(wards, ((PyObject *) py_Module));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Module);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -5517,45 +4913,6 @@ _wrap_PyBambooMolecularField_getSize(PyBambooMolecularField *self)
 
     retval = self->obj->fixed_size();
     py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_asMethod(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Method *retval;
-    PyBambooMethod *py_Method;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_method();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
-    py_Method->obj = retval;
-    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Method) && !PySequence_Contains(wards, ((PyObject *) py_Method)))
-        PyList_Append(wards, ((PyObject *) py_Method));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Method), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Method), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Method);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -5647,45 +5004,6 @@ _wrap_PyBambooMolecularField_hasDefaultValue(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_asArray(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Array *retval;
-    PyBambooArray *py_Array;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_array();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Array = PyObject_New(PyBambooArray, &PyBambooArray_Type);
-    py_Array->obj = retval;
-    py_Array->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Array) && !PySequence_Contains(wards, ((PyObject *) py_Array)))
-        PyList_Append(wards, ((PyObject *) py_Array));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Array), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Array), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Array);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
 _wrap_PyBambooMolecularField_subtype(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -5741,45 +5059,6 @@ _wrap_PyBambooMolecularField_get_field(PyBambooMolecularField *self, PyObject *a
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_asStruct(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Struct *retval;
-    PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_struct();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
-    py_Struct->obj = retval;
-    py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
-    return py_retval;
-}
-
-PyObject *
 _wrap_PyBambooMolecularField_type(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -5824,8 +5103,6 @@ _wrap_PyBambooMolecularField_record(PyBambooMolecularField *self)
     PyObject *py_retval;
     bamboo::Struct *retval;
     PyBambooStruct *py_Struct;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->record();
     if (!(retval)) {
@@ -5835,25 +5112,7 @@ _wrap_PyBambooMolecularField_record(PyBambooMolecularField *self)
     py_Struct = PyObject_New(PyBambooStruct, &PyBambooStruct_Type);
     py_Struct->obj = retval;
     py_Struct->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Struct) && !PySequence_Contains(wards, ((PyObject *) py_Struct)))
-        PyList_Append(wards, ((PyObject *) py_Struct));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Struct), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Struct), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Struct);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -6139,8 +5398,6 @@ _wrap_PyBambooMolecularField_getModule(PyBambooMolecularField *self)
     PyObject *py_retval;
     bamboo::Module *retval;
     PyBambooModule *py_Module;
-    PyObject *wards;
-    PyObject *wards2;
 
     retval = self->obj->module();
     if (!(retval)) {
@@ -6150,25 +5407,7 @@ _wrap_PyBambooMolecularField_getModule(PyBambooMolecularField *self)
     py_Module = PyObject_New(PyBambooModule, &PyBambooModule_Type);
     py_Module->obj = retval;
     py_Module->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Module) && !PySequence_Contains(wards, ((PyObject *) py_Module)))
-        PyList_Append(wards, ((PyObject *) py_Module));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Module), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Module), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
     py_retval = Py_BuildValue((char *) "N", py_Module);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -6188,45 +5427,6 @@ _wrap_PyBambooMolecularField_setAlias(PyBambooMolecularField *self, PyObject *ar
     self->obj->set_alias(alias_std);
     Py_INCREF(Py_None);
     py_retval = Py_None;
-    return py_retval;
-}
-
-PyObject *
-_wrap_PyBambooMolecularField_asNumeric(PyBambooMolecularField *self)
-{
-    PyObject *py_retval;
-    bamboo::Numeric *retval;
-    PyBambooNumeric *py_Numeric;
-    PyObject *wards;
-    PyObject *wards2;
-
-    retval = self->obj->as_numeric();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
-    py_Numeric->obj = retval;
-    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    wards = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards == NULL) {
-        PyErr_Clear();
-        wards = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards);
-    }
-    if (((PyObject *) py_Numeric) && !PySequence_Contains(wards, ((PyObject *) py_Numeric)))
-        PyList_Append(wards, ((PyObject *) py_Numeric));
-    wards2 = PyObject_GetAttrString(((PyObject *) py_Numeric), (char *) "__wards__");
-    if (wards2 == NULL) {
-        PyErr_Clear();
-        wards2 = PyList_New(0);
-        PyObject_SetAttrString(((PyObject *) py_Numeric), (char *) "__wards__", wards2);
-    }
-    if (((PyObject *) self) && !PySequence_Contains(wards2, ((PyObject *) self)))
-        PyList_Append(wards2, ((PyObject *) self));
-    py_retval = Py_BuildValue((char *) "N", py_Numeric);
-    Py_DECREF(wards2);
-    Py_DECREF(wards);
     return py_retval;
 }
 
@@ -6389,22 +5589,15 @@ _wrap_PyBambooMolecularField_set_alias(PyBambooMolecularField *self, PyObject *a
 }
 
 static PyMethodDef PyBambooMolecularField_methods[] = {
-    {(char *) "as_struct", (PyCFunction) _wrap_PyBambooMolecularField_as_struct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
-    {(char *) "as_array", (PyCFunction) _wrap_PyBambooMolecularField_as_array, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
     {(char *) "num_fields", (PyCFunction) _wrap_PyBambooMolecularField_num_fields, METH_NOARGS, "Returns the number of fields in the struct." },
-    {(char *) "as_method", (PyCFunction) _wrap_PyBambooMolecularField_as_method, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
-    {(char *) "as_numeric", (PyCFunction) _wrap_PyBambooMolecularField_as_numeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
     {(char *) "module", (PyCFunction) _wrap_PyBambooMolecularField_module, METH_NOARGS, "Returns the Module object that contains the struct." },
     {(char *) "getSize", (PyCFunction) _wrap_PyBambooMolecularField_getSize, METH_NOARGS, "Returns the size of the Type in bytes or 0 if it is variable." },
-    {(char *) "asMethod", (PyCFunction) _wrap_PyBambooMolecularField_asMethod, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "field_by_name", (PyCFunction) _wrap_PyBambooMolecularField_field_by_name, METH_KEYWORDS|METH_VARARGS, "Returns the field with <name>, or None if no such field exists." },
     {(char *) "setType", (PyCFunction) _wrap_PyBambooMolecularField_setType, METH_KEYWORDS|METH_VARARGS, "Sets the Type of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {(char *) "has_fixed_size", (PyCFunction) _wrap_PyBambooMolecularField_has_fixed_size, METH_NOARGS, "Returns true if the Type has a fixed size in bytes." },
     {(char *) "hasDefaultValue", (PyCFunction) _wrap_PyBambooMolecularField_hasDefaultValue, METH_NOARGS, "Returns true if a default value was defined for this field." },
-    {(char *) "asArray", (PyCFunction) _wrap_PyBambooMolecularField_asArray, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
     {(char *) "subtype", (PyCFunction) _wrap_PyBambooMolecularField_subtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
     {(char *) "get_field", (PyCFunction) _wrap_PyBambooMolecularField_get_field, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
-    {(char *) "asStruct", (PyCFunction) _wrap_PyBambooMolecularField_asStruct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
     {(char *) "type", (PyCFunction) _wrap_PyBambooMolecularField_type, METH_NOARGS, "Returns the Type of the field." },
     {(char *) "record", (PyCFunction) _wrap_PyBambooMolecularField_record, METH_NOARGS, "Returns the Class or Struct that contains this field." },
     {(char *) "getType", (PyCFunction) _wrap_PyBambooMolecularField_getType, METH_NOARGS, "Returns the Type of the field." },
@@ -6420,7 +5613,6 @@ static PyMethodDef PyBambooMolecularField_methods[] = {
     {(char *) "getFieldById", (PyCFunction) _wrap_PyBambooMolecularField_getFieldById, METH_KEYWORDS|METH_VARARGS, "Returns the field with the index <id>, or None if no such field exists." },
     {(char *) "getModule", (PyCFunction) _wrap_PyBambooMolecularField_getModule, METH_NOARGS, "Returns the Module object that contains the struct." },
     {(char *) "setAlias", (PyCFunction) _wrap_PyBambooMolecularField_setAlias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
-    {(char *) "asNumeric", (PyCFunction) _wrap_PyBambooMolecularField_asNumeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
     {(char *) "set_name", (PyCFunction) _wrap_PyBambooMolecularField_set_name, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
     {(char *) "hasAlias", (PyCFunction) _wrap_PyBambooMolecularField_hasAlias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
     {(char *) "getField", (PyCFunction) _wrap_PyBambooMolecularField_getField, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
