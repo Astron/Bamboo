@@ -364,6 +364,61 @@ static PyObject* _wrap_Pystd__vector__lt__std__string__gt__Iter__tp_iternext(Pys
     return py_retval;
 }
 
+PyObject *
+_wrap_Pystd__vector__lt__std__string__gt_____len__(Pystd__vector__lt__std__string__gt__ *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->size();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+static Py_ssize_t
+std__vector__lt__std__string__gt____sq_length (Pystd__vector__lt__std__string__gt__ *py_self)
+{
+    PyObject *py_result;
+    Py_ssize_t result;
+
+    py_result = _wrap_Pystd__vector__lt__std__string__gt_____len__(py_self);
+    if (py_result == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Unknown error in attempting to determine __len__.");
+        Py_XDECREF(py_result);
+        return -1;
+    }
+    result = PyLong_AsSsize_t(py_result);
+    Py_DECREF(py_result);
+    return result;
+}
+
+
+
+static PySequenceMethods std__vector__lt__std__string__gt____py_sequence_methods = {
+    (lenfunc) std__vector__lt__std__string__gt____sq_length,
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+    (ssizeargfunc) NULL,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeargfunc) NULL,
+#else
+    NULL,
+#endif
+    (ssizeobjargproc) NULL,
+#if PY_MAJOR_VERSION < 3
+    (ssizessizeobjargproc) NULL,
+#else
+    NULL,
+#endif
+    (objobjproc) NULL,
+    /* Added in release 2.0 */
+    (binaryfunc) NULL,
+    (ssizeargfunc) NULL,
+};
+
+
+
 int _wrap_convert_py2c__std__string(PyObject *value, std::string *address)
 {
     PyObject *py_retval;
