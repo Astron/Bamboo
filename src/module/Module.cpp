@@ -81,7 +81,10 @@ bool Module::add_class(std::unique_ptr<Class> cls)
 
     cls->set_id(m_types_by_id.size());
     m_types_by_id.push_back(ref);
+
+    // Transfer ownership of the Class to the module
     m_classes.push_back(move(cls));
+
     return true;
 }
 
@@ -105,7 +108,10 @@ bool Module::add_struct(std::unique_ptr<Struct> record)
 
     record->set_id(m_types_by_id.size());
     m_types_by_id.push_back(ref);
+
+    // Transfer ownership of the Struct to the Module
     m_structs.push_back(move(record));
+
     return true;
 }
 
@@ -127,6 +133,8 @@ bool Module::add_typedef(const std::string& name, Type *type)
 void Module::add_import(std::unique_ptr<Import> import)
 {
     // TODO: Combine duplicates
+
+    // Transfer ownership of the import to the module
     m_imports.push_back(move(import));
 }
 

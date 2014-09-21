@@ -1,5 +1,6 @@
 // Filename: Method.h
 #pragma once
+#include <memory>        // std::unique_ptr
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
 #include "Type.h"
@@ -16,7 +17,7 @@ class Method : public Type
     Method();
     Method(const Method&) = delete;
     Method& operator=(const Method&) = delete;
-    virtual ~Method();
+    virtual ~Method() {};
 
     // as_method returns this as a Method if it is a method, or nullptr otherwise.
     Method *as_method() override;
@@ -33,10 +34,10 @@ class Method : public Type
 
     // add_parameter adds a new parameter to the method.
     //     Returns false if the parameter could not be added to the method.
-    bool add_parameter(Parameter *param); // TODO: Transition to unique_ptr<Parameter>
+    bool add_parameter(std::unique_ptr<Parameter> param);
 
   private:
-    std::vector<Parameter *> m_parameters; // the "arguments" or parameters of the method
+    std::vector<std::unique_ptr<Parameter> > m_parameters;
     std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Parameter *> m_parameters_by_name;
 };

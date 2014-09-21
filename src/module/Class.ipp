@@ -34,22 +34,22 @@ inline bool Class::has_constructor() const {
 // constructor returns the constructor method for this class if it is defined,
 //     or nullptr if the class uses the default constructor.
 inline Field *Class::constructor() {
-    return m_constructor;
+    return m_constructor.get();
 }
 inline const Field *Class::constructor() const {
-    return m_constructor;
+    return m_constructor.get();
 }
 
 // num_base_fields returns the number of fields declared directly in this class.
 inline size_t Class::num_base_fields() const {
-    return m_base_fields.size();
+    return m_owned_fields.size();
 }
 // get_base_field returns the <n>th field from the class excluding any inherited fields.
 inline Field *Class::get_base_field(unsigned int n) {
-    return m_base_fields.at(n);
+    return m_owned_fields.at(n).get();
 }
 inline const Field *Class::get_base_field(unsigned int n) const {
-    return m_base_fields.at(n);
+    return m_owned_fields.at(n).get();
 }
 
 

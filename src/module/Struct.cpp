@@ -18,14 +18,6 @@ Struct::Struct(Module *module) : m_module(module), m_id(0)
     m_subtype = kTypeStruct;
 }
 
-// destructor
-Struct::~Struct()
-{
-    for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
-        delete(*it);
-    }
-}
-
 // as_struct returns this as a Struct if it is a Struct, or nullptr otherwise.
 Struct *Struct::as_struct()
 {
@@ -47,8 +39,10 @@ const Class *Struct::as_class() const
 }
 
 // add_field adds a new Field to the struct.
-bool Struct::add_field(Field *field)
+bool Struct::add_field(std::unique_ptr<Field> field)
 {
+    Field *ref = field.get();
+
     // Field must not be null
     if(field == nullptr) {
         return false;
@@ -77,7 +71,7 @@ bool Struct::add_field(Field *field)
 
         // Try to add the field
         bool inserted = m_fields_by_name.insert(
-                            unordered_map<string, Field *>::value_type(field->name(), field)).second;
+                            unordered_map<string, Field *>::value_type(field->name(), ref)).second;
         if(!inserted) {
             // But the field had a name conflict
             return false;
@@ -87,10 +81,11 @@ bool Struct::add_field(Field *field)
     }
 
     // Struct fields are accessible by id.
-    m_module->add_field(field);
-    m_fields_by_id.insert(unordered_map<int, Field *>::value_type(field->id(), field));
+    m_module->add_field(ref);
+    m_fields_by_id.insert(unordered_map<int, Field *>::value_type(field->id(), ref));
 
-    m_fields.push_back(field);
+    // Add it to the accessible list of fields
+    m_fields.push_back(ref);
     if(has_fixed_size() || m_fields.size() == 1) {
         if(field->type()->has_fixed_size()) {
             m_size += field->type()->fixed_size();
@@ -98,6 +93,10 @@ bool Struct::add_field(Field *field)
             m_size = 0;
         }
     }
+
+    // Transfer ownership of the Field to the Struct
+    m_owned_fields.push_back(move(field));
+
     return true;
 }
 

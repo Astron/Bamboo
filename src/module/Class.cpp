@@ -10,14 +10,6 @@ namespace bamboo   // open namespace
 // constructor
 Class::Class(Module *module, const string& name) : Struct(module, name) {}
 
-// destructor
-Class::~Class()
-{
-    if(m_constructor != nullptr) {
-        delete m_constructor;
-    }
-}
-
 // as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
 Class *Class::as_class()
 {
@@ -30,8 +22,10 @@ const Class *Class::as_class() const
 
 // add_parent adds a new parent to the inheritance hierarchy of the class.
 //     Note: This is normally called only during parsing.
-void Class::add_parent(Class *parent)
+bool Class::add_parent(Class *parent)
 {
+    if(parent == nullptr) { return false; }
+
     parent->add_child(this);
     m_parents.push_back(parent);
 
@@ -43,6 +37,8 @@ void Class::add_parent(Class *parent)
     for(auto it = parent_fields.begin(); it != parent_fields.end(); ++it) {
         add_inherited_field(parent, *it);
     }
+
+    return true;
 }
 
 // add_child marks a class as a child of this class.
@@ -54,8 +50,10 @@ void Class::add_child(Class *child)
 // add_field adds the newly-allocated field to the class.  The class becomes
 //     the owner of the pointer and will delete it when it destructs.
 //     Returns true if the field is successfully added, or false if the field cannot be added.
-bool Class::add_field(Field *field)
+bool Class::add_field(unique_ptr<Field> field)
 {
+    Field *ref = field.get();
+
     // Field can't be null
     if(field == nullptr) {
         return false;
@@ -86,27 +84,28 @@ bool Class::add_field(Field *field)
         // The constructor has to be the first declared field.
         //     Note: This is the case because the constructor should
         //           always have the earliest field id.
-        if(m_base_fields.size() > 0) {
+        if(m_owned_fields.size() > 0) {
             return false;
         }
 
-        field->set_struct(this);
-        m_constructor = field;
+        // Add the field to the field dictionaries
+        m_module->add_field(ref);
+        m_fields_by_id[field->id()] = ref;
+        m_fields_by_name[field->name()] = ref;
 
-        m_module->add_field(field);
-        m_fields_by_id[field->id()] = field;
-        m_fields_by_name[field->name()] = field;
+        // Transfer ownership of the Field to the Class
+        field->set_struct(this);
+        m_constructor = move(field);
+
         return true;
     }
 
-    // Try to add the field
-    bool inserted = m_base_fields_by_name.insert(
-                        unordered_map<string, Field *>::value_type(field->name(), field)).second;
+    // Add it to the set of our base field names
+    bool inserted = m_base_names.insert(field->name()).second;
     // Fail if there is a name conflict
     if(!inserted) {
         return false;
     }
-    m_base_fields.push_back(field);
 
     // If a parent has a field with the same name, shadow it
     auto prev_field = m_fields_by_name.find(field->name());
@@ -115,13 +114,12 @@ bool Class::add_field(Field *field)
     }
 
     // Add the field to our full field list
-    field->set_struct(this);
-    m_fields.push_back(field); // Don't have to try to sort; id is always last
+    m_fields.push_back(ref); // Don't have to try to sort; id is always last
 
-    // Add the field to the lookups
-    m_module->add_field(field);
-    m_fields_by_id[field->id()] = field;
-    m_fields_by_name[field->name()] = field;
+    // Add the field to the field dictionaries
+    m_module->add_field(ref);
+    m_fields_by_id[field->id()] = ref;
+    m_fields_by_name[field->name()] = ref;
     m_indices_by_name[field->name()] = m_fields.size() - 1;
 
     // Update our size
@@ -136,8 +134,12 @@ bool Class::add_field(Field *field)
 
     // Tell our children about the new field
     for(auto it = m_children.begin(); it != m_children.end(); ++it) {
-        (*it)->add_inherited_field(this, field);
+        (*it)->add_inherited_field(this, ref);
     }
+
+    // Transfer ownership of the Field to the Class
+    field->set_struct(this);
+    m_owned_fields.push_back(move(field));
 
     return true;
 }
@@ -146,7 +148,7 @@ bool Class::add_field(Field *field)
 void Class::add_inherited_field(Class *parent, Field *field)
 {
     // If the field name matches any base field, it is shadowed.
-    if(m_base_fields_by_name.find(field->name()) != m_base_fields_by_name.end()) {
+    if(m_base_names.find(field->name()) != m_base_names.end()) {
         return;
     }
 

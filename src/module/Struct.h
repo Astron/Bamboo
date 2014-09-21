@@ -1,11 +1,10 @@
 // Filename: Struct.h
 #pragma once
+#include "Type.h"
 #include <memory>        // std::unique_ptr
 #include <string>        // std::string
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
-
-#include "Type.h"
 namespace bamboo   // open namespace
 {
 
@@ -25,7 +24,7 @@ class Struct : public Type
     Struct(Module *module, const std::string& name); // TODO: Throw null error
     Struct(const Struct&) = delete;
     Struct& operator=(const Struct&) = delete;
-    virtual ~Struct();
+    virtual ~Struct() {};
 
     // as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
     virtual Class *as_class();
@@ -58,7 +57,7 @@ class Struct : public Type
 
     // add_field adds a new Field to the struct.
     //     Returns false if the field could not be added to the struct.
-    virtual bool add_field(Field *field); // Transition to unique_ptr<Field>
+    virtual bool add_field(std::unique_ptr<Field> field);
 
   protected:
     Struct(Module *module);
@@ -72,6 +71,7 @@ class Struct : public Type
     std::string m_name;
 
     std::vector<Field *> m_fields;
+    std::vector<std::unique_ptr<Field> > m_owned_fields;
     std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Field *> m_fields_by_name;
     std::unordered_map<unsigned int, Field *> m_fields_by_id;

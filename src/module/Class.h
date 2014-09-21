@@ -1,7 +1,8 @@
 // Filename: Class.h
 #pragma once
-#include <unordered_map>
-#include "../module/Struct.h"
+#include "Struct.h"
+#include <memory>  // std::unique_ptr
+#include <unordered_set>
 namespace bamboo   // open namespace
 {
 
@@ -17,7 +18,7 @@ class Class : public Struct
     Class(Module *module, const std::string& name); // TODO: Throw null_error
     Class(const Class&) = delete;
     Class& operator=(const Class&) = delete;
-    virtual ~Class();
+    virtual ~Class() {};
 
     // as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
     Class *as_class() override;
@@ -49,10 +50,10 @@ class Class : public Struct
     inline const Field *get_base_field(unsigned int n) const;
 
     // add_parent set this class as a subclass to target parent.
-    void add_parent(Class *parent);
+    bool add_parent(Class *parent);
 
     // add_field adds a new Field to the class.
-    bool add_field(Field *field) override; // TODO: Transition to unique_ptr<Field>
+    bool add_field(std::unique_ptr<Field> field) override;
 
   private:
     // add_child marks a class as a child of this class.
@@ -63,10 +64,8 @@ class Class : public Struct
     //     so that another field with the same name can be inserted.
     void shadow_field(Field *field);
 
-    Field *m_constructor = nullptr;
-    std::vector<Field *> m_base_fields;
-    std::unordered_map<std::string, Field *> m_base_fields_by_name;
-
+    std::unique_ptr<Field> m_constructor;
+    std::unordered_set<std::string> m_base_names;
     std::vector<Class *> m_parents;
     std::vector<Class *> m_children;
 };

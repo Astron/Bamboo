@@ -12,15 +12,6 @@ Method::Method()
     m_subtype = kTypeMethod;
 }
 
-// destructor
-Method::~Method()
-{
-    for(auto it = m_parameters.begin(); it != m_parameters.end(); ++it) {
-        delete(*it);
-    }
-    m_parameters.clear();
-}
-
 // as_method returns this as a Method if it is a method, or nullptr otherwise.
 Method *Method::as_method()
 {
@@ -32,8 +23,10 @@ const Method *Method::as_method() const
 }
 
 // add_parameter adds a new parameter to the method.
-bool Method::add_parameter(Parameter *param)
+bool Method::add_parameter(unique_ptr<Parameter> param)
 {
+    Parameter *ref = param.get();
+
     // Param should not be null
     if(param == nullptr) {
         return false;
@@ -42,7 +35,7 @@ bool Method::add_parameter(Parameter *param)
     if(!param->name().empty()) {
         // Try to add the parameter
         bool inserted = m_parameters_by_name.insert(
-                            unordered_map<string, Parameter *>::value_type(param->name(), param)).second;
+                            unordered_map<string, Parameter *>::value_type(param->name(), ref)).second;
         if(!inserted) {
             // But the parameter had a name conflict
             return false;
@@ -50,11 +43,6 @@ bool Method::add_parameter(Parameter *param)
         // The size of the list is the index of the next item in the list
         m_indices_by_name[param->name()] = m_parameters.size();
     }
-
-    // Add the parameter to the main list
-    param->set_position(m_parameters.size());
-    param->set_method(this);
-    m_parameters.push_back(param);
 
     // Update our size
     if(has_fixed_size() || m_parameters.size() == 1) {
@@ -64,6 +52,11 @@ bool Method::add_parameter(Parameter *param)
             m_size = 0;
         }
     }
+
+    // Transfer ownership of the Parameter to the Method
+    param->set_position(m_parameters.size());
+    param->set_method(this);
+    m_parameters.push_back(move(param));
 
     return true;
 }

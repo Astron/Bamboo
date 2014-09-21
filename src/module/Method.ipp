@@ -8,10 +8,10 @@ inline size_t Method::num_parameters() const {
 }
 // get_element returns the <n>th parameter of the method.
 inline Parameter *Method::get_parameter(unsigned int n) {
-    return m_parameters.at(n);
+    return m_parameters.at(n).get();
 }
 inline const Parameter *Method::get_parameter(unsigned int n) const {
-    return m_parameters.at(n);
+    return m_parameters.at(n).get();
 }
 // parameter_by_name returns the parameter with <name>, or nullptr if no such param exists.
 inline Parameter *Method::parameter_by_name(const std::string& name) {

@@ -50,7 +50,7 @@ class Type
 
     Type(const Type&) = delete;
     Type& operator=(const Type&) = delete;
-    virtual ~Type();
+    virtual ~Type() {};
 
     // subtype returns the type's fundamental type as an integer constant.
     inline Subtype subtype() const;

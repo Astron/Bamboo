@@ -34,7 +34,10 @@ class MolecularField : public Field, public Struct
 
     // add_field adds a new Field as part of the Molecular.
     //     Returns false if the field could not be added.
-    bool add_field(Field *field) override;
+    bool add_field(Field *field);
+    // add_field with a unique_ptr always returns false; molecular fields don't own fields.
+    bool add_field(std::unique_ptr<Field> field) override;
+
 
   protected:
     using Field::set_id;

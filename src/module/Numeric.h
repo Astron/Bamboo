@@ -18,6 +18,7 @@ class Numeric : public Type
     explicit Numeric(Subtype type);
     Numeric(const Numeric&) = delete;
     Numeric& operator=(const Numeric&) = delete;
+    virtual ~Numeric() {};
 
     // as_numeric returns this as a Numeric if it is numeric, or nullptr otherwise.
     Numeric *as_numeric() override;

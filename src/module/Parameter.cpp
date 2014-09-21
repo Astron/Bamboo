@@ -9,7 +9,7 @@ namespace bamboo   // open namespace bamboo
 
 
 // constructor
-Parameter::Parameter(Type *type, const string& name) : m_type(type), m_type_alias(), m_name(name)
+Parameter::Parameter(Type *type, const string& name) : m_type(type), m_name(name)
 {
     if(m_type == nullptr) { m_type = Type::invalid; }
 }

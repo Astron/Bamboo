@@ -18,6 +18,7 @@ class Array : public Type
     Array(Type *element_type, const NumericRange& size = NumericRange()); // TODO: throw null_error
     Array(const Array&) = delete;
     Array& operator=(const Array&) = delete;
+    virtual ~Array() {};
 
     // as_array returns this as a Array if it is an array/string/blob, or nullptr otherwise.
     Array *as_array() override;

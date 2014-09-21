@@ -55,8 +55,6 @@ string format_subtype(Subtype subtype)
 
 Type *Type::invalid = new Type();
 
-Type::~Type() {}
-
 // as_number returns this as a Numeric if it is numeric, or nullptr otherwise.
 Numeric *Type::as_numeric()
 {
