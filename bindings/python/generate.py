@@ -362,13 +362,10 @@ def add_function(mod, name, ret, params, **kwargs):
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)
 
 def retval_parent(typestr, **kwargs):
-    # FIXME: Currently this is an alias for retval_child, but it needs to be
-    #        changed to have the returned object be the custodian of the child
-    #        to reduce the amount of reference-loops that are generated
     return retval(typestr, reference_existing_object = True, **kwargs)
 
 def retval_child(typestr, **kwargs):
-    return retval(typestr, custodian = -1, caller_owns_return = False, return_internal_reference = True, **kwargs)
+    return retval(typestr, reference_existing_object = True, **kwargs)
 
 if __name__ == "__main__":
     import sys, os
