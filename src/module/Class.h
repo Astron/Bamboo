@@ -1,8 +1,9 @@
 // Filename: Class.h
 #pragma once
-#include "Struct.h"
 #include <memory>  // std::unique_ptr
 #include <unordered_set>
+#include "Struct.h"
+#include "Field.h"
 namespace bamboo   // open namespace
 {
 

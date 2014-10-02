@@ -4,14 +4,12 @@
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
 #include <memory>        // std::unique_ptr
+#include "Class.h"
 namespace bamboo   // open namespace
 {
 
 
 // Forward declarations
-class Type;
-class Class;
-class Struct;
 class Field;
 class HashGenerator;
 

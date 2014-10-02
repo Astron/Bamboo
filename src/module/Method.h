@@ -4,6 +4,7 @@
 #include <vector>        // std::vector
 #include <unordered_map> // std::unordered_map
 #include "Type.h"
+#include "Parameter.h"
 namespace bamboo   // open namespace
 {
 
