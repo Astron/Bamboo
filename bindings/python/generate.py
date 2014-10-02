@@ -120,47 +120,47 @@ def generate(file_):
     #add_method(structValue, '_getitem_', retval('bamboo::Value'),
     #           [param('unsigned int', 'index')], throw = [indexError])
     #add_method(structValue, '_getitem_', retval('bamboo::Value'),
-    #           [param('const std::string&', 'item')], throw = [indexError])
+    #           [param('std::string', 'item')], throw = [indexError])
     #add_method(structValue, '_setitem_', None,
     #           [param('unsigned int', 'index'), param('const Value', 'value')], throw = [indexError])
     #add_method(structValue, '_setitem_', None,
-    #           [param('const std::string&', 'item'), param('const Value', 'value')], throw = [indexError])
+    #           [param('std::string', 'item'), param('const Value', 'value')], throw = [indexError])
     clsModule.add_constructor([])
     add_method(clsModule, 'num_classes', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_structs', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_types', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_class',
-               retval_child('bamboo::Class *'),
+               retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsModule, 'get_struct',
-               retval_child('bamboo::Struct *'),
+               retval_ref('bamboo::Struct *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsModule, 'class_by_id',
-               retval_child('bamboo::Class *'),
+               retval_ref('bamboo::Class *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'class_by_name',
-               retval_child('bamboo::Class *'),
-               [param('const std::string&', 'name')])
+               retval_ref('bamboo::Class *'),
+               [param('std::string', 'name')])
     add_method(clsModule, 'type_by_id',
-               retval_child('bamboo::Type *'),
+               retval_ref('bamboo::Type *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'type_by_name',
-               retval_child('bamboo::Type *'),
-               [param('const std::string&', 'name')])
+               retval_ref('bamboo::Type *'),
+               [param('std::string', 'name')])
     add_method(clsModule, 'field_by_id',
-               retval_child('bamboo::Field *'),
+               retval_ref('bamboo::Field *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'num_imports', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'get_import',
-               retval_child('bamboo::Import *'),
+               retval_ref('bamboo::Import *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsModule, 'has_keyword', retval('bool'),
-               [param('const std::string&', 'keyword')], is_const = True)
+               [param('std::string', 'keyword')], is_const = True)
     add_method(clsModule, 'num_keywords', retval('size_t'), [], is_const = True)
-    add_method(clsModule, 'get_keyword', retval('const std::string'),
+    add_method(clsModule, 'get_keyword', retval('std::string'),
                [param('unsigned int', 'n')],
                is_const = True, throw = [indexError])
     add_method(clsModule, 'add_class', retval('bool'),
@@ -170,16 +170,21 @@ def generate(file_):
     add_method(clsModule, 'add_import', None,
                [param('std::unique_ptr<Import>', 'import')])
     add_method(clsModule, 'add_typedef', retval('bool'),
-               [param('const std::string&', 'name'),
+               [param('std::string', 'name'),
                 param('Type *', 'type', transfer_ownership = False)])
-    add_method(clsModule, 'add_keyword', None, [param('const std::string&', 'keyword')])
+    add_method(clsModule, 'add_keyword', None, [param('std::string', 'keyword')])
     clsType.add_constructor([], visibility='protected')
     add_method(clsType, 'subtype', retval('bamboo::Subtype'), [], is_const = True)
     add_method(clsType, 'has_fixed_size', retval('bool'), [], is_const = True)
     add_method(clsType, 'fixed_size', retval('size_t'), [], is_const = True)
     add_method(clsType, 'has_alias', retval('bool'), [], is_const = True)
-    add_method(clsType, 'alias', retval('const std::string'), [], is_const = True)
-    add_method(clsType, 'set_alias', None, [param('const std::string&', 'alias')])
+    add_method(clsType, 'alias', retval('std::string'), [], is_const = True)
+    add_method(clsType, 'set_alias', None, [param('std::string', 'alias')])
+    add_method(clsType, 'as_struct', retval_ref('bamboo::Struct *'), [])
+    add_method(clsType, 'as_method', retval_ref('bamboo::Method *'), [])
+    add_method(clsType, 'as_array', retval_ref('bamboo::Array *'), [])
+    add_method(clsType, 'as_numeric', retval_ref('bamboo::Numeric *'), [])
+    add_method(clsType, 'to_string', retval('std::string'), [])
     clsNumType.add_constructor([param('bamboo::Subtype', 'subtype')])
     add_method(clsNumType, 'divisor', retval('unsigned int'), [], is_const = True)
     add_method(clsNumType, 'has_modulus', retval('bool'), [], is_const = True)
@@ -191,83 +196,84 @@ def generate(file_):
     add_method(clsNumType, 'set_range', retval('bool'), [param('const NumericRange&', 'range')])
     clsArrType.add_constructor([
                param('bamboo::Type *', 'elementType', transfer_ownership = False),
-               param('const bamboo::NumericRange&', 'arraySize', default_value = 'bamboo::NumericRange()')])
-    add_method(clsArrType, 'element_type', retval_child('const bamboo::Type *'), [], is_const = True)
+               param('bamboo::NumericRange', 'arraySize', default_value = 'bamboo::NumericRange()')])
+    add_method(clsArrType, 'element_type', retval_ref('const bamboo::Type *'), [], is_const = True)
     add_method(clsArrType, 'array_size', retval('unsigned int'), [], is_const = True)
     add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
     add_method(clsArrType, 'range', retval('bamboo::NumericRange'), [], is_const = True)
     clsMethod.add_constructor([])
     add_method(clsMethod, 'num_parameters', retval('size_t'), [], is_const = True)
-    add_method(clsMethod, 'get_parameter', retval_child('bamboo::Parameter *'),
+    add_method(clsMethod, 'get_parameter', retval_ref('bamboo::Parameter *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
-    add_method(clsMethod, 'parameter_by_name', retval_child('bamboo::Parameter *'),
-               [param('const std::string&', 'name')]),
+    add_method(clsMethod, 'parameter_by_name', retval_ref('bamboo::Parameter *'),
+               [param('std::string', 'name')]),
     add_method(clsMethod, 'add_parameter', retval('bool'), [param('std::unique_ptr<Parameter>', 'param')])
     clsStruct.add_constructor([
                param('bamboo::Module *', 'module', transfer_ownership = False),
-               param('const std::string&', 'name')])
+               param('std::string', 'name')])
     add_method(clsStruct, 'id', retval('unsigned int'), [], is_const = True)
     add_method(clsStruct, 'name', retval('std::string'), [], is_const = True)
-    add_method(clsStruct, 'module', retval_parent('bamboo::Module *'), [])
+    add_method(clsStruct, 'module', retval_ref('bamboo::Module *'), [])
     add_method(clsStruct, 'num_fields', retval('size_t'), [], is_const = True)
-    add_method(clsStruct, 'get_field', retval_child('bamboo::Field *'),
+    add_method(clsStruct, 'get_field', retval_ref('bamboo::Field *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
-    add_method(clsStruct, 'field_by_id', retval_child('bamboo::Field *'),
+    add_method(clsStruct, 'field_by_id', retval_ref('bamboo::Field *'),
                [param('unsigned int', 'id')])
-    add_method(clsStruct, 'field_by_name', retval_child('bamboo::Field *'),
-               [param('const std::string&', 'name')])
+    add_method(clsStruct, 'field_by_name', retval_ref('bamboo::Field *'),
+               [param('std::string', 'name')])
     add_method(clsStruct, 'add_field', retval('bool'), [param('std::unique_ptr<Field>', 'field')])
+    add_method(clsStruct, 'as_class', retval_ref('bamboo::Class *'), [])
     clsClass.add_constructor([
                param('bamboo::Module *', 'module', transfer_ownership = False),
-               param('const std::string&', 'name')])
+               param('std::string', 'name')])
     add_method(clsClass, 'num_parents', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_parent', retval_parent('bamboo::Class *'),
+    add_method(clsClass, 'get_parent', retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsClass, 'num_children', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_child', retval_parent('bamboo::Class *'),
+    add_method(clsClass, 'get_child', retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsClass, 'has_constructor', retval('bool'), [], is_const = True)
-    add_method(clsClass, 'constructor', retval_child('bamboo::Field *'), [])
+    add_method(clsClass, 'constructor', retval_ref('bamboo::Field *'), [])
     add_method(clsClass, 'num_base_fields', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_base_field', retval_child('bamboo::Field *'),
+    add_method(clsClass, 'get_base_field', retval_ref('bamboo::Field *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsClass, 'add_parent', retval('bool'),
                [param('bamboo::Class *', 'parent', transfer_ownership = False)])
     clsParam.add_constructor([
                param('bamboo::Type *', 'type', transfer_ownership = False),
-               param('const std::string&', 'name', default_value = '""')])
+               param('std::string', 'name', default_value = '""')])
     add_method(clsParam, 'name', retval('std::string'), [], is_const = False)
-    add_method(clsParam, 'type', retval_child('bamboo::Type *'), [])
-    add_method(clsParam, 'get_method', retval_parent('bamboo::Method *'), [])
+    add_method(clsParam, 'type', retval_ref('bamboo::Type *'), [])
+    add_method(clsParam, 'get_method', retval_ref('bamboo::Method *'), [])
     add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
     #add_method(clsParam, 'default_value', retval('const bamboo::Value'), [], is_const = True)
-    add_method(clsParam, 'set_name', retval('bool'), [param('const std::string&', 'name')])
+    add_method(clsParam, 'set_name', retval('bool'), [param('std::string', 'name')])
     add_method(clsParam, 'set_type', retval('bool'),
                [param('bamboo::Type *', 'type', transfer_ownership = False)]),
     #add_method(clsParam, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
     #add_method(clsParam, 'set_default_value', retval('bool'), [param('const bamboo::Buffer&', 'value')])
     clsField.add_constructor([
                param('bamboo::Type *', 'type', transfer_ownership = False),
-               param('const std::string&', 'name', default_value = '""')])
+               param('std::string', 'name', default_value = '""')])
     add_method(clsField, 'id', retval('unsigned int'), [], is_const = True)
     add_method(clsField, 'name', retval('std::string'), [], is_const = False)
-    add_method(clsField, 'type', retval_child('bamboo::Type *'), [])
-    add_method(clsField, 'record', retval_parent('bamboo::Struct *'), [])
+    add_method(clsField, 'type', retval_ref('bamboo::Type *'), [])
+    add_method(clsField, 'record', retval_ref('bamboo::Struct *'), [])
     add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
     #add_method(clsField, 'default_value', retval('const bamboo::Value'), [], is_const = True)
-    add_method(clsField, 'set_name', retval('bool'), [param('const std::string&', 'name')])
+    add_method(clsField, 'set_name', retval('bool'), [param('std::string', 'name')])
     add_method(clsField, 'set_type', None,
                [param('bamboo::Type *', 'type', transfer_ownership = False)]),
     #add_method(clsField, 'set_default_value', retval('bool'), [param('const bamboo::Value', 'value')])
     #add_method(clsField, 'set_default_value', retval('bool'), [param('const bamboo::Buffer&', 'value')])
     clsMolecular.add_constructor([
                param('bamboo::Class *', 'cls', transfer_ownership = False),
-               param('const std::string&', 'name')])
+               param('std::string', 'name')])
     clsDatagram.add_constructor([])
     clsDatagram.add_copy_constructor()
     add_custom_method(clsDatagram, 'data', ('METH_NOARGS',))
@@ -287,7 +293,7 @@ def generate(file_):
     add_method(clsDatagram, 'add_float64', None, [param('double', 'value')], throw = [dgOverflowError])
     add_custom_method(clsDatagram, 'add_data')
     #add_method(clsDatagram, 'add_data', None, [param('const bamboo::Buffer&', 'value')])
-    add_method(clsDatagram, 'add_string', None, [param('const std::string&', 'value')], throw = [dgOverflowError])
+    add_method(clsDatagram, 'add_string', None, [param('std::string', 'value')], throw = [dgOverflowError])
     #add_method(clsDatagram, 'add_blob', None, [param('const bamboo::Buffer&', 'value')])
     #add_method(clsDatagram, 'add_value', None,
     #           [param('const bamboo::Type *', 'type', transfer_ownership = False),
@@ -331,13 +337,13 @@ def generate(file_):
     add_function(traits, 'legacy_hash', retval('uint32_t'),
                  [param('const bamboo::Module *', 'module', transfer_ownership = False)])
     add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = True),
-                 [param('const std::string&', 'filename')])
+                 [param('std::string', 'filename')])
     add_function(dcfile, 'parse_dcfile', retval('bool'),
                  [param('bamboo::Module *', 'module', transfer_ownership = False),
-                  param('const std::string&', 'filename')])
+                  param('std::string', 'filename')])
     #add_function(dcfile, 'parse_dcvalue', retval('bamboo::Buffer'),
     #             [param('const bamboo::Type *', 'type', transfer_ownership = False),
-    #              param('const std::string&', 'formattedValue'), param('bool&', 'isError')])
+    #              param('std::string', 'formattedValue'), param('bool&', 'isError')])
 
     bamboo.generate(file_)
 
@@ -361,10 +367,7 @@ def add_function(mod, name, ret, params, **kwargs):
     doc = functionDocstrings[mod.name][name]
     for n in names: mod.add_function(name, ret, params, custom_name = n, **kwargs)
 
-def retval_parent(typestr, **kwargs):
-    return retval(typestr, reference_existing_object = True, **kwargs)
-
-def retval_child(typestr, **kwargs):
+def retval_ref(typestr, **kwargs):
     return retval(typestr, reference_existing_object = True, **kwargs)
 
 if __name__ == "__main__":
