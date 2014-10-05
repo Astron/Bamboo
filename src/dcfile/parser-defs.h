@@ -51,8 +51,7 @@ extern int dcdebug;
 /* Token type.  */
 #ifndef DCTOKENTYPE
 # define DCTOKENTYPE
-  enum dctokentype
-  {
+enum dctokentype {
     UNSIGNED_INTEGER = 258,
     REAL = 259,
     STRING = 260,
@@ -80,7 +79,7 @@ extern int dcdebug;
     KW_STRING = 282,
     KW_BLOB = 283,
     KW_CHAR = 284
-  };
+};
 #endif
 
 /* Value type.  */
@@ -88,4 +87,4 @@ extern int dcdebug;
 
 extern DCSTYPE dclval;
 
-int dcparse (void);
+int dcparse(void);

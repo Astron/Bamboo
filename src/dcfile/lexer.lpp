@@ -9,7 +9,6 @@
 	#include "parse.h"
 
 	#include <iostream>
-	#include <unistd.h>
 
 	#include "../dcfile/token.h"
 	#include "../dcfile/parser-defs.h"
@@ -437,6 +436,8 @@
 
 %option prefix="dc"
 %option nounput
+%option nounistd
+%option never-interactive
 
 INTEGERNUM  ([0-9]+)
 HEXNUM      (0x[0-9a-fA-F]*)
