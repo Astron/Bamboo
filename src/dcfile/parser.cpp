@@ -199,7 +199,7 @@ static void dcparser_cleanup()
 #endif
 
 /* Include the parser definitions */
--#include "parser-defs.h"
+#include "parser-defs.h"
 
 /* Copy the second part of user declarations.  */
 

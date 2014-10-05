@@ -563,10 +563,7 @@ using namespace bamboo;
 
 static int yyinput(void); // declared by flex.
 extern "C" int should_lexer_wrap();
-namespace bamboo
-{
-extern int dclex();
-}
+namespace bamboo { extern int dclex(); }
 
 #define YY_DECL int bamboo::dclex(void)
 #define dcwrap should_lexer_wrap
@@ -1062,7 +1059,7 @@ static int input(void);
             } \
         }\
 \
- 
+
 #endif
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
