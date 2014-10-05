@@ -17,7 +17,7 @@ void print_type(Type *typ, int indent) {
     string tab(2 * indent, ' ');
     if(typ->subtype() == kTypeMethod) {
         Method *method = typ->as_method();
-        for(int i = 0; i < method->num_parameters(); ++i) {
+        for(unsigned int i = 0; i < method->num_parameters(); ++i) {
             Parameter *param = method->get_parameter(i);
             cout << tab;
             if(!param->name().empty()) { cout << param->name() << " : "; }
@@ -26,7 +26,7 @@ void print_type(Type *typ, int indent) {
         }
     } else if(typ->subtype() == kTypeStruct) {
         Struct *cls = typ->as_struct();
-        for(int i = 0; i < cls->num_fields(); ++i) {
+        for(unsigned int i = 0; i < cls->num_fields(); ++i) {
             Field *field = cls->get_field(i);
             cout << tab;
             if(!field->name().empty()) { cout << field->name() << " : "; }
@@ -47,7 +47,7 @@ int main(void) {
 
     /* Inspect python imports */
     cout << "Imports\n";
-    for(int i = 0; i < mod->num_imports(); ++i) {
+    for(unsigned int i = 0; i < mod->num_imports(); ++i) {
         Import *pyimport = mod->get_import(i);
         cout << "  " << pyimport->module << '\n';
         for(string symbol: pyimport->symbols) {
@@ -70,7 +70,7 @@ int main(void) {
 
     /* Inspect module keywords */
     cout << "Keywords\n";
-    for(int i = 0; i < mod->num_keywords(); ++i) {
+    for(unsigned int i = 0; i < mod->num_keywords(); ++i) {
         cout << "  " << mod->get_keyword(i) << '\n';
     }
 
@@ -78,10 +78,10 @@ int main(void) {
 
     /* Inspect module classes */
     cout << "Classes\n";
-    for(int cls_num = 0; cls_num < mod->num_classes(); ++cls_num) {
+    for(unsigned int cls_num = 0; cls_num < mod->num_classes(); ++cls_num) {
         Class *cls = mod->get_class(cls_num);
         cout << "  " << cls->name() << '\n';
-        for(int field_num = 0; field_num < cls->num_fields(); ++field_num) {
+        for(unsigned int field_num = 0; field_num < cls->num_fields(); ++field_num) {
             Field *field = cls->get_field(field_num);
             cout << "    " << field->name() << " : " << field->type()->to_string() << '\n';
             print_type(field->type(), 3);
