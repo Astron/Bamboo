@@ -17,6 +17,11 @@ class Parameter;
 class DCToken
 {
   public:
+    struct NameType {
+        std::string name;
+        Type *type;
+    };
+
     union {
         int8_t int8;
         int16_t int16;
@@ -40,20 +45,18 @@ class DCToken
         Numeric *dnumeric;
     };
 
+    // Have a bloated Token for MSVC
     std::string str;
     std::vector<uint8_t> buffer;
     std::vector<std::string> strings;
     NumericRange range;
-    struct NameType {
-        std::string name;
-        Type *type;
-    } nametype;
+    NameType nametype;
 };
 
 
 } // close namespace
 
-// The bison-generated code expects to use the symbol 'YYSTYPE' to refer to the above class.
+// The bison-generated code expects to use the symbol 'DCSTYPE' to refer to the above class.
 #ifndef DCSTYPE
 #define DCSTYPE bamboo::DCToken
 #endif
