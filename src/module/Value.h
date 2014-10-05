@@ -35,12 +35,24 @@ struct Value {
         uint64_t uint_;
         float float_;
         double double_;
+#ifndef _MSC_VER
+        // Use C++11 relaxed union for compliant compilers
         std::string string_;
         std::vector<uint8_t> blob_;
         std::vector<Value> elements_;
         fields_t fields_;
         arguments_t arguments_;
     };
+#else
+    };
+
+    // Have a bloated Value for MSVC
+    std::string string_;
+    std::vector<uint8_t> blob_;
+    std::vector<Value> elements_;
+    fields_t fields_;
+    arguments_t arguments_;
+#endif
 
     size_t size() const;
     std::vector<uint8_t> pack() const;
