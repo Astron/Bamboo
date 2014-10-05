@@ -122,7 +122,7 @@
 		if(*input_p)
 		{
 			input_p->read(buffer, max_size);
-			result = input_p->gcount();
+			result = int(input_p->gcount());
 			if(result >= 0 && result < max_size)
 			{
 				// Truncate at the end of the read.
@@ -429,7 +429,7 @@
 	// accepted by the lexer; it increments the current column number.
 	inline void accept()
 	{
-		col_number += yyleng;
+		col_number += int(yyleng);
 	}
 
 %}

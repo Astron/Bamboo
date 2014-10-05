@@ -76,8 +76,8 @@
 #include "lex.h"
 #include "parse.h"
 
-#include <stdint.h> // for fixed-width integer limits
-#include <math.h>   // for float-macro INFINITY
+#include <cstdint>  // for fixed-width integers
+#include <cmath>    // std::isinf
 #include <stack>    // std::stack
 #include <fstream>  // std::ifstream
 #include <sstream>  // std::stringstream
@@ -1506,9 +1506,7 @@ yyreduce:
 
     case 16:
 
-    {
-        (yyval.str) = (yyvsp[0].str);
-    }
+    { (yyval.str) = (yyvsp[0].str); }
 
     break;
 
@@ -1522,9 +1520,7 @@ yyreduce:
 
     case 18:
 
-    {
-        (yyval.strings) = (yyvsp[0].strings);
-    }
+    { (yyval.strings) = (yyvsp[0].strings); }
 
     break;
 
@@ -1555,9 +1551,7 @@ yyreduce:
 
     case 22:
 
-    {
-        (yyval.str) = (yyvsp[0].str);
-    }
+    { (yyval.str) = (yyvsp[0].str); }
 
     break;
 
@@ -2172,9 +2166,7 @@ yyreduce:
 
     case 86:
 
-    {
-        (yyval.dnumeric) = new Numeric((yyvsp[0].subtype));
-    }
+    { (yyval.dnumeric) = new Numeric((yyvsp[0].subtype)); }
 
     break;
 
@@ -2382,49 +2374,37 @@ yyreduce:
 
     case 110:
 
-    {
-        (yyval.range) = NumericRange();
-    }
+    { (yyval.range) = NumericRange(); }
 
     break;
 
     case 111:
 
-    {
-        (yyval.range) = NumericRange((yyvsp[0].real), (yyvsp[0].real));
-    }
+    { (yyval.range) = NumericRange((yyvsp[0].real), (yyvsp[0].real)); }
 
     break;
 
     case 112:
 
-    {
-        (yyval.range) = NumericRange((yyvsp[-2].real), (yyvsp[0].real));
-    }
+    { (yyval.range) = NumericRange((yyvsp[-2].real), (yyvsp[0].real)); }
 
     break;
 
     case 113:
 
-    {
-        (yyval.range) = NumericRange();
-    }
+    { (yyval.range) = NumericRange(); }
 
     break;
 
     case 114:
 
-    {
-        (yyval.range) = NumericRange((yyvsp[0].uint32), (yyvsp[0].uint32));
-    }
+    { (yyval.range) = NumericRange((yyvsp[0].uint32), (yyvsp[0].uint32)); }
 
     break;
 
     case 115:
 
-    {
-        (yyval.range) = NumericRange((yyvsp[-2].uint32), (yyvsp[0].uint32));
-    }
+    { (yyval.range) = NumericRange((yyvsp[-2].uint32), (yyvsp[0].uint32)); }
 
     break;
 
@@ -2456,17 +2436,13 @@ yyreduce:
 
     case 119:
 
-    {
-        (yyval.real) = (double)(yyvsp[0].uint64);
-    }
+    { (yyval.real) = (double)(yyvsp[0].uint64); }
 
     break;
 
     case 120:
 
-    {
-        (yyval.real) = (double)(yyvsp[0].int64);
-    }
+    { (yyval.real) = (double)(yyvsp[0].int64); }
 
     break;
 
@@ -3032,121 +3008,91 @@ yyreduce:
 
     case 153:
 
-    {
-        (yyval.int64) = (yyvsp[0].uint64);
-    }
+    { (yyval.int64) = int64_t((yyvsp[0].uint64)); }
 
     break;
 
     case 154:
 
-    {
-        (yyval.int64) = -(yyvsp[0].uint64);
-    }
+    { (yyval.int64) = -int64_t((yyvsp[0].uint64)); }
 
     break;
 
     case 155:
 
-    {
-        (yyval.subtype) = kTypeString;
-    }
+    { (yyval.subtype) = kTypeString; }
 
     break;
 
     case 156:
 
-    {
-        (yyval.subtype) = kTypeBlob;
-    }
+    { (yyval.subtype) = kTypeBlob; }
 
     break;
 
     case 157:
 
-    {
-        (yyval.subtype) = kTypeChar;
-    }
+    { (yyval.subtype) = kTypeChar; }
 
     break;
 
     case 158:
 
-    {
-        (yyval.subtype) = kTypeInt8;
-    }
+    { (yyval.subtype) = kTypeInt8; }
 
     break;
 
     case 159:
 
-    {
-        (yyval.subtype) = kTypeInt16;
-    }
+    { (yyval.subtype) = kTypeInt16; }
 
     break;
 
     case 160:
 
-    {
-        (yyval.subtype) = kTypeInt32;
-    }
+    { (yyval.subtype) = kTypeInt32; }
 
     break;
 
     case 161:
 
-    {
-        (yyval.subtype) = kTypeInt64;
-    }
+    { (yyval.subtype) = kTypeInt64; }
 
     break;
 
     case 162:
 
-    {
-        (yyval.subtype) = kTypeUint8;
-    }
+    { (yyval.subtype) = kTypeUint8; }
 
     break;
 
     case 163:
 
-    {
-        (yyval.subtype) = kTypeUint16;
-    }
+    { (yyval.subtype) = kTypeUint16; }
 
     break;
 
     case 164:
 
-    {
-        (yyval.subtype) = kTypeUint32;
-    }
+    { (yyval.subtype) = kTypeUint32; }
 
     break;
 
     case 165:
 
-    {
-        (yyval.subtype) = kTypeUint64;
-    }
+    { (yyval.subtype) = kTypeUint64; }
 
     break;
 
     case 166:
 
-    {
-        (yyval.subtype) = kTypeFloat32;
-    }
+    { (yyval.subtype) = kTypeFloat32; }
 
     break;
 
     case 167:
 
-    {
-        (yyval.subtype) = kTypeFloat64;
-    }
+    { (yyval.subtype) = kTypeFloat64; }
 
     break;
 
@@ -3486,9 +3432,7 @@ vector<uint8_t> number_value(Subtype type, double& number)
 {
     switch(type) {
     case kTypeFloat32:
-        if(float(number) == INFINITY || float(number) == -INFINITY) {
-            dcerror("Value is out of range for type 'float32'.");
-        }
+        if(isinf(float(number))) { dcerror("Value is out of range for type 'float32'."); }
         return as_buffer(float(number));
     case kTypeFloat64:
         return as_buffer(number);

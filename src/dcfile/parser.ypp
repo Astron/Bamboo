@@ -5,8 +5,8 @@
 	#include "lex.h"
 	#include "parse.h"
 
-	#include <stdint.h> // for fixed-width integer limits
-	#include <math.h>   // for float-macro INFINITY
+	#include <cstdint>  // for fixed-width integers
+	#include <cmath>    // std::isinf
 	#include <stack>    // std::stack
 	#include <fstream>  // std::ifstream
 	#include <sstream>  // std::stringstream
@@ -1623,8 +1623,8 @@ array_expansion
 	;
 
 signed_integer
-	: '+' UNSIGNED_INTEGER { $$ = $2; }
-	| '-' UNSIGNED_INTEGER { $$ = -$2; }
+	: '+' UNSIGNED_INTEGER { $$ = int64_t($2); }
+	| '-' UNSIGNED_INTEGER { $$ = -int64_t($2); }
 	;
 
 array_type_token
@@ -1758,9 +1758,7 @@ vector<uint8_t> number_value(Subtype type, double &number)
 {
 	switch(type) {
 		case kTypeFloat32:
-			if(float(number) == INFINITY || float(number) == -INFINITY) {
-				dcerror("Value is out of range for type 'float32'.");
-			}
+			if(isinf(float(number))) { dcerror("Value is out of range for type 'float32'."); }
 			return as_buffer(float(number));
 		case kTypeFloat64:
 			return as_buffer(number);

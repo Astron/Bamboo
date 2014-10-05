@@ -662,7 +662,7 @@ static void input_chars(char *buffer, int& result, int max_size)
 {
     if(*input_p) {
         input_p->read(buffer, max_size);
-        result = input_p->gcount();
+        result = int(input_p->gcount());
         if(result >= 0 && result < max_size) {
             // Truncate at the end of the read.
             buffer[result] = '\0';
@@ -928,7 +928,7 @@ static void eat_c_comment()
 // accepted by the lexer; it increments the current column number.
 inline void accept()
 {
-    col_number += dcleng;
+    col_number += int(dcleng);
 }
 
 #define YY_NO_UNISTD_H 1
