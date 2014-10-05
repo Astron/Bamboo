@@ -3,6 +3,7 @@ max-code-length=100
 
 # Brackets
 style=linux
+keep-one-line-blocks
 
 # Indentation
 indent=spaces=4
