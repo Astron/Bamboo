@@ -19,7 +19,8 @@ class null_error : std::invalid_argument
 
 class invalid_type : std::domain_error
 {
-    using std::domain_error::domain_error;
+  public:
+    invalid_type(const std::string& what) : std::domain_error(what) {}
 };
 
 

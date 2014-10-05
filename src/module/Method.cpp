@@ -41,7 +41,7 @@ bool Method::add_parameter(unique_ptr<Parameter> param)
             return false;
         }
         // The size of the list is the index of the next item in the list
-        m_indices_by_name[param->name()] = m_parameters.size();
+        m_indices_by_name[param->name()] = (unsigned int)m_parameters.size();
     }
 
     // Update our size
@@ -54,7 +54,7 @@ bool Method::add_parameter(unique_ptr<Parameter> param)
     }
 
     // Transfer ownership of the Parameter to the Method
-    param->set_position(m_parameters.size());
+    param->set_position((unsigned int)m_parameters.size());
     param->set_method(this);
     m_parameters.push_back(move(param));
 

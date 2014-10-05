@@ -120,7 +120,7 @@ bool Class::add_field(unique_ptr<Field> field)
     m_module->add_field(ref);
     m_fields_by_id[field->id()] = ref;
     m_fields_by_name[field->name()] = ref;
-    m_indices_by_name[field->name()] = m_fields.size() - 1;
+    m_indices_by_name[field->name()] = (unsigned int)m_fields.size() - 1;
 
     // Update our size
     if(field->as_molecular() == nullptr
@@ -176,7 +176,7 @@ void Class::add_inherited_field(Class *parent, Field *field)
         m_fields.push_back(field);
         m_indices_by_name[field->name()] = 1;
     } else {
-        unsigned int index = m_fields.size() - 1;
+        unsigned int index = (unsigned int)m_fields.size() - 1;
         // Note: Iterate in reverse because fields added later are more likely to be at the end
         for(auto it = m_fields.rbegin(); it != m_fields.rend(); ++it) {
             if((*it)->id() < field->id()) {

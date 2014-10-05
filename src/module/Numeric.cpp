@@ -78,7 +78,7 @@ bool Numeric::set_modulus(double modulus)
     }
 
     double float_modulus = modulus * m_divisor;
-    uint64_t uint_modulus = floor(float_modulus + 0.5);
+    uint64_t uint_modulus = uint64_t(floor(float_modulus + 0.5));
 
     // Check the range.  A valid range for the modulus is 1 to (maximum_value + 1) after scaling.
     switch(m_subtype) {

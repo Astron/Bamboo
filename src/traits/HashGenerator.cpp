@@ -29,7 +29,7 @@ void HashGenerator::add_int(int num)
 // add_string adds a string to the hash, by breaking it down into a sequence of integers.
 void HashGenerator::add_string(const std::string& str)
 {
-    add_int(str.length());
+    add_int(int(str.length()));
     for(auto it = str.begin(); it != str.end(); ++it) {
         add_int(*it);
     }

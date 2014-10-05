@@ -55,7 +55,7 @@ Value::Value(const Type *type) : type(type)
         const Struct *record = type->as_struct();
         size_t num_fields = record->num_fields();
         for(size_t i = 0; i < num_fields; ++i) {
-            const Field *field = record->get_field(i);
+            const Field *field = record->get_field((unsigned int)i);
             if(field->has_default_value()) {
                 // Get default value for field
                 fields_.emplace(field, *field->default_value());
@@ -72,7 +72,7 @@ Value::Value(const Type *type) : type(type)
         // Construct the method-call from default values for its parameters
         const Method *method = type->as_method();
         size_t num_params = method->num_parameters();
-        for(size_t i = 0; i < num_params; ++i) {
+        for(unsigned int i = 0; i < num_params; ++i) {
             const Parameter *param = method->get_parameter(i);
             if(param->has_default_value()) {
                 // Get default value for field
@@ -273,14 +273,14 @@ vector<uint8_t> Value::pack() const
         }
         // Set the size using the reserved bytes
         uint16_t *size_ptr = (uint16_t *)&packed[0];
-        *size_ptr = packed.size() - sizeof(uint16_t);
+        *size_ptr = uint16_t(packed.size() - sizeof(uint16_t));
         return packed;
     }
     case kTypeStruct: {
         const Struct *record = type->as_struct();
         size_t num_fields = record->num_fields();
         vector<uint8_t> packed;
-        for(size_t i = 0; i < num_fields; ++i) {
+        for(unsigned int i = 0; i < num_fields; ++i) {
             pack_value(fields_.at(record->get_field(i)).pack(), packed);
         }
         return packed;
@@ -289,7 +289,7 @@ vector<uint8_t> Value::pack() const
         const Method *method = type->as_method();
         size_t num_params = method->num_parameters();
         vector<uint8_t> packed;
-        for(size_t i = 0; i < num_params; ++i) {
+        for(unsigned int i = 0; i < num_params; ++i) {
             pack_value(arguments_.at(method->get_parameter(i)).pack(), packed);
         }
         return packed;
@@ -329,14 +329,14 @@ vector<uint8_t> Value::pack32() const
         }
         // Set the size using the reserved bytes
         uint32_t *size_ptr = (uint32_t *)&packed[0];
-        *size_ptr = packed.size() - sizeof(uint32_t);
+        *size_ptr = uint32_t(packed.size() - sizeof(uint32_t));
         return packed;
     }
     case kTypeStruct: {
         const Struct *record = type->as_struct();
         size_t num_fields = record->num_fields();
         vector<uint8_t> packed;
-        for(size_t i = 0; i < num_fields; ++i) {
+        for(unsigned int i = 0; i < num_fields; ++i) {
             pack_value(fields_.at(record->get_field(i)).pack32(), packed);
         }
         return packed;
@@ -345,7 +345,7 @@ vector<uint8_t> Value::pack32() const
         const Method *method = type->as_method();
         size_t num_params = method->num_parameters();
         vector<uint8_t> packed;
-        for(size_t i = 0; i < num_params; ++i) {
+        for(unsigned int i = 0; i < num_params; ++i) {
             pack_value(arguments_.at(method->get_parameter(i)).pack32(), packed);
         }
         return packed;

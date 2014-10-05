@@ -9,6 +9,11 @@
 #include "../module/Method.h"
 #include "../module/Parameter.h"
 using namespace std;
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+#define snprintf sprintf_s
+#endif
+
 namespace bamboo   // open namespace bamboo
 {
 
@@ -133,7 +138,7 @@ void format_value(const Value *value, ostream& out)
                 format_value(value->fields_.at(field), out);
             }
         }
-        for(size_t i = 1; i < num_fields; ++i) {
+        for(unsigned int i = 1; i < num_fields; ++i) {
             out << ", ";
             const Field *field = struct_->get_field(i);
             if(field->as_molecular() == nullptr) {
@@ -151,7 +156,7 @@ void format_value(const Value *value, ostream& out)
             const Parameter *param = method_->get_parameter(0);
             format_value(value->arguments_.at(param), out);
         }
-        for(size_t i = 1; i < num_params; ++i) {
+        for(unsigned int i = 1; i < num_params; ++i) {
             const Parameter *param = method_->get_parameter(i);
             format_value(value->arguments_.at(param), out);
         }
@@ -169,7 +174,7 @@ void format_hex(const vector<uint8_t>& bytes, ostream& out)
     out << '<';
     for(auto it = bytes.begin(); it != bytes.end(); ++it) {
         char infer[10];
-        sprintf(infer, "%02x", (uint8_t)(*it));
+        snprintf(infer, 10, "%02x", (uint8_t)(*it));
         out << infer;
     }
     out << '>';
@@ -196,7 +201,7 @@ void format_quoted(char quote_mark, const string& str, ostream& out)
         } else if(!isprint(c)) { // character is not a printable ascii character
             // print the character as an escaped hexidecimal character constant
             char infer[10];
-            sprintf(infer, "%02x", (unsigned char)c);
+            snprintf(infer, 10, "%02x", (unsigned char)c);
             out << "\\x" << infer;
         } else {
             out << c;

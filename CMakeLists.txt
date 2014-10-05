@@ -42,6 +42,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 ## Handle Bison and Flex components
+set(BISON_VERSION "0.0.0")
 find_package(BISON)
 find_package(FLEX)
 

@@ -77,7 +77,7 @@ bool Struct::add_field(std::unique_ptr<Field> field)
             return false;
         }
         // The index of this named field is the next available index
-        m_indices_by_name[field->name()] = m_fields.size();
+        m_indices_by_name[field->name()] = (unsigned int)m_fields.size();
     }
 
     // Struct fields are accessible by id.

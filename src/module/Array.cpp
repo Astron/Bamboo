@@ -24,7 +24,7 @@ Array::Array(Type *element_type, const NumericRange& size) :
         m_array_range.min.uinteger = 0;
         m_array_range.max.uinteger = UINT64_MAX;
     } else if(m_array_range.min == m_array_range.max) {
-        m_array_size = m_array_range.min.uinteger;
+        m_array_size = (unsigned int)m_array_range.min.uinteger;
     } else {
         m_array_size = 0;
     }

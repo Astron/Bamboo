@@ -59,7 +59,7 @@ enum LegacyType {
 void hash_module(HashGenerator& hashgen, const Module *file)
 {
     hashgen.add_int(1); // (dc_virtual_inheritance && dc_sort_inheritance_by_file)
-    hashgen.add_int(file->num_structs() + file->num_classes());
+    hashgen.add_int(int(file->num_structs() + file->num_classes()));
 
     size_t num_types = file->num_types();
     for(unsigned int i = 0; i < num_types; ++i) {
@@ -83,7 +83,7 @@ void hash_class(HashGenerator& hashgen, const Class *cls)
     hashgen.add_string(cls->name());
 
     size_t num_parents = cls->num_parents();
-    hashgen.add_int(num_parents);
+    hashgen.add_int(int(num_parents));
     for(unsigned int i = 0; i < num_parents; ++i) {
         hashgen.add_int(cls->get_parent(i)->id());
     }
@@ -93,7 +93,7 @@ void hash_class(HashGenerator& hashgen, const Class *cls)
     }
 
     size_t num_fields = cls->num_base_fields();
-    hashgen.add_int(num_fields);
+    hashgen.add_int(int(num_fields));
     for(unsigned int i = 0; i < num_fields; ++i) {
         hash_field(hashgen, cls->get_base_field(i));
     }
@@ -106,7 +106,7 @@ void hash_struct(HashGenerator& hashgen, const Struct *strct)
     hashgen.add_int(0); // num_parents()
 
     size_t num_fields = strct->num_fields();
-    hashgen.add_int(num_fields);
+    hashgen.add_int(int(num_fields));
     for(unsigned int i = 0; i < num_fields; ++i) {
         hash_field(hashgen, strct->get_field(i));
     }
@@ -123,7 +123,7 @@ void hash_field(HashGenerator& hashgen, const Field *field)
         const MolecularField *mol = field->as_molecular();
         size_t num_fields = mol->num_fields();
 
-        hashgen.add_int(num_fields); // _fields.size();
+        hashgen.add_int(int(num_fields)); // _fields.size();
         for(unsigned int i = 0; i < num_fields; ++i) {
             hash_field(hashgen, mol->get_field(i));
         }
@@ -140,7 +140,7 @@ void hash_field(HashGenerator& hashgen, const Field *field)
         const Method *method = field->type()->as_method();
         size_t num_params = method->num_parameters();
 
-        hashgen.add_int(num_params); // _elements.size();
+        hashgen.add_int(int(num_params)); // _elements.size();
         for(unsigned int i = 0; i < num_params; ++i) {
             hash_parameter(hashgen, method->get_parameter(i));
         }
@@ -207,7 +207,7 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list)
     if(flags != ~0) {
         hashgen.add_int(flags);
     } else {
-        hashgen.add_int(num_keywords); // _keywords_by_name.size()
+        hashgen.add_int(int(num_keywords)); // _keywords_by_name.size()
 
         set<string> keywords_by_name;
         for(unsigned int i = 0; i < num_keywords; ++i) {
@@ -367,7 +367,7 @@ void hash_int_type(HashGenerator& hashgen, const Numeric *numeric)
 {
     hashgen.add_int(numeric->divisor());
     if(numeric->has_modulus()) {
-        unsigned int modulus = floor(numeric->modulus() * numeric->divisor() + 0.5);
+        unsigned int modulus = (unsigned int)floor(numeric->modulus() * numeric->divisor() + 0.5);
         hashgen.add_int(int(modulus));
     }
     if(numeric->has_range()) {

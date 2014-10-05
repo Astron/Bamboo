@@ -1,5 +1,6 @@
 // Filename: Field.h
 #pragma once
+#include <cstdint>
 #include "KeywordList.h"
 namespace bamboo   // open namespace
 {

@@ -79,7 +79,7 @@ bool Module::add_class(std::unique_ptr<Class> cls)
         return false;
     }
 
-    cls->set_id(m_types_by_id.size());
+    cls->set_id((unsigned int)m_types_by_id.size());
     m_types_by_id.push_back(ref);
 
     // Transfer ownership of the Class to the module
@@ -106,7 +106,7 @@ bool Module::add_struct(std::unique_ptr<Struct> record)
         return false;
     }
 
-    record->set_id(m_types_by_id.size());
+    record->set_id((unsigned int)m_types_by_id.size());
     m_types_by_id.push_back(ref);
 
     // Transfer ownership of the Struct to the Module

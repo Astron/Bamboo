@@ -1,7 +1,7 @@
 // Filename: NumericRange.h
 #pragma once
-#include <math.h> // INFINITY
-#include <stdint.h>
+#include <cstdint>
+#include <limits>
 namespace bamboo   // open namespace bamboo
 {
 
@@ -57,8 +57,10 @@ struct NumericRange {
     inline NumericRange() : type(Number::kNaN)
     {
         min.type = max.type = Number::kNaN;
-        min.floating = -INFINITY;
-        max.floating =  INFINITY;
+        // lowest is the most negative float (min is smallest positive)
+        // See http://en.cppreference.com/w/cpp/types/numeric_limits/min
+        min.floating = std::numeric_limits<double>::lowest();
+        max.floating = std::numeric_limits<double>::max();
     }
     inline NumericRange(int32_t min, int32_t max)   : type(Number::kInt),   min(min), max(max) {}
     inline NumericRange(int64_t min, int64_t max)   : type(Number::kInt),   min(min), max(max) {}

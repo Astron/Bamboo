@@ -2535,7 +2535,7 @@ yyreduce:
         } else if(dtype->subtype() == kTypeVarstring || dtype->subtype() == kTypeVarblob) {
             // TODO: Check for range limits
             // Prepend length tag
-            sizetag_t length = (yyvsp[0].str).length();
+            size_t length = (yyvsp[0].str).length();
             vector<uint8_t> buf = as_buffer(length);
             pack_value((yyvsp[0].str), buf);
             (yyval.buffer) = buf;
@@ -2597,7 +2597,7 @@ yyreduce:
             size_t num_params = method->num_parameters();
             for(unsigned int i = 1; i <= num_params; ++i) {
                 // Reverse iteration
-                const Parameter *param = method->get_parameter(num_params - i);
+                const Parameter *param = method->get_parameter((unsigned int)num_params - i);
                 // Add parameter types to stack such that the first is on top
                 type_stack.push(TypeAndDepth(param->type(), current_depth));
             }
@@ -2649,7 +2649,7 @@ yyreduce:
             size_t num_fields = dstruct->num_fields();
             for(unsigned int i = 1; i <= num_fields; ++i) {
                 // Reverse iteration
-                const Field *field = dstruct->get_field(num_fields - i);
+                const Field *field = dstruct->get_field((unsigned int)num_fields - i);
                 // Add field types to stack such that the first is on top
                 type_stack.push(TypeAndDepth(field->type(), current_depth));
             }
@@ -3390,7 +3390,7 @@ vector<uint8_t> parse_dcvalue(const Type *dtype, istream& in, bool& err)
         dcparser_init_value(in, "parse_value()", dtype, value);
         dcparse();
         dcparser_cleanup();
-    } catch(const exception& e) {
+    } catch(const exception&) {
         err = true;
         return vector<uint8_t>();
     }
@@ -3487,7 +3487,7 @@ vector<uint8_t> number_value(Subtype type, int64_t& number)
     case kTypeFloat32:
     case kTypeFloat64: {
         // Note: Expecting number to be converted to a double by value (ie. 3 becomes 3.0)
-        double value = number;
+        double value = double(number);
         return number_value(type, value);
     }
     default:
@@ -3534,7 +3534,7 @@ vector<uint8_t> number_value(Subtype type, uint64_t& number)
     case kTypeFloat32:
     case kTypeFloat64: {
         // Note: Expecting number to be converted to a double by value (ie. 3 becomes 3.0)
-        double value = number;
+        double value = double(number);
         return number_value(type, value);
     }
     default:

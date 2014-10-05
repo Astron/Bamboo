@@ -1,5 +1,6 @@
 // Filename: Parameter.h
 #pragma once
+#include <cstdint>
 #include <string> // std::string
 #include <vector> // std::vector
 namespace bamboo   // open namespace bamboo
