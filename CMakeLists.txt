@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 project(Bamboo)
 
+## OS-specific flags
+if(WIN32)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 ## Compiler-specific flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
    CMAKE_CXX_COMPILER_ID MATCHES "GNU")
