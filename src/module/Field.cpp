@@ -70,10 +70,7 @@ bool Field::set_default_value(const Value *default_value)
 }
 bool Field::set_default_value(const vector<uint8_t>& default_value)
 {
-    // TODO: Validate default value
-    if(m_default_value != nullptr) { delete m_default_value; }
-    m_default_value = new Value(m_type, default_value);
-    return true;
+    return set_default_value(Value(m_type, default_value));
 }
 
 // set_id sets the unique index number associated with the field.
