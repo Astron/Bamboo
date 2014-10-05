@@ -1,6 +1,6 @@
 // Filename: hashes.h
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 namespace bamboo   // open namespace
 {
 

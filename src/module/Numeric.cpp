@@ -1,6 +1,7 @@
 // Filename: Numeric.cpp
 #include "Numeric.h"
-#include <limits> // for fixed-width integer limits
+#include <cmath>  // std::floor
+#include <limits> // std::numeric_limits
 using namespace std;
 namespace bamboo   // open namespace bamboo
 {

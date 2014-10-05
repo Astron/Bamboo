@@ -2,6 +2,7 @@
 #include "hashes.h"
 #include "HashGenerator.h"
 
+#include <cmath>    // std::floor
 #include <set>      // std::set
 #include <iostream> // std::cerr
 #include "../module/Module.h"
