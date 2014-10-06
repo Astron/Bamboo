@@ -13,20 +13,24 @@ Numeric::Numeric(Subtype type)
     m_subtype = type;
     switch(type) {
     case kTypeChar:
-    case kTypeInt8:
     case kTypeUint8:
+        m_signed = false;
+    case kTypeInt8:
         m_size = sizeof(int8_t);
         break;
-    case kTypeInt16:
     case kTypeUint16:
+        m_signed = false;
+    case kTypeInt16:
         m_size = sizeof(int16_t);
         break;
-    case kTypeInt32:
     case kTypeUint32:
+        m_signed = false;
+    case kTypeInt32:
         m_size = sizeof(int32_t);
         break;
-    case kTypeInt64:
     case kTypeUint64:
+        m_signed = false;
+    case kTypeInt64:
         m_size = sizeof(int64_t);
         break;
     case kTypeFloat32:

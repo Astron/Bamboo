@@ -1,8 +1,9 @@
 // Filename: Numeric.h
 #pragma once
-#include "Type.h"
-#include "Value.h"
-#include "NumericRange.h"
+#include <cmath> // std::fmod
+#include "../module/Type.h"
+#include "../module/Value.h"
+#include "../module/NumericRange.h"
 namespace bamboo   // open namespace bamboo
 {
 
@@ -24,6 +25,9 @@ class Numeric : public Type
     Numeric *as_numeric() override;
     const Numeric *as_numeric() const override;
 
+    // is_signed returns whether the numeric is a signed type or not.
+    inline bool is_signed() const;
+
     // divisor returns the divisor of the numeric, with a default value of one.
     inline unsigned int divisor() const;
 
@@ -36,17 +40,32 @@ class Numeric : public Type
     inline bool has_range() const;
     // range returns the NumericRange that constrains the type's values.
     inline NumericRange range() const;
+    // clamp returns the value clamped by the Numeric's range.
+    inline double clamp(double value) const;
+    // clamp_fixed returns the value clamped by Numeric's range scaled by the divisor.
+    inline double clamp_fixed(double value) const;
 
-    // to_value scales by the divisor and wraps with the modulus to produce a compressed Value.
-    //     Typically used to compress reals to fixed-point [/100] or wrap arc degrees [% 360].
-    //     Throws range error if the number violates the Numeric's range constraints.
-    Value to_value(Number);
-    // to_number decompresses the Value (frequently from fixed-point) into the expected number.
-    //     Throws range_error if the number violates the Numeric's range constraints.
-    //     Throws domain_error if the value isn't a numeric type.
-    double to_floating(const Value&);
-    int64_t to_integer(const Value&);
-    uint64_t to_uinteger(const Value&);
+    // to_fixed packs a floating point value into a fixed-point representation.
+    // The value is clamped by the numeric's range.
+    inline int8_t to_fixed_i8(double floating) const;
+    inline int16_t to_fixed_i16(double floating) const;
+    inline int32_t to_fixed_i32(double floating) const;
+    inline int64_t to_fixed_i64(double floating) const;
+    inline uint8_t to_fixed_u8(double floating) const;
+    inline uint16_t to_fixed_u16(double floating) const;
+    inline uint32_t to_fixed_u32(double floating) const;
+    inline uint64_t to_fixed_u64(double floating) const;
+
+    // to_floating unpacks a fixed point value into a floating-point representation.
+    // The value is clamped by the numeric's range.
+    inline double to_floating(int8_t fixed) const;
+    inline double to_floating(int16_t fixed) const;
+    inline double to_floating(int32_t fixed) const;
+    inline double to_floating(int64_t fixed) const;
+    inline double to_floating(uint8_t fixed) const;
+    inline double to_floating(uint16_t fixed) const;
+    inline double to_floating(uint32_t fixed) const;
+    inline double to_floating(uint64_t fixed) const;
 
     // set_divisor sets a divisor for the numeric type, typically to represent fixed-point.
     //     Returns false if the divisor is not valid for this type.
@@ -59,6 +78,7 @@ class Numeric : public Type
     bool set_range(const NumericRange& range);
 
   private:
+    bool m_signed = true;
     unsigned int m_divisor = 1;
 
     // These are the original range and modulus values from the file, unscaled by the divisor.
