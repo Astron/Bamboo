@@ -41,7 +41,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   endif()
 endif()
 
-## Handle Bison and Flex components
+## Check for Bison and Flex to enable parser generation
 set(BISON_VERSION "0.0.0")
 find_package(BISON)
 find_package(FLEX)
@@ -91,25 +91,25 @@ if(GENERATE_PARSER)
 
   if(BISON_FOUND)
     add_custom_command(
-      SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
+      SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp
       COMMAND ${BISON_EXECUTABLE} ${BISON_ARGS}
-      ARGS --defines=${CMAKE_SOURCE_DIR}/src/dcfile/parser-defs.h
-           -o ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
-           ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp
+      ARGS --defines=${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser-defs.h
+           -o ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.cpp
+           ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp
       COMMENT "Generating dcfile/parser.cpp"
-      OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/parser.cpp
-      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/parser.ypp)
+      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.cpp
+      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp)
   endif(BISON_FOUND)
 
   if(FLEX_FOUND)
     add_custom_command(
-      SOURCE ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
+      SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp
       COMMAND ${FLEX_EXECUTABLE} ${FLEX_ARGS}
-      ARGS -o${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
-           ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp
+      ARGS -o${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.cpp
+           ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp
       COMMENT "Generating dcfile/lexer.cpp"
-      OUTPUT ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.cpp
-      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/src/dcfile/lexer.lpp)
+      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.cpp
+      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp)
   endif(FLEX_FOUND)
 endif()
 
@@ -119,10 +119,12 @@ include_directories(src)
 # no dependencies
 set(BITS_FILES
   src/bits/byteorder.h
-  src/bits/errors.h
   src/bits/sizetag.h
   src/bits/buffers.h
   src/bits/bits.cpp)
+set(BITS_EXPORTED
+  bits/byteorder.h
+  bits/sizetag.h)
 source_group("Bits" FILES ${BITS_FILES})
 
 # depends: bits
@@ -155,11 +157,40 @@ set(MODULE_FILES
   src/module/Field.cpp
   src/module/MolecularField.h
   src/module/MolecularField.cpp
+  src/module/Numeric.h
+  src/module/Numeric.ipp
+  src/module/Numeric.cpp
   src/module/Parameter.h
   src/module/Parameter.ipp
   src/module/Parameter.cpp
   src/module/Value.h
   src/module/Value.cpp)
+set(MODULE_EXPORTED
+  module/module
+  module/Type.h
+  module/Type.ipp
+  module/Numeric.h
+  module/Numeric.ipp
+  module/Array.h
+  module/Array.ipp
+  module/Struct.h
+  module/Struct.ipp
+  module/Class.h
+  module/Class.ipp
+  module/Method.h
+  module/Method.ipp
+  module/KeywordList.h
+  module/Module.h
+  module/Module.ipp
+  module/Field.h
+  module/Field.ipp
+  module/MolecularField.h
+  module/Numeric.h
+  module/Numeric.ipp
+  module/NumericRange.h
+  module/Parameter.h
+  module/Parameter.ipp
+  module/Value.h)
 source_group("Module" FILES ${MODULE_FILES})
 
 # depends: module
@@ -170,6 +201,7 @@ set(TRAITS_FILES
   src/traits/HashGenerator.cpp
   src/traits/primes.h
   src/traits/primes.cpp)
+set(TRAITS_EXPORTED traits/hashes.h)
 source_group("Traits" FILES ${TRAITS_FILES})
 
 # depends: bits, module
@@ -178,6 +210,9 @@ set(DCFILE_FILES
   src/dcfile/lexer.cpp
   src/dcfile/write.cpp
   src/dcfile/format.cpp)
+set(DCFILE_EXPORTED
+  dcfile/format.h
+  dcfile/parse.h)
 source_group("DCFile" FILES ${DCFILE_FILES})
 
 # depends: bits, module
@@ -186,15 +221,32 @@ set(WIRE_FILES
   src/wire/Datagram.cpp
   src/wire/DatagramIterator.h
   src/wire/DatagramIterator.cpp)
+set(WIRE_EXPORTED
+  wire/Datagram.h
+  wire/DatagramIterator.h)
 source_group("Wire" FILES ${WIRE_FILES})
 
 set(BAMBOO_SOURCES
   ${BITS_FILES}
-  ${VALUES_FILES}
   ${MODULE_FILES}
   ${DCFILE_FILES}
   ${TRAITS_FILES}
   ${WIRE_FILES})
+set(BAMBOO_HEADERS
+  ${BITS_EXPORTED}
+  ${MODULE_EXPORTED}
+  ${DCFILE_EXPORTED}
+  ${TRAITS_EXPORTED}
+  ${WIRE_EXPORTED})
+
+# Create include directory in build directory
+add_custom_target(EXPORT_HEADERS ALL)
+foreach(HEADER ${BAMBOO_HEADERS})
+  add_custom_command(TARGET EXPORT_HEADERS PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+      copy ${CMAKE_CURRENT_SOURCE_DIR}/src/${HEADER}
+           ${CMAKE_CURRENT_BINARY_DIR}/include/bamboo/${HEADER})
+endforeach()
 
 option(BUILD_SHARED_LIBS "Builds shared libraries instead of static libraries.")
 option(BUILD_SHARED_AND_STATIC "Build both shared and static libraries.")
@@ -210,7 +262,7 @@ set_property(CACHE BUILD_PACKAGE PROPERTY STRINGS None Default)
 if(NOT BUILD_PACKAGE MATCHES None)
   include(CPack)
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Bamboo is a library for defining object-oriented message protocols.")
-  set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
+  set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
 endif()
 
 option(BUILD_16BIT_SIZETAG "Compiles the bamboo library with 16-bit sizetags." true)
@@ -218,7 +270,7 @@ if(BUILD_16BIT_SIZETAG)
   add_library(bamboo ${LIBRARY_TYPE} ${BAMBOO_SOURCES})
   install(TARGETS bamboo DESTINATION lib/bamboo EXPORT bamboo-targets)
   install(EXPORT bamboo-targets DESTINATION lib/bamboo)
-  install(FILES "${CMAKE_SOURCE_DIR}/cmake/bamboo-config.cmake" DESTINATION lib/bamboo)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/bamboo-config.cmake" DESTINATION lib/bamboo)
 endif()
 
 option(BUILD_32BIT_SIZETAG "Compiles the bamboo library with 32-bit sizetags.")
@@ -227,7 +279,7 @@ if(BUILD_32BIT_SIZETAG)
   target_compile_definitions(bamboo32 PUBLIC BAMBOO_32BIT_SIZETAG)
   install(TARGETS bamboo32 DESTINATION lib/bamboo EXPORT bamboo32-targets)
   install(EXPORT bamboo32-targets DESTINATION lib/bamboo)
-  install(FILES "${CMAKE_SOURCE_DIR}/cmake/bamboo32-config.cmake" DESTINATION lib/bamboo)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/bamboo32-config.cmake" DESTINATION lib/bamboo)
 endif()
 
 if(BUILD_SHARED_AND_STATIC)
@@ -247,6 +299,16 @@ if(BUILD_SHARED_AND_STATIC)
     endif()
     install(TARGETS bamboo32-static DESTINATION lib/bamboo)
   endif()
+endif()
+
+## Check for CxxTest to enable unittests
+find_package(CxxTest)
+if(CXXTEST_FOUND)
+    include_directories(${CXXTEST_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include)
+    enable_testing()
+    CXXTEST_ADD_TEST(dcfile_test dcfile_test.cpp
+                     ${CMAKE_CURRENT_SOURCE_DIR}/test/dcfile/ParseValueTests.h)
+    target_link_libraries(dcfile_test bamboo)
 endif()
 
 # Is Python installed, and should Python interfaces be generated?
@@ -270,57 +332,57 @@ if(BUILD_PYTHON)
     message(FATAL_ERROR "Building python bindings is enabled, but python interpreter wasn't found.")
   endif()
 
-  include(${CMAKE_SOURCE_DIR}/cmake/modules/CheckPythonModule.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/CheckPythonModule.cmake)
   check_python_module(pybindgen)
   if(PYTHON_PYBINDGEN_FOUND)
     if(BUILD_16BIT_SIZETAG)
       # Generate the 16-bit bindings
       add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-                ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
-        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+                ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings.cpp
+        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)
     endif()
     if(BUILD_32BIT_SIZETAG)
       add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-                ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
-        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings32.cpp
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+                ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings32.cpp
+        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)
     endif()
 
     if(BUILD_16BIT_SIZETAG AND BUILD_32BIT_SIZETAG)
       add_custom_target(
         update-python-prebuilt
         ${CMAKE_COMMAND} -E copy
-            ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
-            ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
+            ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
-            ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp)
+            ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings32.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp)
     endif()
   else()
     if(BUILD_16BIT_SIZETAG)
       add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
-          ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
-          ${CMAKE_BINARY_DIR}/python/pythonBindings.cpp
-        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
+          ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings.cpp
+          ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings.cpp
+        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py)
     endif()
     if(BUILD_32BIT_SIZETAG)
       add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings32.cpp
         COMMAND ${CMAKE_COMMAND} -E copy
-          ${CMAKE_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp
-          ${CMAKE_BINARY_DIR}/python/pythonBindings32.cpp
-        MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        IMPLICIT_DEPENDS Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py)
+          ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/prebuilt/pythonBindings32.cpp
+          ${CMAKE_CURRENT_BINARY_DIR}/python/pythonBindings32.cpp
+        MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        IMPLICIT_DEPENDS Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py)
     endif()
   endif()
 
@@ -334,61 +396,61 @@ if(BUILD_PYTHON)
     "Path to the Python architecture-dependent package directory.")
 
   # Create a working directory
-  add_custom_target(python-directory ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/python)
+  add_custom_target(python-directory ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/python)
 
   if(BUILD_16BIT_SIZETAG)
     # Build the 16-bit python module
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/python/build/
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup.py build
-      MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/pythonBindings.cpp
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/python/build/
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup.py build
+      MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings.cpp
       IMPLICIT_DEPENDS
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/setup.py
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup.py
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)
     add_custom_target(python-bindings ALL
       DEPENDS bamboo python-directory
-        ${CMAKE_BINARY_DIR}/pythonBindings.cpp
-        ${CMAKE_BINARY_DIR}/python/build/)
+        ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/python/build/)
 
     # Install the 16-bit python module
     install(CODE "
       message(STATUS \"Installing: ${PYTHON_ARCH_DIR}/bamboo.so\")
       execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup.py install --quiet
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)")
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup.py install --quiet
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)")
   endif()
   if(BUILD_32BIT_SIZETAG)
     # Build the 32-bit python module
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/python/build/
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py build
-      MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/python/build/
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup32.py build
+      MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings32.cpp
       IMPLICIT_DEPENDS
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/generate.py
-        Python ${CMAKE_SOURCE_DIR}/bindings/python/mappings.py
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup32.py
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/generate.py
+        Python ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/mappings.py
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)
     add_custom_target(python-bindings32 ALL
       DEPENDS bamboo32 python-directory
-        ${CMAKE_BINARY_DIR}/pythonBindings32.cpp
-        ${CMAKE_BINARY_DIR}/python/build/)
+        ${CMAKE_CURRENT_BINARY_DIR}/pythonBindings32.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/python/build/)
 
     # Install the 32-bit python module
     install(CODE "
       message(STATUS \"Installing: ${PYTHON_ARCH_DIR}/bamboo32.so\")
       execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/python/setup32.py install --quiet
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/python)")
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/bindings/python/setup32.py install --quiet
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/python)")
   endif()
 endif()
 
 # Install header files
-install(DIRECTORY src/
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/bamboo
   DESTINATION include/bamboo
   FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY src/
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/bamboo
   DESTINATION include/bamboo
   FILES_MATCHING PATTERN "*.ipp")
 
