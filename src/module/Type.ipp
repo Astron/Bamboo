@@ -2,12 +2,7 @@
 namespace bamboo { // open namespace bamboo
 
 
-// null constructor
-inline Type::Type() :
-    m_subtype(kTypeInvalid), m_size(0) {
-}
-
-// subtype returns the type's fundamental type as an integer constant.
+// subtype returns the type's layout as an integer constant.
 inline Subtype Type::subtype() const {
     return m_subtype;
 }
@@ -34,5 +29,6 @@ inline const std::string& Type::alias() const {
 inline void Type::set_alias(const std::string& alias) {
     m_alias = alias;
 }
+
 
 } // close namespace bamboo

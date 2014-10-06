@@ -32,16 +32,10 @@ string format_subtype(Subtype subtype)
         return "float64";
     case kTypeString:
         return "string";
-    case kTypeVarstring:
-        return "varstring";
     case kTypeBlob:
         return "blob";
-    case kTypeVarblob:
-        return "varblob";
     case kTypeArray:
         return "array";
-    case kTypeVararray:
-        return "vararray";
     case kTypeStruct:
         return "struct";
     case kTypeMethod:
