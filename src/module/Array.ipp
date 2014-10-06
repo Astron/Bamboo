@@ -19,7 +19,8 @@ inline size_t Array::array_size() const {
 // has_range returns true if there is a constraint on the range of valid array sizes.
 //     This is always true for fixed-size arrays.
 inline bool Array::has_range() const {
-    return !m_array_range.is_empty();
+    return m_array_range.min.uinteger != 0 ||
+           m_array_range.max.uinteger != std::numeric_limits<uint64_t>::max();
 }
 
 // range returns the range of sizes that the array may have.

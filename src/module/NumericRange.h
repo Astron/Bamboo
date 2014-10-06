@@ -12,7 +12,7 @@ struct Number {
         kNaN = 0,
         kInt,
         kUint,
-        kFloat,
+        kFloat
     };
 
     Type type;
@@ -22,7 +22,7 @@ struct Number {
         double floating;
     };
 
-    Number()           : type(kNaN),  integer(0)  {}
+    Number()           : type(kNaN),   integer(0)  {}
     Number(int32_t n)  : type(kInt),   integer(n)  {}
     Number(int64_t n)  : type(kInt),   integer(n)  {}
     Number(uint32_t n) : type(kUint),  uinteger(n) {}
@@ -40,6 +40,36 @@ struct Number {
     {
         return Number(n);
     }
+
+#define CONVERSION(numtype) \
+    operator numtype() const \
+    { \
+        switch(type) { \
+        case kInt: \
+            return (numtype)integer; \
+        case kUint: \
+            return (numtype)uinteger; \
+        case kFloat: \
+            return (numtype)floating; \
+        case kNaN: \
+        default: \
+            return 0; \
+        } \
+    }
+
+    explicit CONVERSION(int8_t);
+    explicit CONVERSION(int16_t);
+    explicit CONVERSION(int32_t);
+    explicit CONVERSION(int64_t);
+    explicit CONVERSION(uint8_t);
+    explicit CONVERSION(uint16_t);
+    explicit CONVERSION(uint32_t);
+    explicit CONVERSION(uint64_t);
+    explicit CONVERSION(float);
+    explicit CONVERSION(double);
+
+#undef CONVERSION
+
 };
 
 inline bool operator==(const Number& a, const Number& b)
@@ -82,7 +112,7 @@ struct NumericRange {
         }
     }
 
-    inline bool is_empty() const
+    inline bool is_nan() const
     {
         return (type == Number::kNaN);
     }

@@ -1,56 +1,35 @@
 // Filename: Array.cpp
 #include "Array.h"
-
-// This must be defined for inttypes.h to define the fixed with integer macros
-#if defined(__cplusplus) && !defined(__STDC_LIMIT_MACROS)
-#define __STDC_LIMIT_MACROS
-#endif
-#include <inttypes.h> // UINT64_MAX
+using namespace std;
 namespace bamboo   // open namespace
 {
 
 
 // type constructor
-Array::Array(Type *element_type, const NumericRange& size) :
-    m_element_type(element_type), m_array_range(size)
+Array::Array(Type *element_type, const NumericRange& size) : m_element_type(element_type)
 {
-    if(m_element_type == nullptr) {
-        m_element_type = Type::invalid;
-    }
-
-    // TODO: Handle non-uinteger NumericRanges
-    if(m_array_range.is_empty()) {
+    // Determine array range/size
+    if(size.is_nan()) {
         m_array_size = 0;
-        m_array_range.min.uinteger = 0;
-        m_array_range.max.uinteger = UINT64_MAX;
-    } else if(m_array_range.min == m_array_range.max) {
-        m_array_size = (unsigned int)m_array_range.min.uinteger;
+        m_array_range = NumericRange(uint64_t(0), numeric_limits<uint64_t>::max());
+    } else if(size.min == size.max) {
+        m_array_size = (unsigned int)size.min;
     } else {
         m_array_size = 0;
+        m_array_range = NumericRange(uint64_t(m_array_range.min), uint64_t(m_array_range.max));
     }
-
-    if(m_element_type->has_fixed_size() && m_array_size > 0) {
-        m_subtype = kTypeArray;
-        m_size = m_array_size * m_element_type->fixed_size();
-    } else {
-        m_subtype = kTypeVararray;
-        m_size = 0;
-    }
-
-
 
     if(m_element_type->subtype() == kTypeChar) {
-        if(m_subtype == kTypeArray) {
-            m_subtype = kTypeString;
-        } else {
-            m_subtype = kTypeVarstring;
-        }
+        m_subtype = kTypeString;
+        if(m_array_size > 0) { m_size = m_array_size; }
+        else { m_size = 0; }
     } else if(m_element_type->subtype() == kTypeUint8) {
-        if(m_subtype == kTypeArray) {
-            m_subtype = kTypeBlob;
-        } else {
-            m_subtype = kTypeVarblob;
-        }
+        m_subtype = kTypeBlob;
+        if(m_array_size > 0) { m_size = m_array_size; }
+        else { m_size = 0; }
+    } else {
+        m_subtype = kTypeArray;
+        m_size = 0;
     }
 }
 
