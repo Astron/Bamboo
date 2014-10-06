@@ -158,9 +158,8 @@ void DatagramIterator::read_packed(const Type *dtype, vector<uint8_t>& buffer)
         }
         break;
     }
-    case kTypeInvalid: {
+    case kTypeInvalid:
         break;
-    }
     }
 }
 
@@ -200,10 +199,9 @@ void DatagramIterator::skip_type(const Type *dtype)
         }
         break;
     }
-    default: {
+    default:
         // This case should be impossible, but a default is required by compilers
         break;
-    }
     }
 }
 

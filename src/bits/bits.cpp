@@ -1,6 +1,6 @@
 // Filename: bits.cpp
-#include "sizetag.h"
-#include "byteorder.h"
+#include "../bits/sizetag.h"
+#include "../bits/byteorder.h"
 namespace bamboo   // open namespace bamboo
 {
 

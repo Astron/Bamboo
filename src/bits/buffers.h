@@ -2,7 +2,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "sizetag.h"
+#include "../bits/sizetag.h"
 namespace bamboo
 {
 
@@ -114,86 +114,133 @@ inline void pack_value(const std::vector<uint8_t>& r, std::vector<uint8_t>& buf)
     buf.insert(buf.end(), r.begin(), r.end());
 }
 
-/*
-inline bool read_bool(const std::vector<uint8_t>& buf, size_t& offset)
+inline bool safe_read_bool(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    return bool(buf[offset++]) != false;
-}
-inline char read_char(const std::vector<uint8_t>& buf, size_t& offset)
-{
-    return char(buf[offset++]);
-}
-inline int8_t read_int8(const std::vector<uint8_t>& buf, size_t& offset)
-{
-    return int8_t(buf[offset++]);
-}
-inline int16_t read_int16(const std::vector<uint8_t>& buf, size_t& offset)
-{
-    int16_t r = *(int16_t *)(&buf[offset]);
+    bool r = '\0';
+    if(offset + sizeof(r) <= buf.size()) {
+        r = bool(buf[offset]);
+    }
     offset += sizeof(r);
     return r;
 }
-inline int32_t read_int32(const std::vector<uint8_t>& buf, size_t& offset)
+inline char safe_read_char(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    int32_t r = *(int32_t *)(&buf[offset]);
+    char r = '\0';
+    if(offset + sizeof(r) <= buf.size()) {
+        r = char(buf[offset]);
+    }
     offset += sizeof(r);
     return r;
 }
-inline int64_t read_int64(const std::vector<uint8_t>& buf, size_t& offset)
+inline int8_t safe_read_int8(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    int64_t r = *(int64_t *)(&buf[offset]);
+    int8_t r = '\0';
+    if(offset + sizeof(r) <= buf.size()) {
+        r = int8_t(buf[offset]);
+    }
     offset += sizeof(r);
     return r;
 }
-inline uint8_t read_uint8(const std::vector<uint8_t>& buf, size_t& offset)
+inline int16_t safe_read_int16(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    return buf[offset++];
-}
-inline uint16_t read_uint16(const std::vector<uint8_t>& buf, size_t& offset)
-{
-    uint16_t r = *(uint16_t *)(&buf[offset]);
+    int16_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(int16_t *)(&buf[offset]);;
+    }
     offset += sizeof(r);
     return r;
 }
-inline uint32_t read_uint32(const std::vector<uint8_t>& buf, size_t& offset)
+inline int32_t safe_read_int32(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    uint32_t r = *(uint32_t *)(&buf[offset]);
+    int32_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(int32_t *)(&buf[offset]);;
+    }
     offset += sizeof(r);
     return r;
 }
-inline uint64_t read_uint64(const std::vector<uint8_t>& buf, size_t& offset)
+inline int64_t safe_read_int64(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    uint64_t r = *(uint64_t *)(&buf[offset]);
+    int64_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(int64_t *)(&buf[offset]);;
+    }
     offset += sizeof(r);
     return r;
 }
-inline float read_float32(const std::vector<uint8_t>& buf, size_t& offset)
+inline uint8_t safe_read_uint8(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    float r = *(float *)(&buf[offset]);
+    uint8_t r = '\0';
+    if(offset + sizeof(r) <= buf.size()) {
+        r = buf[offset];
+    }
     offset += sizeof(r);
     return r;
 }
-inline double read_float64(const std::vector<uint8_t>& buf, size_t& offset)
+inline uint16_t safe_read_uint16(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    double r = *(double *)(&buf[offset]);
+    uint16_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(uint16_t *)(&buf[offset]);;
+    }
     offset += sizeof(r);
     return r;
 }
-inline std::string read_string(const std::vector<uint8_t>& buf, size_t length,
-                               size_t& offset)
+inline uint32_t safe_read_uint32(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    std::string r = std::string((char *)&buf[offset], (char *)&buf[offset] + length);
-    offset += length;
+    uint32_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(uint32_t *)(&buf[offset]);;
+    }
+    offset += sizeof(r);
     return r;
 }
-inline std::vector<uint8_t> read_data(const std::vector<uint8_t>& buf, size_t length,
-                                      size_t& offset)
+inline uint64_t safe_read_uint64(const std::vector<uint8_t>& buf, size_t& offset)
 {
-    std::vector<uint8_t> r = std::vector<uint8_t>(&buf[offset], &buf[offset] + length);
-    offset += length;
+    uint64_t r = 0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(uint64_t *)(&buf[offset]);;
+    }
+    offset += sizeof(r);
     return r;
 }
-*/
+inline float safe_read_float32(const std::vector<uint8_t>& buf, size_t& offset)
+{
+    float r = 0.0f;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(float *)(&buf[offset]);;
+    }
+    offset += sizeof(r);
+    return r;
+}
+inline double safe_read_float64(const std::vector<uint8_t>& buf, size_t& offset)
+{
+    double r = 0.0;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = *(double *)(&buf[offset]);;
+    }
+    offset += sizeof(r);
+    return r;
+}
+inline std::string safe_read_string(const std::vector<uint8_t>& buf, size_t n, size_t& offset)
+{
+    std::string r;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = std::string((char *)&buf[offset], (char *)&buf[offset] + n);
+        offset += n;
+    }
+    offset += n;
+    return r;
+}
+inline std::vector<uint8_t> safe_read_data(const std::vector<uint8_t>& buf, size_t n, size_t& offset)
+{
+    std::vector<uint8_t> r;
+    if(offset + sizeof(r) <= buf.size()) {
+        r = std::vector<uint8_t>(&buf[offset], &buf[offset] + n);
+    }
+    offset += n;
+    return r;
+}
 
 
 } // close namespace bamboo

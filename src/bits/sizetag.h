@@ -1,4 +1,4 @@
-// Filename: traits.h
+// Filename: sizetag.h
 #pragma once
 #include <stdint.h>
 namespace bamboo   // open namespace bamboo
@@ -13,5 +13,6 @@ typedef uint16_t sizetag_t;
 
 extern const int kSizetagWidth;
 extern const unsigned long long kSizetagMax;
+
 
 } // close namespace bamboo

@@ -19,16 +19,19 @@ Array::Array(Type *element_type, const NumericRange& size) : m_element_type(elem
         m_array_range = NumericRange(uint64_t(m_array_range.min), uint64_t(m_array_range.max));
     }
 
+    // Set subtype
     if(m_element_type->subtype() == kTypeChar) {
         m_subtype = kTypeString;
-        if(m_array_size > 0) { m_size = m_array_size; }
-        else { m_size = 0; }
     } else if(m_element_type->subtype() == kTypeUint8) {
         m_subtype = kTypeBlob;
-        if(m_array_size > 0) { m_size = m_array_size; }
-        else { m_size = 0; }
     } else {
         m_subtype = kTypeArray;
+    }
+
+    // Set byte size
+    if(m_array_size > 0 && m_element_type->has_fixed_size()) {
+        m_size = m_array_size * m_element_type->fixed_size();
+    } else {
         m_size = 0;
     }
 }

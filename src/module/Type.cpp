@@ -30,6 +30,8 @@ string format_subtype(Subtype subtype)
         return "float32";
     case kTypeFloat64:
         return "float64";
+    case kTypeFixed:
+        return "fixed";
     case kTypeString:
         return "string";
     case kTypeBlob:
