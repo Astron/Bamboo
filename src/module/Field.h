@@ -56,7 +56,6 @@ class Field : public KeywordList
     //     Returns false if the value is invalid for the field's type.
     virtual bool set_default_value(const Value&);
     virtual bool set_default_value(const Value *);
-    virtual bool set_default_value(const std::vector<uint8_t>& packed);
 
     struct sort_by_id {
         inline bool operator()(const Field *lhs, const Field *rhs) const;

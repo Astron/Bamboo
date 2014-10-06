@@ -51,7 +51,6 @@ class Parameter
     //     Returns false if the value is invalid for the field's type.
     bool set_default_value(const Value& default_value);
     bool set_default_value(const Value *default_value);
-    bool set_default_value(const std::vector<uint8_t>& default_value);
 
     struct sort_by_position {
         inline bool operator()(const Parameter *lhs, const Parameter *rhs) const;

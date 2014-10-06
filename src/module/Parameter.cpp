@@ -56,7 +56,7 @@ bool Parameter::set_type(Type *type)
 //     Returns false if the value is invalid for the parameter's type.
 bool Parameter::set_default_value(const Value& default_value)
 {
-    // TODO: Validate default value
+    if(default_value.type() != this->type()) { return false; }
     if(m_default_value != nullptr) { delete m_default_value; }
     m_default_value = new Value(default_value);
     return true;
@@ -64,10 +64,6 @@ bool Parameter::set_default_value(const Value& default_value)
 bool Parameter::set_default_value(const Value *default_value)
 {
     return set_default_value(*default_value);
-}
-bool Parameter::set_default_value(const vector<uint8_t>& default_value)
-{
-    return set_default_value(Value(m_type, default_value));
 }
 
 // set_position allows a method to tell the parameter its order in the function.

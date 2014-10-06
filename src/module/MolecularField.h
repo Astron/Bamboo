@@ -30,7 +30,6 @@ class MolecularField : public Field, public Struct
     // set_default_value always returns false; molecular fields don't have default values.
     bool set_default_value(const Value&) override;
     bool set_default_value(const Value *) override;
-    bool set_default_value(const std::vector<uint8_t>&) override;
 
     // add_field adds a new Field as part of the Molecular.
     //     Returns false if the field could not be added.

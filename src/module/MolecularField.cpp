@@ -72,10 +72,6 @@ bool MolecularField::set_default_value(const Value *)
 {
     return false;
 }
-bool MolecularField::set_default_value(const std::vector<uint8_t>&)
-{
-    return false;
-}
 
 
 } // close namespace bamboo
