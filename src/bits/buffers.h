@@ -60,6 +60,11 @@ inline std::vector<uint8_t> as_buffer(const std::string& r)
 {
     return std::vector<uint8_t>(r.begin(), r.end());
 }
+inline std::vector<uint8_t> as_buffer(unsigned long r)
+{
+    return std::vector<uint8_t>((uint8_t *)&r, (uint8_t *)(&r + 1));
+}
+    
 
 inline void pack_value(char r, std::vector<uint8_t>& buf)
 {
