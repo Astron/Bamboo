@@ -51,6 +51,8 @@ def generate(file_):
         foreign_cpp_namespace = 'std',
         message_rvalue = "'\"NoneType' object\" + exc.reason()",
         is_standard_error = True)
+    clsKeywordList = module.add_class('KeywordList',
+        docstring = classDocstrings['KeywordList'])
     clsModule = module.add_class('Module',
         docstring = classDocstrings['Module'])
     clsType = module.add_class('Type',
@@ -67,7 +69,7 @@ def generate(file_):
         docstring = classDocstrings['Class'])
     clsParam = module.add_class('Parameter',
         docstring = classDocstrings['Parameter'])
-    clsField = module.add_class('Field',
+    clsField = module.add_class('Field', parent = clsKeywordList,
         docstring = classDocstrings['Field'])
     clsMolecular = module.add_class('MolecularField', parent = [clsField, clsStruct])
     structImport = module.add_struct('Import')
@@ -125,6 +127,18 @@ def generate(file_):
     #           [param('unsigned int', 'index'), param('const Value', 'value')], throw = [indexError])
     #add_method(structValue, '_setitem_', None,
     #           [param('std::string', 'item'), param('const Value', 'value')], throw = [indexError])
+    clsKeywordList.add_constructor([])
+    clsKeywordList.add_copy_constructor()
+    add_method(clsKeywordList, 'has_keyword', retval('bool'),
+               [param('std::string', 'keyword')], is_const = True)
+    add_method(clsKeywordList, 'has_matching_keywords', retval('bool'),
+               [param('const bamboo::KeywordList&', 'other')], is_const = True)
+    add_method(clsKeywordList, 'num_keywords', retval('size_t'), [], is_const = True)
+    add_method(clsKeywordList, 'get_keyword', retval('std::string'),
+               [param('unsigned int', 'n')],
+               is_const = True, throw = [indexError])
+    add_method(clsKeywordList, 'add_keyword', retval('bool'), [param('std::string', 'keyword')])
+    add_method(clsKeywordList, 'copy_keywords', None, [param('const bamboo::KeywordList&', 'other')])
     clsModule.add_constructor([])
     add_method(clsModule, 'num_classes', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_structs', retval('size_t'), [], is_const = True)

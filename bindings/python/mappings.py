@@ -29,6 +29,14 @@ altnames = {
     'from_packed': ['from_packed', 'fromPacked'],
     'pack':        ['pack'],
 
+    # KeywordList
+    'has_keyword':   ['has_keyword',   'hasKeyword'],
+    'num_keywords':  ['num_keywords',  'numKeywords'],
+    'get_keyword':   ['get_keyword',   'getKeyword'],
+    'add_keyword':   ['add_keyword',   'addKeyword'],
+    'copy_keywords': ['copy_keywords', 'copyKeywords'],
+    'has_matching_keywords': ['has_matching_keywords', 'hasMatchingKeywords'],
+
     # Module
     'num_classes':   ['num_classes',   'numClasses'],
     'num_structs':   ['num_structs',   'numStructs'],
@@ -42,14 +50,14 @@ altnames = {
     'field_by_id':   ['field_by_id',   'fieldById'],
     'num_imports':   ['num_imports',   'numImports'],
     'get_import':    ['get_import',    'getImport'],
-    'has_keyword':   ['has_keyword',   'hasKeyword'],
-    'num_keywords':  ['num_keywords',  'numKeywords'],
-    'get_keyword':   ['get_keyword',   'getKeyword'],
+    #'has_keyword':   ['has_keyword',   'hasKeyword'],
+    #'num_keywords':  ['num_keywords',  'numKeywords'],
+    #'get_keyword':   ['get_keyword',   'getKeyword'],
     'add_class':     ['add_class',     'addClass'],
     'add_struct':    ['add_struct',    'addStruct'],
     'add_import':    ['add_import',    'addImport'],
     'add_typedef':   ['add_typedef',   'addTypedef'],
-    'add_keyword':   ['add_keyword',   'addKeyword'],
+    #'add_keyword':   ['add_keyword',   'addKeyword'],
 
     # Type
     'subtype':        ['subtype'],
@@ -182,6 +190,8 @@ altnames = {
 }
 
 classDocstrings = {
+    'KeywordList':
+'A KeywordList is a list of keywords that may be set on a particular field.',
     'Module':
 'A Module represents the complete list of Distributed Class definitions that define a particular ' +
 'protocol. Typically, parsed from one or more \\".dc\\" or other bamboo protocol description files.',
@@ -259,6 +269,23 @@ methodDocstrings = {
 'Returns the size (the number of items) in a value.  ' +
 'Size may be called on an array, string, blob, struct, or function value.',
 
+    },
+
+    'KeywordList': {
+        'has_keyword':
+'Returns true if this list includes the indicated keyword, false otherwise.',
+        'num_keywords':
+'Returns the number of keywords in the list.',
+        'get_keyword':
+'Returns the <n>th keyword in the list.',
+        'add_keyword':
+'Adds the indicated keyword to the list.  ' +
+'Returns true if it is added, false if it was already there.',
+        'copy_keywords':
+'Replaces this keyword list with those from the other list.',
+        'has_matching_keywords':
+'Returns true if this list has the same keywords as the other list, ' +
+'false if some keywords differ. Order is not considered important.',
     },
 
     'Module': {

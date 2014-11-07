@@ -22,7 +22,7 @@ class KeywordList
 
     // has_keyword returns true if this list includes the indicated keyword, false otherwise.
     bool has_keyword(const std::string& name) const;
-    // num_keywordsnum_keywords returns the number of keywords in the list.
+    // num_keywords returns the number of keywords in the list.
     size_t num_keywords() const;
     // get_keyword returns the nth keyword in the list.
     const std::string& get_keyword(unsigned int n) const;

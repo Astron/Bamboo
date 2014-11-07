@@ -124,6 +124,16 @@ int _wrap_convert_py2c__std__vector__lt___std__string___gt__(PyObject *arg, std:
 
 typedef struct {
     PyObject_HEAD
+    bamboo::KeywordList *obj;
+    PyBindGenWrapperFlags flags:8;
+} PyBambooKeywordList;
+
+
+extern PyTypeObject PyBambooKeywordList_Type;
+
+
+typedef struct {
+    PyObject_HEAD
     bamboo::Module *obj;
     PyBindGenWrapperFlags flags:8;
 } PyBambooModule;
@@ -619,6 +629,406 @@ static PyMethodDef bamboo_module_functions[] = {
     {NULL, NULL, 0, NULL}
 };
 /* --- classes --- */
+
+
+
+
+static int
+_wrap_PyBambooKeywordList__tp_init__0(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    const char *keywords[] = {NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "", (char **) keywords)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    self->obj = new bamboo::KeywordList();
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+static int
+_wrap_PyBambooKeywordList__tp_init__1(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs, PyObject **return_exception)
+{
+    PyBambooKeywordList *ctor_arg;
+    const char *keywords[] = {"ctor_arg", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &ctor_arg)) {
+        {
+            PyObject *exc_type, *traceback;
+            PyErr_Fetch(&exc_type, return_exception, &traceback);
+            Py_XDECREF(exc_type);
+            Py_XDECREF(traceback);
+        }
+        return -1;
+    }
+    self->obj = new bamboo::KeywordList(*((PyBambooKeywordList *) ctor_arg)->obj);
+    self->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return 0;
+}
+
+int _wrap_PyBambooKeywordList__tp_init(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    int retval;
+    PyObject *error_list;
+    PyObject *exceptions[2] = {0,};
+    retval = _wrap_PyBambooKeywordList__tp_init__0(self, args, kwargs, &exceptions[0]);
+    if (!exceptions[0]) {
+        return retval;
+    }
+    retval = _wrap_PyBambooKeywordList__tp_init__1(self, args, kwargs, &exceptions[1]);
+    if (!exceptions[1]) {
+        Py_DECREF(exceptions[0]);
+        return retval;
+    }
+    error_list = PyList_New(2);
+    PyList_SET_ITEM(error_list, 0, PyObject_Str(exceptions[0]));
+    Py_DECREF(exceptions[0]);
+    PyList_SET_ITEM(error_list, 1, PyObject_Str(exceptions[1]));
+    Py_DECREF(exceptions[1]);
+    PyErr_SetObject(PyExc_TypeError, error_list);
+    Py_DECREF(error_list);
+    return -1;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_copyKeywords(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    self->obj->copy_keywords(*((PyBambooKeywordList *) other)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_copy_keywords(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    self->obj->copy_keywords(*((PyBambooKeywordList *) other)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_get_keyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    try
+    {
+        retval = self->obj->get_keyword(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_has_matching_keywords(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    retval = self->obj->has_matching_keywords(*((PyBambooKeywordList *) other)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_has_keyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->has_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_numKeywords(PyBambooKeywordList *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->num_keywords();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_num_keywords(PyBambooKeywordList *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->num_keywords();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_add_keyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->add_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_addKeyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->add_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_hasKeyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->has_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_getKeyword(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    try
+    {
+        retval = self->obj->get_keyword(n);
+    } catch (std::out_of_range const &exc) {
+        PyErr_SetString((PyObject *) PyExc_IndexError, exc.what());
+        return NULL;
+    }
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+
+PyObject *
+_wrap_PyBambooKeywordList_hasMatchingKeywords(PyBambooKeywordList *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    retval = self->obj->has_matching_keywords(*((PyBambooKeywordList *) other)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+
+static PyObject*
+_wrap_PyBambooKeywordList__copy__(PyBambooKeywordList *self)
+{
+
+    PyBambooKeywordList *py_copy;
+    py_copy = PyObject_New(PyBambooKeywordList, &PyBambooKeywordList_Type);
+    py_copy->obj = new bamboo::KeywordList(*self->obj);
+    py_copy->flags = PYBINDGEN_WRAPPER_FLAG_NONE;
+    return (PyObject*) py_copy;
+}
+
+static PyMethodDef PyBambooKeywordList_methods[] = {
+    {(char *) "copyKeywords", (PyCFunction) _wrap_PyBambooKeywordList_copyKeywords, METH_KEYWORDS|METH_VARARGS, "Replaces this keyword list with those from the other list." },
+    {(char *) "copy_keywords", (PyCFunction) _wrap_PyBambooKeywordList_copy_keywords, METH_KEYWORDS|METH_VARARGS, "Replaces this keyword list with those from the other list." },
+    {(char *) "get_keyword", (PyCFunction) _wrap_PyBambooKeywordList_get_keyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword in the list." },
+    {(char *) "has_matching_keywords", (PyCFunction) _wrap_PyBambooKeywordList_has_matching_keywords, METH_KEYWORDS|METH_VARARGS, "Returns true if this list has the same keywords as the other list, false if some keywords differ. Order is not considered important." },
+    {(char *) "has_keyword", (PyCFunction) _wrap_PyBambooKeywordList_has_keyword, METH_KEYWORDS|METH_VARARGS, "Returns true if this list includes the indicated keyword, false otherwise." },
+    {(char *) "numKeywords", (PyCFunction) _wrap_PyBambooKeywordList_numKeywords, METH_NOARGS, "Returns the number of keywords in the list." },
+    {(char *) "num_keywords", (PyCFunction) _wrap_PyBambooKeywordList_num_keywords, METH_NOARGS, "Returns the number of keywords in the list." },
+    {(char *) "add_keyword", (PyCFunction) _wrap_PyBambooKeywordList_add_keyword, METH_KEYWORDS|METH_VARARGS, "Adds the indicated keyword to the list.  Returns true if it is added, false if it was already there." },
+    {(char *) "addKeyword", (PyCFunction) _wrap_PyBambooKeywordList_addKeyword, METH_KEYWORDS|METH_VARARGS, "Adds the indicated keyword to the list.  Returns true if it is added, false if it was already there." },
+    {(char *) "hasKeyword", (PyCFunction) _wrap_PyBambooKeywordList_hasKeyword, METH_KEYWORDS|METH_VARARGS, "Returns true if this list includes the indicated keyword, false otherwise." },
+    {(char *) "getKeyword", (PyCFunction) _wrap_PyBambooKeywordList_getKeyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword in the list." },
+    {(char *) "hasMatchingKeywords", (PyCFunction) _wrap_PyBambooKeywordList_hasMatchingKeywords, METH_KEYWORDS|METH_VARARGS, "Returns true if this list has the same keywords as the other list, false if some keywords differ. Order is not considered important." },
+    {(char *) "__copy__", (PyCFunction) _wrap_PyBambooKeywordList__copy__, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+
+static void
+_wrap_PyBambooKeywordList__tp_dealloc(PyBambooKeywordList *self)
+{
+        bamboo::KeywordList *tmp = self->obj;
+        self->obj = NULL;
+        if (!(self->flags&PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED)) {
+            delete tmp;
+        }
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject*
+_wrap_PyBambooKeywordList__tp_richcompare (PyBambooKeywordList *PYBINDGEN_UNUSED(self), PyBambooKeywordList *other, int opid)
+{
+
+    if (!PyObject_IsInstance((PyObject*) other, (PyObject*) &PyBambooKeywordList_Type)) {
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    }
+    switch (opid)
+    {
+    case Py_LT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_LE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_EQ:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_NE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GE:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    case Py_GT:
+        Py_INCREF(Py_NotImplemented);
+        return Py_NotImplemented;
+    } /* closes switch (opid) */
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+}
+
+PyTypeObject PyBambooKeywordList_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    (char *) "bamboo.module.KeywordList",            /* tp_name */
+    sizeof(PyBambooKeywordList),                  /* tp_basicsize */
+    0,                                 /* tp_itemsize */
+    /* methods */
+    (destructor)_wrap_PyBambooKeywordList__tp_dealloc,        /* tp_dealloc */
+    (printfunc)0,                      /* tp_print */
+    (getattrfunc)NULL,       /* tp_getattr */
+    (setattrfunc)NULL,       /* tp_setattr */
+    (cmpfunc)NULL,           /* tp_compare */
+    (reprfunc)NULL,             /* tp_repr */
+    (PyNumberMethods*)NULL,     /* tp_as_number */
+    (PySequenceMethods*)NULL, /* tp_as_sequence */
+    (PyMappingMethods*)NULL,   /* tp_as_mapping */
+    (hashfunc)NULL,             /* tp_hash */
+    (ternaryfunc)NULL,          /* tp_call */
+    (reprfunc)NULL,              /* tp_str */
+    (getattrofunc)NULL,     /* tp_getattro */
+    (setattrofunc)NULL,     /* tp_setattro */
+    (PyBufferProcs*)NULL,  /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                      /* tp_flags */
+    "A KeywordList is a list of keywords that may be set on a particular field.",                        /* Documentation string */
+    (traverseproc)NULL,     /* tp_traverse */
+    (inquiry)NULL,             /* tp_clear */
+    (richcmpfunc)_wrap_PyBambooKeywordList__tp_richcompare,   /* tp_richcompare */
+    0,             /* tp_weaklistoffset */
+    (getiterfunc)NULL,          /* tp_iter */
+    (iternextfunc)NULL,     /* tp_iternext */
+    (struct PyMethodDef*)PyBambooKeywordList_methods, /* tp_methods */
+    (struct PyMemberDef*)0,              /* tp_members */
+    0,                     /* tp_getset */
+    NULL,                              /* tp_base */
+    NULL,                              /* tp_dict */
+    (descrgetfunc)NULL,    /* tp_descr_get */
+    (descrsetfunc)NULL,    /* tp_descr_set */
+    0,                 /* tp_dictoffset */
+    (initproc)_wrap_PyBambooKeywordList__tp_init,             /* tp_init */
+    (allocfunc)PyType_GenericAlloc,           /* tp_alloc */
+    (newfunc)PyType_GenericNew,               /* tp_new */
+    (freefunc)0,             /* tp_free */
+    (inquiry)NULL,             /* tp_is_gc */
+    NULL,                              /* tp_bases */
+    NULL,                              /* tp_mro */
+    NULL,                              /* tp_cache */
+    NULL,                              /* tp_subclasses */
+    NULL,                              /* tp_weaklist */
+    (destructor) NULL                  /* tp_del */
+};
+
 
 
 
@@ -4490,6 +4900,33 @@ _wrap_PyBambooMolecularField_as_array(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_subtype(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Subtype retval;
+
+    retval = self->obj->subtype();
+    py_retval = Py_BuildValue((char *) "i", retval);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_has_matching_keywords(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    retval = self->obj->has_matching_keywords(*((PyBambooKeywordList *) other)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_num_fields(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -4539,6 +4976,17 @@ _wrap_PyBambooMolecularField_as_numeric(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_numKeywords(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->num_keywords();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_fieldById(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -4582,21 +5030,30 @@ _wrap_PyBambooMolecularField_module(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_asNumeric(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_addKeyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    bamboo::Numeric *retval;
-    PyBambooNumeric *py_Numeric;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
 
-    retval = self->obj->as_numeric();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
     }
-    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
-    py_Numeric->obj = retval;
-    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    py_retval = Py_BuildValue((char *) "N", py_Numeric);
+    retval = self->obj->add_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_num_keywords(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    size_t retval;
+
+    retval = self->obj->num_keywords();
+    py_retval = Py_BuildValue((char *) "K", ((unsigned PY_LONG_LONG) retval));
     return py_retval;
 }
 
@@ -4655,6 +5112,22 @@ _wrap_PyBambooMolecularField_has_fixed_size(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_copyKeywords(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    self->obj->copy_keywords(*((PyBambooKeywordList *) other)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_hasDefaultValue(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -4662,6 +5135,22 @@ _wrap_PyBambooMolecularField_hasDefaultValue(PyBambooMolecularField *self)
 
     retval = self->obj->has_default_value();
     py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_get_keyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_keyword(n);
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
     return py_retval;
 }
 
@@ -4707,13 +5196,19 @@ _wrap_PyBambooMolecularField_numFields(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_subtype(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_has_keyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    bamboo::Subtype retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
 
-    retval = self->obj->subtype();
-    py_retval = Py_BuildValue((char *) "i", retval);
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->has_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -4738,6 +5233,22 @@ _wrap_PyBambooMolecularField_get_field(PyBambooMolecularField *self, PyObject *a
     py_Field->obj = retval;
     py_Field->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
     py_retval = Py_BuildValue((char *) "N", py_Field);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_hasMatchingKeywords(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
+    }
+    retval = self->obj->has_matching_keywords(*((PyBambooKeywordList *) other)->obj);
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
     return py_retval;
 }
 
@@ -4791,21 +5302,18 @@ _wrap_PyBambooMolecularField___str__(PyBambooMolecularField *self)
 }
 
 PyObject *
-_wrap_PyBambooMolecularField_asMethod(PyBambooMolecularField *self)
+_wrap_PyBambooMolecularField_copy_keywords(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
-    bamboo::Method *retval;
-    PyBambooMethod *py_Method;
+    PyBambooKeywordList *other;
+    const char *keywords[] = {"other", NULL};
 
-    retval = self->obj->as_method();
-    if (!(retval)) {
-        Py_INCREF(Py_None);
-        return Py_None;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "O!", (char **) keywords, &PyBambooKeywordList_Type, &other)) {
+        return NULL;
     }
-    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
-    py_Method->obj = retval;
-    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
-    py_retval = Py_BuildValue((char *) "N", py_Method);
+    self->obj->copy_keywords(*((PyBambooKeywordList *) other)->obj);
+    Py_INCREF(Py_None);
+    py_retval = Py_None;
     return py_retval;
 }
 
@@ -4873,6 +5381,25 @@ _wrap_PyBambooMolecularField_field_by_id(PyBambooMolecularField *self, PyObject 
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_asMethod(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Method *retval;
+    PyBambooMethod *py_Method;
+
+    retval = self->obj->as_method();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Method = PyObject_New(PyBambooMethod, &PyBambooMethod_Type);
+    py_Method->obj = retval;
+    py_Method->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
+    py_retval = Py_BuildValue((char *) "N", py_Method);
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_set_type(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -4934,6 +5461,39 @@ _wrap_PyBambooMolecularField_has_alias(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_add_keyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->add_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_getKeyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    std::string retval;
+    unsigned int n;
+    const char *keywords[] = {"n", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "I", (char **) keywords, &n)) {
+        return NULL;
+    }
+    retval = self->obj->get_keyword(n);
+    py_retval = Py_BuildValue((char *) "s#", (retval).c_str(), (retval).size());
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField_setAlias(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *py_retval;
@@ -4966,6 +5526,25 @@ _wrap_PyBambooMolecularField_as_class(PyBambooMolecularField *self)
     py_Class->obj = retval;
     py_Class->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
     py_retval = Py_BuildValue((char *) "N", py_Class);
+    return py_retval;
+}
+
+PyObject *
+_wrap_PyBambooMolecularField_asNumeric(PyBambooMolecularField *self)
+{
+    PyObject *py_retval;
+    bamboo::Numeric *retval;
+    PyBambooNumeric *py_Numeric;
+
+    retval = self->obj->as_numeric();
+    if (!(retval)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    py_Numeric = PyObject_New(PyBambooNumeric, &PyBambooNumeric_Type);
+    py_Numeric->obj = retval;
+    py_Numeric->flags = PYBINDGEN_WRAPPER_FLAG_OBJECT_NOT_OWNED;
+    py_retval = Py_BuildValue((char *) "N", py_Numeric);
     return py_retval;
 }
 
@@ -5087,6 +5666,23 @@ _wrap_PyBambooMolecularField_record(PyBambooMolecularField *self)
 }
 
 PyObject *
+_wrap_PyBambooMolecularField_hasKeyword(PyBambooMolecularField *self, PyObject *args, PyObject *kwargs)
+{
+    PyObject *py_retval;
+    bool retval;
+    const char *keyword;
+    Py_ssize_t keyword_len;
+    const char *keywords[] = {"keyword", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &keyword, &keyword_len)) {
+        return NULL;
+    }
+    retval = self->obj->has_keyword(std::string(keyword, keyword_len));
+    py_retval = Py_BuildValue((char *) "N", PyBool_FromLong(retval));
+    return py_retval;
+}
+
+PyObject *
 _wrap_PyBambooMolecularField___repr__(PyBambooMolecularField *self)
 {
     PyObject *py_retval;
@@ -5129,41 +5725,53 @@ static PyMethodDef PyBambooMolecularField_methods[] = {
     {(char *) "alias", (PyCFunction) _wrap_PyBambooMolecularField_alias, METH_NOARGS, "Returns the name used to define the type, or the empty string." },
     {(char *) "as_struct", (PyCFunction) _wrap_PyBambooMolecularField_as_struct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
     {(char *) "as_array", (PyCFunction) _wrap_PyBambooMolecularField_as_array, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
+    {(char *) "subtype", (PyCFunction) _wrap_PyBambooMolecularField_subtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
+    {(char *) "has_matching_keywords", (PyCFunction) _wrap_PyBambooMolecularField_has_matching_keywords, METH_KEYWORDS|METH_VARARGS, "Returns true if this list has the same keywords as the other list, false if some keywords differ. Order is not considered important." },
     {(char *) "num_fields", (PyCFunction) _wrap_PyBambooMolecularField_num_fields, METH_NOARGS, "Returns the number of fields in the struct." },
     {(char *) "as_method", (PyCFunction) _wrap_PyBambooMolecularField_as_method, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "as_numeric", (PyCFunction) _wrap_PyBambooMolecularField_as_numeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
+    {(char *) "numKeywords", (PyCFunction) _wrap_PyBambooMolecularField_numKeywords, METH_NOARGS, "Returns the number of keywords in the list." },
     {(char *) "fieldById", (PyCFunction) _wrap_PyBambooMolecularField_fieldById, METH_KEYWORDS|METH_VARARGS, "Returns the field with the index <id>, or None if no such field exists." },
     {(char *) "module", (PyCFunction) _wrap_PyBambooMolecularField_module, METH_NOARGS, "Returns the Module object that contains the struct." },
-    {(char *) "asNumeric", (PyCFunction) _wrap_PyBambooMolecularField_asNumeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
+    {(char *) "addKeyword", (PyCFunction) _wrap_PyBambooMolecularField_addKeyword, METH_KEYWORDS|METH_VARARGS, "Adds the indicated keyword to the list.  Returns true if it is added, false if it was already there." },
+    {(char *) "num_keywords", (PyCFunction) _wrap_PyBambooMolecularField_num_keywords, METH_NOARGS, "Returns the number of keywords in the list." },
     {(char *) "fieldByName", (PyCFunction) _wrap_PyBambooMolecularField_fieldByName, METH_KEYWORDS|METH_VARARGS, "Returns the field with <name>, or None if no such field exists." },
     {(char *) "setType", (PyCFunction) _wrap_PyBambooMolecularField_setType, METH_KEYWORDS|METH_VARARGS, "Sets the Type of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {(char *) "has_fixed_size", (PyCFunction) _wrap_PyBambooMolecularField_has_fixed_size, METH_NOARGS, "Returns true if the Type has a fixed size in bytes." },
+    {(char *) "copyKeywords", (PyCFunction) _wrap_PyBambooMolecularField_copyKeywords, METH_KEYWORDS|METH_VARARGS, "Replaces this keyword list with those from the other list." },
     {(char *) "hasDefaultValue", (PyCFunction) _wrap_PyBambooMolecularField_hasDefaultValue, METH_NOARGS, "Returns true if a default value was defined for this field." },
+    {(char *) "get_keyword", (PyCFunction) _wrap_PyBambooMolecularField_get_keyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword in the list." },
     {(char *) "asArray", (PyCFunction) _wrap_PyBambooMolecularField_asArray, METH_NOARGS, "Returns this as an Array if it is an array, or None otherwise." },
     {(char *) "toString", (PyCFunction) _wrap_PyBambooMolecularField_toString, METH_NOARGS, NULL },
     {(char *) "numFields", (PyCFunction) _wrap_PyBambooMolecularField_numFields, METH_NOARGS, "Returns the number of fields in the struct." },
-    {(char *) "subtype", (PyCFunction) _wrap_PyBambooMolecularField_subtype, METH_NOARGS, "Returns the type's fundamental type as an integer constant." },
+    {(char *) "has_keyword", (PyCFunction) _wrap_PyBambooMolecularField_has_keyword, METH_KEYWORDS|METH_VARARGS, "Returns true if this list includes the indicated keyword, false otherwise." },
     {(char *) "get_field", (PyCFunction) _wrap_PyBambooMolecularField_get_field, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
+    {(char *) "hasMatchingKeywords", (PyCFunction) _wrap_PyBambooMolecularField_hasMatchingKeywords, METH_KEYWORDS|METH_VARARGS, "Returns true if this list has the same keywords as the other list, false if some keywords differ. Order is not considered important." },
     {(char *) "asStruct", (PyCFunction) _wrap_PyBambooMolecularField_asStruct, METH_NOARGS, "Returns this as a Struct if it is a struct, or None otherwise." },
     {(char *) "type", (PyCFunction) _wrap_PyBambooMolecularField_type, METH_NOARGS, "Returns the Type of the field." },
     {(char *) "__str__", (PyCFunction) _wrap_PyBambooMolecularField___str__, METH_NOARGS, NULL },
-    {(char *) "asMethod", (PyCFunction) _wrap_PyBambooMolecularField_asMethod, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
+    {(char *) "copy_keywords", (PyCFunction) _wrap_PyBambooMolecularField_copy_keywords, METH_KEYWORDS|METH_VARARGS, "Replaces this keyword list with those from the other list." },
     {(char *) "hasFixedSize", (PyCFunction) _wrap_PyBambooMolecularField_hasFixedSize, METH_NOARGS, "Returns true if the Type has a fixed size in bytes." },
     {(char *) "setName", (PyCFunction) _wrap_PyBambooMolecularField_setName, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
     {(char *) "fixed_size", (PyCFunction) _wrap_PyBambooMolecularField_fixed_size, METH_NOARGS, "Returns the size of the Type in bytes or 0 if it is variable." },
     {(char *) "field_by_id", (PyCFunction) _wrap_PyBambooMolecularField_field_by_id, METH_KEYWORDS|METH_VARARGS, "Returns the field with the index <id>, or None if no such field exists." },
+    {(char *) "asMethod", (PyCFunction) _wrap_PyBambooMolecularField_asMethod, METH_NOARGS, "Returns this as a Method if it is a method, or None otherwise." },
     {(char *) "set_type", (PyCFunction) _wrap_PyBambooMolecularField_set_type, METH_KEYWORDS|METH_VARARGS, "Sets the Type of the field and clear's the default value.  Returns false if a field cannot represent <type>." },
     {(char *) "add_field", (PyCFunction) _wrap_PyBambooMolecularField_add_field, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Field to the Struct returning false if there is a name conflict." },
     {(char *) "has_default_value", (PyCFunction) _wrap_PyBambooMolecularField_has_default_value, METH_NOARGS, "Returns true if a default value was defined for this field." },
     {(char *) "has_alias", (PyCFunction) _wrap_PyBambooMolecularField_has_alias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
+    {(char *) "add_keyword", (PyCFunction) _wrap_PyBambooMolecularField_add_keyword, METH_KEYWORDS|METH_VARARGS, "Adds the indicated keyword to the list.  Returns true if it is added, false if it was already there." },
+    {(char *) "getKeyword", (PyCFunction) _wrap_PyBambooMolecularField_getKeyword, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th keyword in the list." },
     {(char *) "setAlias", (PyCFunction) _wrap_PyBambooMolecularField_setAlias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
     {(char *) "as_class", (PyCFunction) _wrap_PyBambooMolecularField_as_class, METH_NOARGS, NULL },
+    {(char *) "asNumeric", (PyCFunction) _wrap_PyBambooMolecularField_asNumeric, METH_NOARGS, "Returns this as a Numeric if it is numeric, or None otherwise." },
     {(char *) "set_name", (PyCFunction) _wrap_PyBambooMolecularField_set_name, METH_KEYWORDS|METH_VARARGS, "Sets the name of this field.  Returns false if a field with the same name already exists in the containing method." },
     {(char *) "getField", (PyCFunction) _wrap_PyBambooMolecularField_getField, METH_KEYWORDS|METH_VARARGS, "Returns the <n>th field of the struct." },
     {(char *) "addField", (PyCFunction) _wrap_PyBambooMolecularField_addField, METH_KEYWORDS|METH_VARARGS, "Gives ownership of the Field to the Struct returning false if there is a name conflict." },
     {(char *) "field_by_name", (PyCFunction) _wrap_PyBambooMolecularField_field_by_name, METH_KEYWORDS|METH_VARARGS, "Returns the field with <name>, or None if no such field exists." },
     {(char *) "to_string", (PyCFunction) _wrap_PyBambooMolecularField_to_string, METH_NOARGS, NULL },
     {(char *) "record", (PyCFunction) _wrap_PyBambooMolecularField_record, METH_NOARGS, "Returns the Class or Struct that contains this field." },
+    {(char *) "hasKeyword", (PyCFunction) _wrap_PyBambooMolecularField_hasKeyword, METH_KEYWORDS|METH_VARARGS, "Returns true if this list includes the indicated keyword, false otherwise." },
     {(char *) "__repr__", (PyCFunction) _wrap_PyBambooMolecularField___repr__, METH_NOARGS, NULL },
     {(char *) "hasAlias", (PyCFunction) _wrap_PyBambooMolecularField_hasAlias, METH_NOARGS, "Returns true if this type was defined the an aliased name." },
     {(char *) "set_alias", (PyCFunction) _wrap_PyBambooMolecularField_set_alias, METH_KEYWORDS|METH_VARARGS, "Gives this type an alternate name <alias>." },
@@ -6204,6 +6812,11 @@ initbamboo_module(void)
     if (m == NULL) {
         return NULL;
     }
+    /* Register the 'bamboo::KeywordList' class */
+    if (PyType_Ready(&PyBambooKeywordList_Type)) {
+        return NULL;
+    }
+    PyModule_AddObject(m, (char *) "KeywordList", (PyObject *) &PyBambooKeywordList_Type);
     /* Register the 'bamboo::Module' class */
     if (PyType_Ready(&PyBambooModule_Type)) {
         return NULL;
@@ -6250,6 +6863,7 @@ initbamboo_module(void)
     }
     PyModule_AddObject(m, (char *) "Parameter", (PyObject *) &PyBambooParameter_Type);
     /* Register the 'bamboo::Field' class */
+    PyBambooField_Type.tp_base = &PyBambooKeywordList_Type;
     if (PyType_Ready(&PyBambooField_Type)) {
         return NULL;
     }
