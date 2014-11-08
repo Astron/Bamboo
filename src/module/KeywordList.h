@@ -18,7 +18,7 @@ class KeywordList
     KeywordList(const KeywordList&);
     KeywordList& operator=(KeywordList);
     friend void swap(KeywordList& lhs, KeywordList& rhs);
-    ~KeywordList() = default;
+    virtual ~KeywordList() {}
 
     // has_keyword returns true if this list includes the indicated keyword, false otherwise.
     bool has_keyword(const std::string& name) const;
