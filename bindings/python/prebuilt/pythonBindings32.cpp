@@ -7849,7 +7849,6 @@ bool _custom_parse_buffer_value(PyObject *value_tuple, PyObject **return_excepti
 bool _custom_PyBambooDatagram_pack_tuple(bamboo::Datagram *dg, const bamboo::Type *type,
                                          PyObject *value_tuple, PyObject **return_exception)
 {
-    std::cerr << bamboo::format_subtype(type->subtype()) << "\n";
     switch(type->subtype()) {
     case bamboo::kTypeChar: {
         char value;
@@ -8318,7 +8317,6 @@ bool _custom_parse_buffer_value(PyObject *value_tuple, PyObject **return_excepti
 bool _custom_PyBambooDatagram_pack_tuple(bamboo::Datagram *dg, const bamboo::Type *type,
                                          PyObject *value_tuple, PyObject **return_exception)
 {
-    std::cerr << bamboo::format_subtype(type->subtype()) << "\n";
     switch(type->subtype()) {
     case bamboo::kTypeChar: {
         char value;
