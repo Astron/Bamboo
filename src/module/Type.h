@@ -39,6 +39,8 @@ enum Subtype {
     kTypeInvalid
 };
 
+std::string format_subtype(Subtype subtype);
+
 // A Type is a shared type with a defined layout of data.
 class Type
 {

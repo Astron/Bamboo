@@ -114,7 +114,7 @@ sizetag_t Datagram::add_packed(const Type *type,
     case kTypeBlob: {
         sizetag_t len = type->fixed_size();
         check_read_length(packed, offset, len);
-        add_blob(&packed[offset], len);
+        add_data(&packed[offset], len);
         offset += len;
         return offset;
     }
@@ -199,9 +199,8 @@ sizetag_t Datagram::add_packed(const Type *type,
         }
         return offset;
     }
-    case kTypeInvalid: {
+    case kTypeInvalid:
         return offset;
-    }
     }
     return offset;
 }

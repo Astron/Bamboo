@@ -306,16 +306,9 @@ def generate(file_):
     add_method(clsDatagram, 'add_float32', None, [param('float', 'value')], throw = [dgOverflowError])
     add_method(clsDatagram, 'add_float64', None, [param('double', 'value')], throw = [dgOverflowError])
     add_custom_method(clsDatagram, 'add_data')
-    #add_method(clsDatagram, 'add_data', None, [param('const bamboo::Buffer&', 'value')])
+    add_custom_method(clsDatagram, 'add_value', ('METH_VARARGS',))
     add_method(clsDatagram, 'add_string', None, [param('std::string', 'value')], throw = [dgOverflowError])
-    #add_method(clsDatagram, 'add_blob', None, [param('const bamboo::Buffer&', 'value')])
-    #add_method(clsDatagram, 'add_value', None,
-    #           [param('const bamboo::Type *', 'type', transfer_ownership = False),
-    #            param('const Value', 'value')])
-    #add_method(clsDatagram, 'add_packed', None,
-    #           [param('const bamboo::Type *', 'type', transfer_ownership = False),
-    #            param('const bamboo::Buffer&', 'packed'),
-    #            param('size_t', 'offset', default_value = '0')])
+    #add_method(clsDatagram, 'add_blob', None, [param('std::string', 'value')], throw = [dgOverflowError])
     clsDgIter.add_constructor([
             param('const bamboo::Datagram&', 'dg'),
             param('size_t', 'offset', default_value = '0')])

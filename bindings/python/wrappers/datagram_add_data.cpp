@@ -8,12 +8,14 @@ _custom_wrap_PyBambooDatagram_%s(PyBambooDatagram *self, PyObject *args,
     const char *keywords[] = {"value", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "s#", (char **) keywords, &value, &value_len)) {
+
         {
             PyObject *exc_type, *traceback;
             PyErr_Fetch(&exc_type, return_exception, &traceback);
             Py_XDECREF(exc_type);
             Py_XDECREF(traceback);
         }
+
         return NULL;
     }
 

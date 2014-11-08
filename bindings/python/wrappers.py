@@ -14,4 +14,5 @@ wrapperNames = {
 wrapperBodies = {
     'add_data': read_wrapper('datagram_add_data.cpp'),
     'data': read_wrapper('datagram_data.cpp'),
+    'add_value': read_wrapper('pydatagram_add_value.cpp')
 }
