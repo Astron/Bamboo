@@ -1,5 +1,4 @@
-PyObject *
-_custom_wrap_PyBambooDatagram_%s(PyBambooDatagram *self, PyObject **return_exception)
+PyObject *_custom_wrap_PyBambooDatagram_data(PyBambooDatagram *self, PyObject **return_exception)
 {
     PyObject *py_retval;
     const uint8_t *retval;

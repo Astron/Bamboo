@@ -268,6 +268,14 @@ class Datagram
             buf_offset += length;
         }
     }
+    void add_data(const char *data, sizetag_t length)
+    {
+        if(length) {
+            check_add_length(length);
+            memcpy(buf + buf_offset, data, length);
+            buf_offset += length;
+        }
+    }
     void add_data(const Datagram& dg)
     {
         if(dg.buf_offset) {
@@ -304,6 +312,13 @@ class Datagram
         buf_offset += blob.size();
     }
     void add_blob(const uint8_t *data, sizetag_t length)
+    {
+        add_size(length);
+        check_add_length(length);
+        memcpy(buf + buf_offset, data, length);
+        buf_offset += length;
+    }
+    void add_blob(const char *data, sizetag_t length)
     {
         add_size(length);
         check_add_length(length);

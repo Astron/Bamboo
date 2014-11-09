@@ -151,8 +151,8 @@ altnames = {
     'add_float64': ['add_float64', 'addFloat64'],
     'add_size':    ['add_size',    'addSize'],
     'add_data':    ['add_data',    'addData'],
-    'add_string':  ['add_string',  'addString'],
-    'add_blob':    ['add_blob',    'addBlob'],
+    'add_string':  ['add_string',  'addString', 'add_blob', 'addBlob'],
+#    'add_blob':    ['add_blob',    'addBlob'],
     'add_value':   ['add_value',   'addValue'],
     'add_packed':  ['add_packed',  'addPacked'],
 
@@ -170,8 +170,8 @@ altnames = {
     'read_float32':   ['read_float32',   'readFloat32'],
     'read_float64':   ['read_float64',   'readFloat64'],
     'read_size':      ['read_size',      'readSize'],
-    'read_string':    ['read_string',    'readString'],
-    'read_blob':      ['read_blob',      'readBlob'],
+    'read_string':    ['read_string',    'readString', 'read_blob', 'readBlob'],
+#    'read_blob':      ['read_blob',      'readBlob'],
     'read_datagram':  ['read_datagram',  'readDatagram'],
     'read_data':      ['read_data',      'readData'],
     'read_remainder': ['read_remainder', 'readRemainder'],
@@ -523,9 +523,9 @@ methodDocstrings = {
         'add_string':
 'Adds a string to the datagram; a length tag (typically a uint16_t) ' +
 'is prepended to the string before it is added.',
-        'add_blob':
-'Adds a blob to the datagram from bytes; a length tag (typically a uint16_t) ' +
-'is prepended to the blob before it is added.',
+#        'add_blob':
+#'Adds a blob to the datagram from bytes; a length tag (typically a uint16_t) ' +
+#'is prepended to the blob before it is added.',
         'add_value':
 'Adds a Value with the given type packed into the datagram, converting ' +
 'byte-order from native-endianess to wire-endianess (if necessary).',
@@ -568,8 +568,8 @@ methodDocstrings = {
 'Reads reads 8 bytes from the datagram, returning a 64-bit float in native endianness.',
         'read_string':
 'Reads a length, then reads a string of that length from the datagram.',
-        'read_blob':
-'Reads a length, then reads a blob of that length from the datagram.',
+#        'read_blob':
+#'Reads a length, then reads a blob of that length from the datagram.',
         'read_datagram':
 'Reads a blob from the datagram and returns it as another datagram.',
         'read_data':

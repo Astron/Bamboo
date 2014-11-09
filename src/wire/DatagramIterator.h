@@ -170,6 +170,7 @@ class DatagramIterator
 
     // read_string reads a string from the datagram in the format
     //     {sizetag_t length; char[length] characters} and returns the character data.
+    // When given a length, returns the next <length> bytes as a string.
     std::string read_string()
     {
         sizetag_t length = read_size();
@@ -178,12 +179,24 @@ class DatagramIterator
         m_offset += length;
         return str;
     }
+    std::string read_string(sizetag_t length)
+    {
+        check_read_length(length);
+        std::string str((char *)(m_dg->data() + m_offset), length);
+        m_offset += length;
+        return str;
+    }
 
     // read_blob reads a blob from the datagram in the format
     //     {sizetag_t length; uint8[length] binary} and returns the binary part.
+    // When given a length, returns the next <length> bytes as a blob.
     std::vector<uint8_t> read_blob()
     {
         sizetag_t length = read_size();
+        return read_data(length);
+    }
+    std::vector<uint8_t> read_blob(sizetag_t length)
+    {
         return read_data(length);
     }
 

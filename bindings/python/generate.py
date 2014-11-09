@@ -75,8 +75,6 @@ def generate(file_):
     structImport = module.add_struct('Import')
     structNumber = module.add_struct('Number')
     structNumericRange = module.add_struct('NumericRange')
-    #structValue = module.add_struct('Value',
-    #    docstring = classDocstrings['Value'])
     dgOverflowError = wire.add_exception('DatagramOverflow', message_rvalue = 'exc.what()')
     dgiEOFError = wire.add_exception('DatagramIteratorEOF', message_rvalue = 'exc.what()')
     clsDatagram = wire.add_class('Datagram',
@@ -110,23 +108,6 @@ def generate(file_):
     structNumericRange.add_instance_attribute('max', 'Number')
 
     # Declare functions/methods
-    #structValue.add_copy_constructor()
-    #add_method(structValue, 'from_type', retval('bamboo::Value'),
-    #           [param('const bamboo::Type *', 'type', transfer_ownership = False)],
-    #           is_static = True, throw = [typeError])
-    #add_custom_method(structValue, 'from_packed', ('METH_KEYWORDS', 'METH_VARARGS', 'METH_STATIC'))
-    #add_method(structValue, 'pack', retval('bamboo::Buffer'),
-    #           [param('const bamboo::Type *', 'type', transfer_ownership = False)],
-    #           is_const = True, throw = [typeError])
-    #add_method(structValue, 'size', retval('size_t'), [], is_const = True)
-    #add_method(structValue, '_getitem_', retval('bamboo::Value'),
-    #           [param('unsigned int', 'index')], throw = [indexError])
-    #add_method(structValue, '_getitem_', retval('bamboo::Value'),
-    #           [param('std::string', 'item')], throw = [indexError])
-    #add_method(structValue, '_setitem_', None,
-    #           [param('unsigned int', 'index'), param('const Value', 'value')], throw = [indexError])
-    #add_method(structValue, '_setitem_', None,
-    #           [param('std::string', 'item'), param('const Value', 'value')], throw = [indexError])
     clsKeywordList.add_constructor([])
     clsKeywordList.add_copy_constructor()
     add_method(clsKeywordList, 'has_keyword', retval('bool'),
@@ -290,7 +271,6 @@ def generate(file_):
                param('std::string', 'name')])
     clsDatagram.add_constructor([])
     clsDatagram.add_copy_constructor()
-    add_custom_method(clsDatagram, 'data', ('METH_NOARGS',))
     add_method(clsDatagram, 'size', retval('size_t'), [], is_const = True)
     add_method(clsDatagram, 'cap', retval('size_t'), [], is_const = True)
     add_method(clsDatagram, 'add_bool', None, [param('bool', 'value')], throw = [dgOverflowError])
@@ -306,9 +286,10 @@ def generate(file_):
     add_method(clsDatagram, 'add_float32', None, [param('float', 'value')], throw = [dgOverflowError])
     add_method(clsDatagram, 'add_float64', None, [param('double', 'value')], throw = [dgOverflowError])
     add_custom_method(clsDatagram, 'add_data')
-    add_custom_method(clsDatagram, 'add_value', ('METH_VARARGS',))
+    add_custom_method(clsDatagram, 'add_value')
+    add_custom_method(clsDatagram, 'data', ('METH_NOARGS',))
+    # add_string also moonlights as add_blob and addBlob
     add_method(clsDatagram, 'add_string', None, [param('std::string', 'value')], throw = [dgOverflowError])
-    #add_method(clsDatagram, 'add_blob', None, [param('std::string', 'value')], throw = [dgOverflowError])
     clsDgIter.add_constructor([
             param('const bamboo::Datagram&', 'dg'),
             param('size_t', 'offset', default_value = '0')])
@@ -319,7 +300,6 @@ def generate(file_):
     add_method(clsDgIter, 'skip_type', None,
                [param('const bamboo::Type *', 'type', transfer_ownership = False)], throw = [dgiEOFError])
     add_method(clsDgIter, 'remaining', retval('size_t'), [], is_const = True)
-    #add_method(clsDgIter, 'read_remainder', retval('bamboo::Buffer'), [])
     add_method(clsDgIter, 'read_bool', retval('bool'), [], throw = [dgiEOFError])
     add_method(clsDgIter, 'read_char', retval('char'), [], throw = [dgiEOFError])
     add_method(clsDgIter, 'read_int8', retval('int8_t'), [], throw = [dgiEOFError])
@@ -333,14 +313,14 @@ def generate(file_):
     add_method(clsDgIter, 'read_float32', retval('float'), [], throw = [dgiEOFError])
     add_method(clsDgIter, 'read_float64', retval('double'), [], throw = [dgiEOFError])
     add_method(clsDgIter, 'read_size', retval('size_t'), [], throw = [dgiEOFError])
+    # read_string also moonlights as read_blob and readBlob
     add_method(clsDgIter, 'read_string', retval('std::string'), [], throw = [dgiEOFError])
-    #add_method(clsDgIter, 'read_blob', retval('bamboo::Buffer'), [])
     add_method(clsDgIter, 'read_datagram', retval('bamboo::Datagram'), [], throw = [dgiEOFError])
-    #add_method(clsDgIter, 'read_data', retval('bamboo::Buffer'), [param('size_t', 'length')])
+    add_custom_method(clsDgIter, 'read_value')
     #add_method(clsDgIter, 'read_value', retval('bamboo::Value'),
     #           [param('const bamboo::Type *', 'type', transfer_ownership = False)])
-    #add_method(clsDgIter, 'read_packed', retval('bamboo::Buffer'),
-    #           [param('const bamboo::Type *', 'type', transfer_ownership = False)])
+    #add_method(clsDgIter, 'read_data', retval('std::string'), [param('size_t', 'length')])
+    #add_method(clsDgIter, 'read_remainder', retval('std::string'), [])
     add_function(traits, 'legacy_hash', retval('uint32_t'),
                  [param('const bamboo::Module *', 'module', transfer_ownership = False)])
     add_function(dcfile, 'read_dcfile', retval('bamboo::Module *', caller_owns_return = True),
@@ -367,7 +347,7 @@ def add_custom_method(cls, name, *args, **kwargs):
        name in methodDocstrings[cls.get_python_name()]:
       kwargs['docstring'] = methodDocstrings[cls.get_python_name()][name]
     for n in names:
-      cls.add_custom_method_wrapper(n, wrapperNames[cls.name] + n, wrapperBodies[name] % n, *args, **kwargs)
+      cls.add_custom_method_wrapper(n, wrapperNames[cls.name] + n, wrapperBodies[n], *args, **kwargs)
 
 def add_function(mod, name, ret, params, **kwargs):
     names = altnames[name]

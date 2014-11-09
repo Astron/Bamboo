@@ -9,10 +9,15 @@ def read_wrapper(filename):
 
 wrapperNames = {
     'Datagram': '_custom_wrap_PyBambooDatagram_',
+    'DatagramIterator': '_custom_wrap_PyBambooDatagramIterator_',
 }
 
 wrapperBodies = {
     'add_data': read_wrapper('datagram_add_data.cpp'),
+    'addData': '/* addData */',
+    'add_value': read_wrapper('pydatagram_add_value.cpp'),
+    'addValue': '/* add_value */',
     'data': read_wrapper('datagram_data.cpp'),
-    'add_value': read_wrapper('pydatagram_add_value.cpp')
+    'read_value': read_wrapper('pydatagramiterator_read_value.cpp'),
+    'readValue': '/* read_value */',
 }
