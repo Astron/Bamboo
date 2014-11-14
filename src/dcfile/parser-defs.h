@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#pragma once
-
+#ifndef YY_DC_MEDIA_STORAGE_DEVEL_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
+# define YY_DC_MEDIA_STORAGE_DEVEL_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED
 /* Debug traces.  */
 #ifndef DCDEBUG
 # if defined YYDEBUG
@@ -51,7 +51,8 @@ extern int dcdebug;
 /* Token type.  */
 #ifndef DCTOKENTYPE
 # define DCTOKENTYPE
-enum dctokentype {
+  enum dctokentype
+  {
     UNSIGNED_INTEGER = 258,
     REAL = 259,
     STRING = 260,
@@ -79,7 +80,7 @@ enum dctokentype {
     KW_STRING = 282,
     KW_BLOB = 283,
     KW_CHAR = 284
-};
+  };
 #endif
 
 /* Value type.  */
@@ -87,4 +88,6 @@ enum dctokentype {
 
 extern DCSTYPE dclval;
 
-int dcparse(void);
+int dcparse (void);
+
+#endif /* !YY_DC_MEDIA_STORAGE_DEVEL_ASTRON_BAMBOO_SRC_DCFILE_PARSER_DEFS_H_INCLUDED  */

@@ -32,7 +32,7 @@ altnames = {
     # KeywordList
     'has_keyword':   ['has_keyword',   'hasKeyword'],
     'num_keywords':  ['num_keywords',  'numKeywords'],
-    'get_keyword':   ['get_keyword',   'getKeyword'],
+    'nth_keyword':   ['nth_keyword',   'nthKeyword'],
     'add_keyword':   ['add_keyword',   'addKeyword'],
     'copy_keywords': ['copy_keywords', 'copyKeywords'],
     'has_matching_keywords': ['has_matching_keywords', 'hasMatchingKeywords'],
@@ -40,8 +40,8 @@ altnames = {
     # Module
     'num_classes':   ['num_classes',   'numClasses'],
     'num_structs':   ['num_structs',   'numStructs'],
-    'get_class':     ['get_class',     'getClass'],
-    'get_struct':    ['get_struct',    'getStruct'],
+    'nth_class':     ['nth_class',     'nthClass'],
+    'nth_struct':    ['nth_struct',    'nthStruct'],
     'class_by_id':   ['class_by_id',   'classById'],
     'class_by_name': ['class_by_name', 'classByName'],
     'num_types':     ['num_types',     'numTypes'],
@@ -49,10 +49,10 @@ altnames = {
     'type_by_name':  ['type_by_name',  'typeByName'],
     'field_by_id':   ['field_by_id',   'fieldById'],
     'num_imports':   ['num_imports',   'numImports'],
-    'get_import':    ['get_import',    'getImport'],
+    'nth_import':    ['nth_import',    'nthImport'],
     #'has_keyword':   ['has_keyword',   'hasKeyword'],
     #'num_keywords':  ['num_keywords',  'numKeywords'],
-    #'get_keyword':   ['get_keyword',   'getKeyword'],
+    #'nth_keyword':   ['nth_keyword',   'nthKeyword'],
     'add_class':     ['add_class',     'addClass'],
     'add_struct':    ['add_struct',    'addStruct'],
     'add_import':    ['add_import',    'addImport'],
@@ -88,17 +88,17 @@ altnames = {
     #'range':       ['range'],
 
     # Method
-    'num_parameters':    ['num_parameters',    'numParameters'],
-    'get_parameter':     ['get_parameter',     'getParameter'],
-    'parameter_by_name': ['parameter_by_name', 'parameterByName'],
-    'add_parameter':     ['add_parameter',     'addParameter'],
+    'num_params':    ['num_params',    'numParams'],
+    'nth_param':     ['nth_param',     'nthParam'],
+    'param_by_name': ['param_by_name', 'paramByName'],
+    'add_param':     ['add_param',     'addParam'],
 
     # Struct
     'id':            ['id'],
     'name':          ['name'],
     'module':        ['module'],
     'num_fields':    ['num_fields',    'numFields'],
-    'get_field':     ['get_field',     'getField'],
+    'nth_field':     ['nth_field',     'nthField'],
     'field_by_id':   ['field_by_id',   'fieldById'],
     'field_by_name': ['field_by_name', 'fieldByName'],
     'add_field':     ['add_field',     'addField'],
@@ -106,19 +106,17 @@ altnames = {
 
     # Class
     'num_parents':     ['num_parents',     'numParents'],
-    'get_parent':      ['get_parent',      'getParent'],
+    'nth_parent':      ['nth_parent',      'nthParent'],
     'num_children':    ['num_children',    'numChildren'],
-    'get_child':       ['get_child',       'getChild'],
-    'has_constructor': ['has_constructor', 'hasConstructor'],
-    'constructor':     ['constructor'],
-    'num_base_fields': ['num_base_fields', 'numBaseFields'],
-    'get_base_field':  ['get_base_field',  'getBaseField'],
+    'nth_child':       ['nth_child',       'nthChild'],
+    'num_declared_fields': ['num_declared_fields', 'numDeclaredFields'],
+    'nth_declared_field':  ['nth_declared_field',  'nthDeclaredField'],
     'add_parent':      ['add_parent',      'addParent'],
 
     # Parameter
     #'name':             ['name'],
     'type':              ['type'],
-    'get_method':        ['get_method',        'getMethod'],
+    'method':            ['method'],
     'has_default_value': ['has_default_value', 'hasDefaultValue'],
     'default_value':     ['default_value',     'defaultValue'],
     'set_name':          ['set_name',          'setName'],
@@ -129,7 +127,7 @@ altnames = {
     #'id':                ['id'],
     #'name':              ['name'],
     #'type':              ['type'],
-    'record':            ['record'],
+    'container':            ['container'],
     #'has_default_value': ['has_default_value', 'hasDefaultValue'],
     #'default_value':     ['default_value',     'defaultValue'],
     #'set_name':          ['set_name',          'setName'],
@@ -276,7 +274,7 @@ methodDocstrings = {
 'Returns true if this list includes the indicated keyword, false otherwise.',
         'num_keywords':
 'Returns the number of keywords in the list.',
-        'get_keyword':
+        'nth_keyword':
 'Returns the <n>th keyword in the list.',
         'add_keyword':
 'Adds the indicated keyword to the list.  ' +
@@ -293,9 +291,9 @@ methodDocstrings = {
 'Returns the number of classes in the module.',
         'num_structs':
 'Returns the number of structs in the module.',
-        'get_class':
+        'nth_class':
 'Returns the <n>th Class in the module.',
-        'get_struct':
+        'nth_struct':
 'Returns the <n>th Struct in the module.',
         'class_by_id':
 'Returns the requested Class or None if there is no such class.',
@@ -311,13 +309,13 @@ methodDocstrings = {
 'Returns the requested Field or None if there is no such type.',
         'num_imports':
 'Returns the number of imports in the module.',
-        'get_import':
+        'nth_import':
 'Returns the <n>th import in the module.',
         'has_keyword':
 'Returns true if a keyword with the name <keyword> is declared in the module.',
         'num_keywords':
 'Returns the number of keywords declared in the module.',
-        'get_keyword':
+        'nth_keyword':
 'Returns the <n>th keyword declared in the module.',
         'add_class':
 'Gives ownership of the Class to the Module returning false if there is a name conflict.',
@@ -390,13 +388,13 @@ methodDocstrings = {
     },
 
     'Method': {
-        'num_parameters':
+        'num_params':
 'Returns the number of parameters/arguments of the method.',
-        'get_parameter':
+        'nth_param':
 'Returns the <n>th parameter of the method.',
-        'parameter_by_name':
+        'param_by_name':
 'Returns the requested parameter or None if there is no such param.',
-        'add_parameter':
+        'add_param':
 'Gives ownership of the Parameter to the Method returning false if there is a name conflict.',
     },
 
@@ -409,7 +407,7 @@ methodDocstrings = {
 'Returns the Module object that contains the struct.',
         'num_fields':
 'Returns the number of fields in the struct.',
-        'get_field':
+        'nth_field':
 'Returns the <n>th field of the struct.',
         'field_by_id':
 'Returns the field with the index <id>, or None if no such field exists.',
@@ -422,21 +420,15 @@ methodDocstrings = {
     'Class': {
         'num_parents':
 'Returns the number of superclasses this class inherits from.',
-        'get_parent':
+        'nth_parent':
 'Returns the <n>th parent-/super-class this class inherits from.',
         'num_children':
 'Returns the number of subclasses that inherit from this class.',
-        'get_child':
+        'nth_child':
 'Returns the <n>th child-/sub-class that inherits this class.',
-        'has_constructor':
-'Returns true if this class has a constructor method, ' +
-'or false if it just uses the default constructor.',
-        'constructor':
-'Returns the constructor method for this class if it is defined, ' +
-'or nullptr if the class uses the default constructor.',
-        'num_base_fields':
+        'num_declared_fields':
 'Returns the number of fields declared directly in this class.',
-        'get_base_field':
+        'nth_declared_field':
 'Returns the <n>th field from the class excluding any inherited fields.',
         'add_parent':
 'Set this class as a subclass to target parent.',
@@ -447,7 +439,7 @@ methodDocstrings = {
 'Returns the parameter\'s name.  An unnamed parameter returns the empty string.',
         'type':
 'Returns the Type of the Parameter.',
-        'get_method':
+        'method':
 'Returns the Method that contains the Parameter.',
         'has_default_value':
 'Returns true if a default value was defined for this parameter.',
@@ -472,7 +464,7 @@ methodDocstrings = {
 'Returns the field\'s name.  An unnamed field returns the empty string.',
         'type':
 'Returns the Type of the field.',
-        'record':
+        'container':
 'Returns the Class or Struct that contains this field.',
         'has_default_value':
 'Returns true if a default value was defined for this field.',

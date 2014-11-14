@@ -3,11 +3,10 @@
 #include <cmath>  // std::floor
 #include <limits> // std::numeric_limits
 using namespace std;
-namespace bamboo   // open namespace bamboo
+namespace bamboo
 {
 
 
-// Type constructor
 Numeric::Numeric(Subtype type)
 {
     m_subtype = type;
@@ -40,22 +39,20 @@ Numeric::Numeric(Subtype type)
         m_size = sizeof(double);
         break;
     default:
-        m_subtype = kTypeInvalid;
+        m_subtype = kTypeNone;
     }
 }
 
-// as_numeric returns this as a Numeric if it is numeric, or nullptr otherwise.
 Numeric *Numeric::as_numeric()
 {
     return this;
 }
+
 const Numeric *Numeric::as_numeric() const
 {
     return this;
 }
 
-// set_divisor sets a divisor for the numeric type, typically to represent fixed-point.
-//     Returns false if the divisor is not valid for this type.
 bool Numeric::set_divisor(unsigned int divisor)
 {
     if(divisor == 0) {
@@ -74,14 +71,9 @@ bool Numeric::set_divisor(unsigned int divisor)
     return true;
 }
 
-// set_modulus sets a modulus value of the numeric type.
-//     Returns false if the modulus is not valid for this type.
 bool Numeric::set_modulus(double modulus)
 {
-    if(modulus <= 0.0) {
-        return false;
-    }
-
+    if(modulus <= 0.0) { return false; }
     double float_modulus = modulus * m_divisor;
     uint64_t uint_modulus = uint64_t(floor(float_modulus + 0.5));
 
@@ -148,48 +140,46 @@ bool Numeric::set_modulus(double modulus)
     return true;
 }
 
-// set_range sets a valid range of the numeric type.
-//     Returns false if the range is not valid for this type.
 bool Numeric::set_range(const NumericRange& range)
 {
     // TODO: Accept integer ranges
-    if(range.type != Number::kFloat) {
-        return false;
-    }
+    if(range.type != Number::kFloat) { return false; }
 
     m_orig_range = range;
     switch(m_subtype) {
     case kTypeInt8:
     case kTypeInt16:
     case kTypeInt32:
-    case kTypeInt64: {
-        int64_t min = (int64_t)floor(range.min.floating * m_divisor + 0.5);
-        int64_t max = (int64_t)floor(range.max.floating * m_divisor + 0.5);
-        m_range = NumericRange(min, max);
-        // TODO: Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
+    case kTypeInt64:
+        {
+            // TODO: Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
+            int64_t min = (int64_t)floor(range.min.floating * m_divisor + 0.5);
+            int64_t max = (int64_t)floor(range.max.floating * m_divisor + 0.5);
+            m_range = NumericRange(min, max);
+        }
         break;
-    }
     case kTypeChar:
     case kTypeUint8:
     case kTypeUint16:
     case kTypeUint32:
-    case kTypeUint64: {
-        uint64_t min = (uint64_t)floor(range.min.floating * m_divisor + 0.5);
-        uint64_t max = (uint64_t)floor(range.max.floating * m_divisor + 0.5);
-        m_range = NumericRange(min, max);
-        // TODO: Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
+    case kTypeUint64:
+        {
+            // TODO: Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
+            uint64_t min = (uint64_t)floor(range.min.floating * m_divisor + 0.5);
+            uint64_t max = (uint64_t)floor(range.max.floating * m_divisor + 0.5);
+            m_range = NumericRange(min, max);
+        }
         break;
-    }
     case kTypeFloat32:
-    case kTypeFloat64: {
-        double min = range.min.floating * m_divisor;
-        double max = range.max.floating * m_divisor;
-        m_range = NumericRange(min, max);
+    case kTypeFloat64:
+        {
+            double min = range.min.floating * m_divisor;
+            double max = range.max.floating * m_divisor;
+            m_range = NumericRange(min, max);
+        }
         break;
-    }
-    default: {
+    default:
         return false;
-    }
     }
 
     return true;

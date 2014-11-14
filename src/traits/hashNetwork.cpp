@@ -60,10 +60,10 @@ void Class::generate_hash(HashGenerator& hashgen) const
         m_constructor->generate_hash(hashgen);
     }
 
-    /* Hash our base fields */
+    /* Hash our declared fields */
     // We don't hash our inherited fields because thats implicit in the hash of our parents; also,
     // it is a bad idea to hash any thing we're not considered the owner of (could cause looping).
-    hashgen.add_int(m_base_fields.size());
+    hashgen.add_int(m_declared_fields.size());
     for(auto it = m_fields.begin(); it != m_fields.end(); ++it) {
         (*it)->generate_hash(hashgen);
     }
@@ -107,8 +107,8 @@ void Number::generate_hash(HashGenerator& hashgen) const
 void Method::generate_hash(HashGenerator& hashgen) const
 {
     Type::generate_hash(hashgen);
-    hashgen.add_int(m_parameters.size());
-    for(auto it = m_parameters.begin(); it != m_parameters.end(); ++it) {
+    hashgen.add_int(m_params.size());
+    for(auto it = m_params.begin(); it != m_params.end(); ++it) {
         (*it)->generate_hash(hashgen);
     }
 }

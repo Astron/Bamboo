@@ -1,7 +1,7 @@
 // Filename: sizetag.h
 #pragma once
-#include <stdint.h>
-namespace bamboo   // open namespace bamboo
+#include <cstdint>
+namespace bamboo
 {
 
 

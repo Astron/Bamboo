@@ -8,16 +8,10 @@ namespace bamboo   // open namespace bamboo
 {
 
 
-// constructor
 MolecularField::MolecularField(Class *cls, const string& name) :
     Field(cls, name), Struct(cls->module())
 {
     Field::m_type = this;
-}
-
-// destructor
-MolecularField::~MolecularField()
-{
 }
 
 // as_molecular returns this as a MolecularField if it is molecular, or nullptr otherwise.

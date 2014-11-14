@@ -10,6 +10,7 @@ namespace bamboo   // open namespace bamboo
 // Forward declarations
 class Type;
 class Module;
+class Value;
 
 // read_dcfile opens the given file or stream and parses it as a .dc file.  Classes defined in
 //     the file are added to a new Module object, and a pointer to that object is returned.
@@ -24,12 +25,18 @@ bool parse_dcfile(Module *f, std::istream& in, const std::string& filename);
 bool parse_dcfile(Module *f, const std::string& filename);
 
 
-// parse_dcvalue reads a .dc-formatted parameter value and outputs the data in packed form
-//     matching the appropriate Type and suitable for a default parameter value.
+// parse_dcvalue reads a .dc-formatted parameter value and returns a Value.
 //     If an error occurs, the error reason is returned instead of the parsed value.
-std::vector<uint8_t> parse_dcvalue(const Type *, const std::string& formatted,
-                                   bool& err);
-std::vector<uint8_t> parse_dcvalue(const Type *, std::istream& in, bool& err);
+Value parse_dcvalue(const Type *, const std::string& formatted, bool& err);
+Value parse_dcvalue(const Type *, std::istream& in, bool& err);
+
+// parse_packed reads a .dc-formatted parameter value and outputs the data in packed form
+//     matching the appropriate Type and suitable for a default parameter value.
+//     If an error occurs, no data is returned.
+std::vector<uint8_t> parse_packed(const Type *, const std::string& formatted, bool& err);
+std::vector<uint8_t> parse_packed(const Type *, std::istream& in, bool& err);
+std::vector<uint8_t> parse_packed32(const Type *, const std::string& formatted, bool& err);
+std::vector<uint8_t> parse_packed32(const Type *, std::istream& in, bool& err);
 
 
 } // close namespace bamboo

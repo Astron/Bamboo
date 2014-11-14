@@ -1,18 +1,17 @@
 #pragma once
-#include <string>    // for std::string
-#include <vector>    // for std::vector
-#include <sstream>   // for std::sstream
-#include <stdexcept> // for std::runtime_error
-#include <string.h>  // for memcpy
+#include <cstring>   // memcpy
+#include <stdexcept> // std::runtime_error
+#include <string>
+#include <vector>
+#include <sstream>
 #include "../bits/sizetag.h"
 #include "../bits/byteorder.h"
-namespace bamboo    // close namespace bamboo
+namespace bamboo
 {
 
 
-// Foward Declarations
 class Type;
-struct Value;
+class Value;
 
 // A DatagramOverflow is an exception which occurs when an add_<value> method is called which would
 // increase the size of the datagram past DGSIZE_MAX (preventing integer and buffer overflow).
@@ -65,53 +64,41 @@ class Datagram
     }
 
   public:
-    // default-constructor:
-    //     creates a new datagram with some pre-allocated space
     Datagram() : buf(new uint8_t[64]), buf_cap(64), buf_offset(0) {}
-
-    // sized-constructor:
-    //     allows you to specify the capacity of the datagram ahead of time,
-    //     this should be used when the exact size is known ahead of time for performance
-    explicit Datagram(size_t capacity) : buf(new uint8_t[capacity]), buf_cap(capacity) {}
-
-    // copy-constructor:
-    //     creates a new datagram which is a deep-copy of another datagram;
-    //     capacity is not perserved and instead is reduced to the size of the source datagram.
-    Datagram(const Datagram& dg) :
-        buf(new uint8_t[dg.size()]),
-        buf_cap(dg.size()),
-        buf_offset(dg.size())
+    Datagram(const Datagram& dg) : buf(new uint8_t[dg.size()]), buf_cap(dg.size()), buf_offset(dg.size())
     {
         memcpy(buf, dg.buf, dg.size());
     }
+    Datagram& operator=(Datagram dg)
+    {
+        swap(*this, dg);
+        return *this;
+    }
+    friend void swap(Datagram& lhs, Datagram& rhs);
+    ~Datagram() { delete [] buf; }
 
-    // shallow-constructor:
-    //     creates a new datagram that uses an existing buffer as its data
+    // specify the capacity of the datagram ahead of time
+    explicit Datagram(size_t capacity) : buf(new uint8_t[capacity]), buf_cap(capacity) {}
+
+    // construct datagram pointing to existing buffer; datagram will cleanup the data
     Datagram(uint8_t *data, sizetag_t length, sizetag_t capacity) :
         buf(data), buf_cap(capacity), buf_offset(length) {}
 
-    // binary-constructor(pointer):
-    //     creates a new datagram with a copy of the data contained at the pointer.
+    // construct datagram copying data from a raw pointer
     Datagram(const uint8_t *data, sizetag_t length) :
-        buf(new uint8_t[length]),
-        buf_cap(length),
-        buf_offset(length)
+        buf(new uint8_t[length]), buf_cap(length), buf_offset(length)
     {
         memcpy(buf, data, length);
     }
 
-    // binary-constructor(vector):
-    //     creates a new datagram with a copy of the binary data contained in a vector<uint8_t>.
+    // construct a datagram copying data from a vector<uint8_t>
     explicit Datagram(const std::vector<uint8_t>& data) :
-        buf(new uint8_t[data.size()]),
-        buf_cap(data.size()),
-        buf_offset(data.size())
+        buf(new uint8_t[data.size()]), buf_cap(data.size()), buf_offset(data.size())
     {
         memcpy(buf, &data[0], data.size());
     }
 
-    // binary-constructor(string):
-    //     creates a new datagram with a copy of the data contained in a string, treated as binary.
+    // construct a datagram copying data from a string
     explicit Datagram(const std::string& data) :
         buf(new uint8_t[data.length()]),
         buf_cap(data.length()),
@@ -120,24 +107,7 @@ class Datagram
         memcpy(buf, data.c_str(), data.length());
     }
 
-    // assignment operator
-    Datagram& operator=(Datagram dg)
-    {
-        swap(*this, dg);
-        return *this;
-    }
-
-    // implement swap for Datagram
-    friend void swap(Datagram& lhs, Datagram& rhs);
-
-    // destructor
-    ~Datagram()
-    {
-        delete [] buf;
-    }
-
-    // add_bool adds an 8-bit integer to the datagram that is guaranteed
-    // to be one of the values 0x00 (false) or 0x01 (true).
+    // 8-bit value, either 0x00 (false) or 0x01 (true)
     void add_bool(const bool& v)
     {
         if(v) {
@@ -147,7 +117,7 @@ class Datagram
         }
     }
 
-    // add_char adds an 8-bit ascii-character value to the datagram.
+    // 8-bit ascii character
     void add_char(const char& v)
     {
         check_add_length(1);
@@ -155,7 +125,7 @@ class Datagram
         buf_offset += 1;
     }
 
-    // add_int8 adds a signed 8-bit integer value to the datagram.
+    // Numeric adders always convert to little endian.
     void add_int8(const int8_t& v)
     {
         check_add_length(1);
@@ -163,7 +133,6 @@ class Datagram
         buf_offset += 1;
     }
 
-    // add_int16 adds a signed 16-bit integer value to the datagram arranged in little-endian.
     void add_int16(const int16_t& v)
     {
         check_add_length(2);
@@ -171,7 +140,6 @@ class Datagram
         buf_offset += 2;
     }
 
-    // add_int32 adds a signed 32-bit integer value to the datagram arranged in little-endian.
     void add_int32(const int32_t& v)
     {
         check_add_length(4);
@@ -179,7 +147,6 @@ class Datagram
         buf_offset += 4;
     }
 
-    // add_int64 adds a signed 64-bit integer value to the datagram arranged in little-endian.
     void add_int64(const int64_t& v)
     {
         check_add_length(8);
@@ -187,7 +154,6 @@ class Datagram
         buf_offset += 8;
     }
 
-    // add_uint8 adds an unsigned 8-bit integer value to the datagram.
     void add_uint8(const uint8_t& v)
     {
         check_add_length(1);
@@ -195,7 +161,6 @@ class Datagram
         buf_offset += 1;
     }
 
-    // add_uint16 adds an unsigned 16-bit integer value to the datagram arranged in little-endian.
     void add_uint16(const uint16_t& v)
     {
         check_add_length(2);
@@ -203,7 +168,6 @@ class Datagram
         buf_offset += 2;
     }
 
-    // add_uint32 adds an unsigned 32-bit integer value to the datagram arranged in little-endian.
     void add_uint32(const uint32_t& v)
     {
         check_add_length(4);
@@ -211,7 +175,6 @@ class Datagram
         buf_offset += 4;
     }
 
-    // add_uint64 adds an unsigned 64-bit integer value to the datagram arranged in little-endian.
     void add_uint64(const uint64_t& v)
     {
         check_add_length(8);
@@ -219,7 +182,6 @@ class Datagram
         buf_offset += 8;
     }
 
-    // add_float32 adds a float (32-bit IEEE 754 floating point) value to the datagram.
     void add_float32(const float& v)
     {
         check_add_length(4);
@@ -227,7 +189,6 @@ class Datagram
         buf_offset += 4;
     }
 
-    // add_float64 adds a double (64-bit IEEE 754 floating point) value to the datagram.
     void add_float64(const double& v)
     {
         check_add_length(8);
@@ -235,7 +196,7 @@ class Datagram
         buf_offset += 8;
     }
 
-    // add_size adds a length-tag to the datagram.
+    // adds a sizetag (either 16-bit or 32-bit depending on compile options)
     void add_size(const sizetag_t& v)
     {
         check_add_length(sizeof(sizetag_t));
@@ -243,7 +204,7 @@ class Datagram
         buf_offset += sizeof(sizetag_t);
     }
 
-    // add_data adds raw binary data directly to the end of the datagram.
+    // add_data adds raw binary data directly to the end of the datagram
     void add_data(const std::vector<uint8_t>& data)
     {
         if(data.size()) {
@@ -252,6 +213,7 @@ class Datagram
             buf_offset += data.size();
         }
     }
+
     void add_data(const std::string& str)
     {
         if(str.length()) {
@@ -260,6 +222,7 @@ class Datagram
             buf_offset += str.length();
         }
     }
+
     void add_data(const uint8_t *data, sizetag_t length)
     {
         if(length) {
@@ -268,6 +231,7 @@ class Datagram
             buf_offset += length;
         }
     }
+
     void add_data(const char *data, sizetag_t length)
     {
         if(length) {
@@ -285,8 +249,7 @@ class Datagram
         }
     }
 
-    // add_string adds a bamboo string to the datagram from binary data;
-    // a length tag (typically a uint16_t) is prepended to the string before it is added.
+    // add_string adds an ascii string to the datagram, prepended with a length tag
     void add_string(const std::string& str)
     {
         add_size(str.length());
@@ -294,6 +257,7 @@ class Datagram
         memcpy(buf + buf_offset, str.c_str(), str.length());
         buf_offset += str.length();
     }
+
     void add_string(const char *str, sizetag_t length)
     {
         add_size(length);
@@ -302,8 +266,7 @@ class Datagram
         buf_offset += length;
     }
 
-    // add_blob adds a bamboo blob to the datagram from binary data;
-    // a length tag (typically a uint16_t) is prepended to the blob before it is added.
+    // add_blob adds a binary data to the datagram, prepended with a length tag
     void add_blob(const std::vector<uint8_t>& blob)
     {
         add_size(blob.size());
@@ -311,6 +274,7 @@ class Datagram
         memcpy(buf + buf_offset, &blob[0], blob.size());
         buf_offset += blob.size();
     }
+
     void add_blob(const uint8_t *data, sizetag_t length)
     {
         add_size(length);
@@ -318,6 +282,7 @@ class Datagram
         memcpy(buf + buf_offset, data, length);
         buf_offset += length;
     }
+
     void add_blob(const char *data, sizetag_t length)
     {
         add_size(length);
@@ -325,6 +290,7 @@ class Datagram
         memcpy(buf + buf_offset, data, length);
         buf_offset += length;
     }
+
     void add_blob(const Datagram& dg)
     {
         add_size(dg.buf_offset);
@@ -334,7 +300,7 @@ class Datagram
     }
 
     // add_buffer reserves a buffer of size "length" at the end of the datagram
-    // and returns a pointer to the buffer so it can be filled manually
+    //     and returns a pointer to the buffer so it can be filled manually
     uint8_t *add_buffer(sizetag_t length)
     {
         check_add_length(length);
@@ -343,32 +309,16 @@ class Datagram
         return buf_start;
     }
 
-    // add_value adds a packed value with the given type to the datagram, converting
-    // byte-order from native-endianess to wire-endianess (if necessary).
+    // add_value packs data from a Value in little-endian;
     void add_value(const Value&);
     void add_value(const Value *);
-    // add_packed adds data from a packed value, returning the number of bytes read from the buffer.
-    sizetag_t add_packed(const Type *,
-                         const std::vector<uint8_t>& packed,
-                         sizetag_t offset = 0);
 
-    // size returns the amount of data added to the datagram in bytes.
-    sizetag_t size() const
-    {
-        return buf_offset;
-    }
+    // add_packed returns the number of bytes read from the buffer, converts to little-endian
+    sizetag_t add_packed(const Type *, const std::vector<uint8_t>& packed, sizetag_t offset = 0);
 
-    // cap returns the currently allocated size of the datagram in memory (ie. capacity).
-    sizetag_t cap() const
-    {
-        return buf_cap;
-    }
-
-    // data returns a pointer to the start of the Datagram's data buffer.
-    const uint8_t *data() const
-    {
-        return buf;
-    }
+    sizetag_t size() const { return buf_offset; }
+    sizetag_t cap() const { return buf_cap; }
+    const uint8_t *data() const { return buf; }
 };
 
 

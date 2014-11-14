@@ -15,54 +15,6 @@ ostream& indent(ostream& out, unsigned int indent_level)
     return out;
 }
 
-string format_type(unsigned int type)
-{
-    switch(type) {
-    case kTypeChar:
-        return "char";
-    case kTypeInt8:
-        return "int8";
-    case kTypeInt16:
-        return "int16";
-    case kTypeInt32:
-        return "int32";
-    case kTypeInt64:
-        return "int64";
-    case kTypeUint8:
-        return "uint8";
-    case kTypeUint16:
-        return "uint16";
-    case kTypeUint32:
-        return "uint32";
-    case kTypeUint64:
-        return "uint64";
-    case kTypeFloat32:
-        return "float32";
-    case kTypeFloat64:
-        return "float64";
-    case kTypeString:
-        return "string";
-    case kTypeVarstring:
-        return "varstring";
-    case kTypeBlob:
-        return "blob";
-    case kTypeVarblob:
-        return "varblob";
-    case kTypeArray:
-        return "array";
-    case kTypeVararray:
-        return "vararray";
-    case kTypeStruct:
-        return "struct";
-    case kTypeMethod:
-        return "method";
-    case kTypeInvalid:
-        return "invalid";
-    default:
-        return "error";
-    }
-}
-
 
 } // close namespace bamboo
 
@@ -240,7 +192,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
             case DT_int8:
             case DT_int16:
             case DT_int32:
-                if(!m_int_range.is_empty())
+                if(!m_int_range.is_nan())
                 {
                     out << "(";
                     m_int_range.output(out, m_divisor);
@@ -249,7 +201,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
                 break;
 
             case DT_int64:
-                if(!m_int64_range.is_empty())
+                if(!m_int64_range.is_nan())
                 {
                     out << "(";
                     m_int64_range.output(out, m_divisor);
@@ -260,7 +212,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
             case DT_uint8:
             case DT_uint16:
             case DT_uint32:
-                if(!m_uint_range.is_empty())
+                if(!m_uint_range.is_nan())
                 {
                     out << "(";
                     m_uint_range.output(out, m_divisor);
@@ -269,7 +221,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
                 break;
 
             case DT_char:
-                if(!m_uint_range.is_empty())
+                if(!m_uint_range.is_nan())
                 {
                     out << "(";
                     m_uint_range.output_char(out, m_divisor);
@@ -278,7 +230,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
                 break;
 
             case DT_uint64:
-                if(!m_uint64_range.is_empty())
+                if(!m_uint64_range.is_nan())
                 {
                     out << "(";
                     m_uint64_range.output(out, m_divisor);
@@ -287,7 +239,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
                 break;
 
             case DT_float64:
-                if(!m_double_range.is_empty())
+                if(!m_double_range.is_nan())
                 {
                     out << "(";
                     m_double_range.output(out, m_divisor);
@@ -296,7 +248,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
                 break;
 
             case DT_string:
-                if(!m_uint_range.is_empty())
+                if(!m_uint_range.is_nan())
                 {
                     out << "(";
                     m_uint_range.output(out, m_divisor);

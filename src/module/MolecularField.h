@@ -15,9 +15,7 @@ class MolecularField : public Field, public Struct
     MolecularField(Class *cls, const std::string& name); // TODO: Throw null error
     MolecularField(const MolecularField&) = delete;
     MolecularField& operator=(const MolecularField&) = delete;
-    virtual ~MolecularField();
-
-    // as_molecular returns this as a MolecularField if it is molecular, or nullptr otherwise.
+    virtual ~MolecularField() {}
     MolecularField *as_molecular() override;
     const MolecularField *as_molecular() const override;
 
@@ -27,16 +25,11 @@ class MolecularField : public Field, public Struct
     using Field::type;
     using Field::set_name;
 
-    // set_default_value always returns false; molecular fields don't have default values.
-    bool set_default_value(const Value&) override;
+    bool set_default_value(const Value&) override; // always returns false; no explicit defaults
     bool set_default_value(const Value *) override;
 
-    // add_field adds a new Field as part of the Molecular.
-    //     Returns false if the field could not be added.
     bool add_field(Field *field);
-    // add_field with a unique_ptr always returns false; molecular fields don't own fields.
     bool add_field(std::unique_ptr<Field> field) override;
-
 
   protected:
     using Field::set_id;

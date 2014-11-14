@@ -3,8 +3,8 @@
 #include "HashGenerator.h"
 
 #include <cmath>    // std::floor
-#include <set>      // std::set
 #include <iostream> // std::cerr
+#include <set>
 #include "../module/Module.h"
 #include "../module/Class.h"
 #include "../module/Method.h"
@@ -15,7 +15,7 @@
 #include "../module/Numeric.h"
 
 using namespace std;
-namespace bamboo   // open namespace bamboo
+namespace bamboo
 {
 
 
@@ -86,17 +86,13 @@ void hash_class(HashGenerator& hashgen, const Class *cls)
     size_t num_parents = cls->num_parents();
     hashgen.add_int(int(num_parents));
     for(unsigned int i = 0; i < num_parents; ++i) {
-        hashgen.add_int(cls->get_parent(i)->id());
+        hashgen.add_int(cls->nth_parent(i)->id());
     }
 
-    if(cls->has_constructor()) {
-        hash_field(hashgen, cls->constructor());
-    }
-
-    size_t num_fields = cls->num_base_fields();
+    size_t num_fields = cls->num_declared_fields();
     hashgen.add_int(int(num_fields));
     for(unsigned int i = 0; i < num_fields; ++i) {
-        hash_field(hashgen, cls->get_base_field(i));
+        hash_field(hashgen, cls->nth_declared_field(i));
     }
 }
 
@@ -109,7 +105,7 @@ void hash_struct(HashGenerator& hashgen, const Struct *strct)
     size_t num_fields = strct->num_fields();
     hashgen.add_int(int(num_fields));
     for(unsigned int i = 0; i < num_fields; ++i) {
-        hash_field(hashgen, strct->get_field(i));
+        hash_field(hashgen, strct->nth_field(i));
     }
 }
 
@@ -126,7 +122,7 @@ void hash_field(HashGenerator& hashgen, const Field *field)
 
         hashgen.add_int(int(num_fields)); // _fields.size();
         for(unsigned int i = 0; i < num_fields; ++i) {
-            hash_field(hashgen, mol->get_field(i));
+            hash_field(hashgen, mol->nth_field(i));
         }
         return;
     }
@@ -139,11 +135,11 @@ void hash_field(HashGenerator& hashgen, const Field *field)
         hashgen.add_int(field->id());
 
         const Method *method = field->type()->as_method();
-        size_t num_params = method->num_parameters();
+        size_t num_params = method->num_params();
 
         hashgen.add_int(int(num_params)); // _elements.size();
         for(unsigned int i = 0; i < num_params; ++i) {
-            hash_parameter(hashgen, method->get_parameter(i));
+            hash_parameter(hashgen, method->nth_param(i));
         }
 
         // DCKeywordList::generate_hash()
@@ -190,7 +186,7 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list)
     int flags = 0;
     for(unsigned int i = 0; i < num_keywords; ++i) {
         bool set_flag = false;
-        string keyword = list->get_keyword(i);
+        string keyword = list->nth_keyword(i);
         for(unsigned int j = 0; j < sizeof(legacy_keywords); ++j) {
             if(keyword == legacy_keywords[j].keyword) {
                 flags |= legacy_keywords[j].flag;
@@ -212,7 +208,7 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list)
 
         set<string> keywords_by_name;
         for(unsigned int i = 0; i < num_keywords; ++i) {
-            keywords_by_name.insert(list->get_keyword(i));
+            keywords_by_name.insert(list->nth_keyword(i));
         }
 
         for(auto it = keywords_by_name.begin(); it != keywords_by_name.end(); ++it) {
@@ -225,74 +221,71 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list)
 void hash_legacy_type(HashGenerator& hashgen, const Type *type)
 {
     switch(type->subtype()) {
-    case kTypeStruct: {
-        // get_class()->generate_hash()
-        const Struct *strct = type->as_struct();
-        if(strct->as_class()) {
-            hash_class(hashgen, strct->as_class());
-        } else {
-            hash_struct(hashgen, strct);
+    case kTypeStruct:
+        {
+            // get_class()->generate_hash()
+            const Struct *strct = type->as_struct();
+            if(strct->as_class()) {
+                hash_class(hashgen, strct->as_class());
+            } else {
+                hash_struct(hashgen, strct);
+            }
         }
         break;
-    }
-
     case kTypeArray:
-    case kTypeVararray: {
-        const Array *arr = type->as_array();
+        {
+            const Array *arr = type->as_array();
 
-        // _element_type->generate_hash()
-        hash_legacy_type(hashgen, arr->element_type());
+            // _element_type->generate_hash()
+            hash_legacy_type(hashgen, arr->element_type());
 
-        // _array_size_range.generate_hash()
-        if(arr->has_range()) {
-            NumericRange rng = arr->range();
-            hashgen.add_int(1); // _range._ranges.size();
-            hashgen.add_int((int)rng.min.uinteger);
-            hashgen.add_int((int)rng.max.uinteger);
+            // _array_size_range.generate_hash()
+            if(arr->has_range()) {
+                NumericRange rng = arr->range();
+                hashgen.add_int(1); // _range._ranges.size();
+                hashgen.add_int((int)rng.min.uinteger);
+                hashgen.add_int((int)rng.max.uinteger);
+            }
         }
         break;
-    }
-
     case kTypeBlob:
-    case kTypeVarblob: {
-        if(type->alias() == "blob") {
-            hashgen.add_int(L_BLOB); // _type
-        } else {
-            hashgen.add_int(L_UINT8); // _type
-        }
-        hashgen.add_int(1); // _divisor
+        {
+            if(type->alias() == "blob") {
+                hashgen.add_int(L_BLOB); // _type
+            } else {
+                hashgen.add_int(L_UINT8); // _type
+            }
+            hashgen.add_int(1); // _divisor
 
-        const Array *blob = type->as_array();
-        if(blob->has_range()) {
-            // _uint_range.generate_hash();
-            NumericRange rng = blob->range();
-            hashgen.add_int(1); // _range._ranges.size();
-            hashgen.add_int((int)rng.min.uinteger);
-            hashgen.add_int((int)rng.max.uinteger);
-        }
-        break;
-    }
-
-    case kTypeVarstring:
-    case kTypeString: {
-        if(type->alias() == "string") {
-            hashgen.add_int(L_STRING); // _type
-        } else {
-            hashgen.add_int(L_CHAR); // _type
-        }
-        hashgen.add_int(1); // _divisor
-
-        const Array *str = type->as_array();
-        if(str->has_range()) {
-            // _uint_range.generate_hash());
-            NumericRange rng = str->range();
-            hashgen.add_int(1u); // _range._ranges.size();
-            hashgen.add_int((int)rng.min.uinteger);
-            hashgen.add_int((int)rng.max.uinteger);
+            const Array *blob = type->as_array();
+            if(blob->has_range()) {
+                // _uint_range.generate_hash();
+                NumericRange rng = blob->range();
+                hashgen.add_int(1); // _range._ranges.size();
+                hashgen.add_int((int)rng.min.uinteger);
+                hashgen.add_int((int)rng.max.uinteger);
+            }
         }
         break;
-    }
+    case kTypeString:
+        {
+            if(type->alias() == "string") {
+                hashgen.add_int(L_STRING); // _type
+            } else {
+                hashgen.add_int(L_CHAR); // _type
+            }
+            hashgen.add_int(1); // _divisor
 
+            const Array *str = type->as_array();
+            if(str->has_range()) {
+                // _uint_range.generate_hash());
+                NumericRange rng = str->range();
+                hashgen.add_int(1u); // _range._ranges.size();
+                hashgen.add_int((int)rng.min.uinteger);
+                hashgen.add_int((int)rng.max.uinteger);
+            }
+        }
+        break;
     case kTypeInt8:
         hashgen.add_int(L_INT8);
         hash_int_type(hashgen, type->as_numeric());
@@ -309,7 +302,6 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
         hashgen.add_int(L_INT64);
         hash_int_type(hashgen, type->as_numeric());
         break;
-
     case kTypeUint8:
         hashgen.add_int(L_UINT8);
         hash_int_type(hashgen, type->as_numeric());
@@ -326,38 +318,34 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
         hashgen.add_int(L_UINT64);
         hash_int_type(hashgen, type->as_numeric());
         break;
-
     case kTypeChar:
         hashgen.add_int(L_CHAR);
         hash_int_type(hashgen, type->as_numeric());
         break;
+    case kTypeFloat64:
+        {
+            hashgen.add_int(L_FLOAT64); // _type
 
-    case kTypeFloat64: {
-        hashgen.add_int(L_FLOAT64); // _type
-
-        const Numeric *numeric = type->as_numeric();
-        hashgen.add_int(numeric->divisor()); // _divisor
-        if(numeric->has_modulus()) {
-            hashgen.add_int(int(numeric->modulus() * numeric->divisor())); // _modulus
-        }
-        if(numeric->has_range()) {
-            // _double_range.generate_hash());
-            NumericRange rng = numeric->range();
-            hashgen.add_int(1u); // _range._ranges.size();
-            hashgen.add_int(int(rng.min.floating * numeric->divisor()));
-            hashgen.add_int(int(rng.max.floating * numeric->divisor()));
+            const Numeric *numeric = type->as_numeric();
+            hashgen.add_int(numeric->divisor()); // _divisor
+            if(numeric->has_modulus()) {
+                hashgen.add_int(int(numeric->modulus() * numeric->divisor())); // _modulus
+            }
+            if(numeric->has_range()) {
+                // _double_range.generate_hash());
+                NumericRange rng = numeric->range();
+                hashgen.add_int(1u); // _range._ranges.size();
+                hashgen.add_int(int(rng.min.floating * numeric->divisor()));
+                hashgen.add_int(int(rng.max.floating * numeric->divisor()));
+            }
         }
         break;
-    }
-
     case kTypeFloat32:
         cerr << "Warning: float32 ignored in legacy_hash.\n";
         break;
-
-    case kTypeInvalid:
-        cerr << "Error: Cannot generate legacy_hash, encountered invalid type.\n";
+    case kTypeNone:
+        cerr << "Warning: none type ignored in legacy_hash.\n";
         break;
-
     default:
         cerr << "Error: Unexpected type in hash_legacy_type while generating legacy_hash.\n";
     }

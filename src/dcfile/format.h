@@ -1,12 +1,9 @@
 // Filename: format.h
 #pragma once
 #include "../module/Value.h"
-namespace bamboo   // open namespace bamboo
+namespace bamboo
 {
 
-
-// Forward declarations
-struct Value;
 
 // format_value steps through a Value and outputs it as a .dc file parameter value.
 std::string format_value(const Value& value);

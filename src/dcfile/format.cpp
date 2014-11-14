@@ -39,7 +39,7 @@ void format_value(const Value *value, ostream& out)
     const Type *type = value->type;
     Subtype subtype = type->subtype();
     switch(subtype) {
-    case kTypeInvalid:
+    case kTypeNone:
         out << "<invalid>";
         break;
     case kTypeInt8:
@@ -133,14 +133,14 @@ void format_value(const Value *value, ostream& out)
         const Struct *struct_ = type->as_struct();
         size_t num_fields = struct_->num_fields();
         if(num_fields > 0) {
-            const Field *field = struct_->get_field(0);
+            const Field *field = struct_->nth_field(0);
             if(field->as_molecular() == nullptr) {
                 format_value(value->fields_.at(field), out);
             }
         }
         for(unsigned int i = 1; i < num_fields; ++i) {
             out << ", ";
-            const Field *field = struct_->get_field(i);
+            const Field *field = struct_->nth_field(i);
             if(field->as_molecular() == nullptr) {
                 format_value(value->fields_.at(field), out);
             }
@@ -151,13 +151,13 @@ void format_value(const Value *value, ostream& out)
     case kTypeMethod: {
         out << '(';
         const Method *method_ = type->as_method();
-        size_t num_params = method_->num_parameters();
+        size_t num_params = method_->num_params();
         if(num_params > 0) {
-            const Parameter *param = method_->get_parameter(0);
+            const Parameter *param = method_->nth_param(0);
             format_value(value->arguments_.at(param), out);
         }
         for(unsigned int i = 1; i < num_params; ++i) {
-            const Parameter *param = method_->get_parameter(i);
+            const Parameter *param = method_->nth_param(i);
             format_value(value->arguments_.at(param), out);
         }
         out << ')';

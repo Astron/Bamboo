@@ -6,6 +6,7 @@
 namespace bamboo
 {
 
+
 /* Yay for doing all of our heavy-lifting with static-typing! */
 
 inline std::vector<uint8_t> as_buffer(bool r)

@@ -1,6 +1,6 @@
 // Filename: byteorder.h
 #pragma once
-namespace bamboo   // open namespace bamboo
+namespace bamboo
 {
 
 

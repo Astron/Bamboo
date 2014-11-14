@@ -2,6 +2,7 @@
 #include <bytesobject.h>  // python2.6+ compat with BYTES_*
 
 static char _custom_py_float_is_not_integer[] = "integer argument expected, got float";
+static char _custom_numeric_has_bad_bytesize[] = "can't pack value for numeric with invalid bytesize";
 static char *_custom_py_pack_typerr(const char *expected, PyObject *py_value, char *msgbuf, size_t bufsize)
 {
     assert(expected != NULL);
@@ -153,6 +154,49 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             dg->add_float64((double)value);
         }
         break;
+    case bamboo::kTypeFixed:
+        {
+            const bamboo::Numeric *numeric = type->as_numeric();
+            double value = PyFloat_AsDouble(py_value);
+            if(PyErr_Occurred()) { return PY_PACK_ERROR; }
+
+            if(numeric->is_signed()) {
+                switch(numeric->fixed_size()) {
+                case 1:
+                    dg->add_int8(numeric->to_fixed_s8(value));
+                    break;
+                case 2:
+                    dg->add_int16(numeric->to_fixed_s16(value));
+                    break;
+                case 4:
+                    dg->add_int32(numeric->to_fixed_s32(value));
+                    break;
+                case 8:
+                    dg->add_int64(numeric->to_fixed_s64(value));
+                    break;
+                default:
+                    return _custom_numeric_has_bad_bytesize;
+                }
+            } else {
+                switch(numeric->fixed_size()) {
+                case 1:
+                    dg->add_int8(numeric->to_fixed_u8(value));
+                    break;
+                case 2:
+                    dg->add_int16(numeric->to_fixed_u16(value));
+                    break;
+                case 4:
+                    dg->add_int32(numeric->to_fixed_u32(value));
+                    break;
+                case 8:
+                    dg->add_int64(numeric->to_fixed_u64(value));
+                    break;
+                default:
+                    return _custom_numeric_has_bad_bytesize;
+                }
+            }
+        }
+        break;
     case bamboo::kTypeString:
     case bamboo::kTypeBlob:
         {
@@ -168,34 +212,20 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
                 return _custom_py_pack_typerr("unicode, string(py2), or bytes(py3)", py_value, msgbuf, bufsize);
             }
 
-            bamboo::sizetag_t length = type->fixed_size();
-            if(Py_ssize_t(length) != value_length) {
-                PyOS_snprintf(msgbuf, bufsize,
-                    "Datagram tried to add string/blob value, but value had length %d"
-                    " for a string/blob of fixed length %d", (int)value_length, length);
-                PyErr_SetString(PyExc_ValueError, msgbuf);
-                return PY_PACK_ERROR;
-            }
+            if(type->has_fixed_size()) {
+                bamboo::sizetag_t length = type->fixed_size();
+                if(Py_ssize_t(length) != value_length) {
+                    PyOS_snprintf(msgbuf, bufsize,
+                        "Datagram tried to add string/blob value, but value had length %d"
+                        " for a string/blob of fixed length %d", (int)value_length, length);
+                    PyErr_SetString(PyExc_ValueError, msgbuf);
+                    return PY_PACK_ERROR;
+                }
 
-            dg->add_data(value_ptr, value_length);
-        }
-        break;
-    case bamboo::kTypeVarstring:
-    case bamboo::kTypeVarblob:
-        {
-            const char *value_ptr;
-            Py_ssize_t value_length;
-            if(PyBytes_Check(py_value)) {
-                value_length = PyBytes_Size(py_value);
-                value_ptr = PyBytes_AS_STRING(py_value);
-            } else if(PyUnicode_Check(py_value)) {
-                value_length = PyUnicode_GET_DATA_SIZE(py_value);
-                value_ptr = PyUnicode_AS_DATA(py_value);
+                dg->add_data(value_ptr, value_length);
             } else {
-                return _custom_py_pack_typerr("unicode, string(py2), or bytes(py3)", py_value, msgbuf, bufsize);
+                dg->add_blob(value_ptr, value_length);
             }
-
-            dg->add_blob(value_ptr, value_length);
         }
         break;
     case bamboo::kTypeArray:
@@ -203,40 +233,37 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             const bamboo::Array *arr = type->as_array();
             const bamboo::Type *element_type = arr->element_type();
 
-            bamboo::sizetag_t size = arr->array_size();
-            Py_ssize_t value_size = PyList_Size(py_value);
-            if(Py_ssize_t(size) != value_size) {
-                PyOS_snprintf(msgbuf, bufsize,
-                    "Datagram tried to add array value, but was given %d"
-                    " elements for an array of fixed size %d", (int)value_size, (int)size);
-                PyErr_SetString(PyExc_ValueError, msgbuf);
-                return PY_PACK_ERROR;
-            }
+            if(type->has_fixed_size()) {
+                bamboo::sizetag_t size = arr->array_size();
+                Py_ssize_t value_size = PyList_Size(py_value);
+                if(Py_ssize_t(size) != value_size) {
+                    PyOS_snprintf(msgbuf, bufsize,
+                        "Datagram tried to add array value, but was given %d"
+                        " elements for an array of fixed size %d", (int)value_size, (int)size);
+                    PyErr_SetString(PyExc_ValueError, msgbuf);
+                    return PY_PACK_ERROR;
+                }
 
-            for(int i = 0; i < value_size; ++i) {
-                PyObject *element_value = PyList_GetItem(py_value, i);
-                char *msg = _custom_PyBambooDatagram_py_pack(dg, element_type, element_value, msgbuf, bufsize);
-                if(msg != nullptr) { return msg; }
-            }
-        } else {
-            return _custom_py_pack_typerr("list", py_value, msgbuf, bufsize);
-        }
-        break;
-    case bamboo::kTypeVararray:
-        if(PyList_Check(py_value)) {
-            const bamboo::Array *arr = type->as_array();
-            const bamboo::Type *element_type = arr->element_type();
+                for(int i = 0; i < value_size; ++i) {
+                    PyObject *element_value = PyList_GetItem(py_value, i);
+                    char *msg = _custom_PyBambooDatagram_py_pack(dg, element_type, element_value, msgbuf, bufsize);
+                    if(msg != nullptr) { return msg; }
+                }
+            } else {
+                const bamboo::Array *arr = type->as_array();
+                const bamboo::Type *element_type = arr->element_type();
 
-            bamboo::Datagram packed;
-            Py_ssize_t num_elements = PyList_Size(py_value);
-            for(int i = 0; i < num_elements; ++i) {
-                PyObject *element_value = PyList_GetItem(py_value, i);
-                char *msg = _custom_PyBambooDatagram_py_pack(&packed, element_type, element_value, msgbuf, bufsize);
-                if(msg != nullptr) { return msg; }
-            }
+                bamboo::Datagram packed;
+                Py_ssize_t num_elements = PyList_Size(py_value);
+                for(int i = 0; i < num_elements; ++i) {
+                    PyObject *element_value = PyList_GetItem(py_value, i);
+                    char *msg = _custom_PyBambooDatagram_py_pack(&packed, element_type, element_value, msgbuf, bufsize);
+                    if(msg != nullptr) { return msg; }
+                }
 
-            dg->add_size(packed.size());
-            dg->add_data(packed);
+                dg->add_size(packed.size());
+                dg->add_data(packed);
+            }
         } else {
             return _custom_py_pack_typerr("list", py_value, msgbuf, bufsize);
         }
@@ -256,7 +283,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             }
 
             for(int i = 0; i < value_num_fields; ++i) {
-                const bamboo::Type *field_type = struct_->get_field((unsigned int)i)->type();
+                const bamboo::Type *field_type = struct_->nth_field((unsigned int)i)->type();
                 PyObject *field_value = PyTuple_GetItem(py_value, i);
                 char *msg = _custom_PyBambooDatagram_py_pack(dg, field_type, field_value, msgbuf, bufsize);
                 if(msg != nullptr) { return msg; }
@@ -268,7 +295,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
     case bamboo::kTypeMethod:
         if(PyTuple_Check(py_value)) {
             const bamboo::Method *method = type->as_method();
-            size_t num_params = method->num_parameters();
+            size_t num_params = method->num_params();
 
             Py_ssize_t value_num_params = PyTuple_Size(py_value);
             if(Py_ssize_t(num_params) != value_num_params) {
@@ -280,7 +307,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             }
 
             for(int i = 0; i < value_num_params; ++i) {
-                const bamboo::Type *param_type = method->get_parameter((unsigned int)i)->type();
+                const bamboo::Type *param_type = method->nth_param((unsigned int)i)->type();
                 PyObject *param_value = PyTuple_GetItem(py_value, i);
                 char *msg = _custom_PyBambooDatagram_py_pack(dg, param_type, param_value, msgbuf, bufsize);
                 if(msg != nullptr) { return msg; }
@@ -289,8 +316,8 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("tuple", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeInvalid:
-        return (char *)"Can't pack value for type with subtype 'invalid'";
+    case bamboo::kTypeNone:
+        return (char *)"Can't pack value for type with subtype 'none'";
     }
 
     return nullptr;

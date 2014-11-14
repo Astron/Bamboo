@@ -88,7 +88,6 @@ struct NumericRange {
     {
         min.type = max.type = Number::kNaN;
         // lowest is the most negative float (min is smallest positive)
-        // See http://en.cppreference.com/w/cpp/types/numeric_limits/min
         min.floating = std::numeric_limits<double>::lowest();
         max.floating = std::numeric_limits<double>::max();
     }

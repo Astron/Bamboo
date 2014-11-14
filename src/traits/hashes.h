@@ -1,11 +1,10 @@
 // Filename: hashes.h
 #pragma once
-#include <cstdint>
-namespace bamboo   // open namespace
+#include <cstdint> // uint32_t
+namespace bamboo
 {
 
 
-// Forward declarations
 class Module;
 
 // property_hash will hash nearly everything in the module, and can be used to

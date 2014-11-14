@@ -1,6 +1,6 @@
 #pragma once
 #include "Datagram.h"
-namespace bamboo    // close namespace bamboo
+namespace bamboo
 {
 
 
@@ -26,7 +26,6 @@ class DatagramIterator
 
     void check_read_length(sizetag_t length)
     {
-        //fprintf(stderr, "Checked %d, found %d", m_offset + length, m_dg->size());
         if(m_offset + length > m_dg->size()) {
             std::stringstream error;
             error << "Datagram iterator tried to read past dg end, offset+length("
@@ -36,21 +35,17 @@ class DatagramIterator
     }
 
   public:
-    // constructor
     DatagramIterator(const Datagram& dg, sizetag_t offset = 0) : m_dg(&dg), m_offset(offset)
     {
         check_read_length(0); //shortcuts, yay
     }
 
-    // read_bool reads the next byte from the datagram and returns either false or true.
     bool read_bool()
     {
         uint8_t val = read_uint8();
         return val != false; // returns either 1 or 0
     }
 
-    // read_char reads a byte from the datagram,
-    // returning an 8-bit ascii character.
     char read_char()
     {
         check_read_length(1);
@@ -59,8 +54,8 @@ class DatagramIterator
         return r;
     }
 
-    // read_int8 reads a byte from the datagram,
-    // returning a signed 8-bit integer.
+
+    // Numeric readers always convert to native-endiannes
     int8_t read_int8()
     {
         check_read_length(1);
@@ -69,8 +64,6 @@ class DatagramIterator
         return r;
     }
 
-    // read_int16 reads 2 bytes from the datagram,
-    // returning a signed 16-bit integer in native endianness.
     int16_t read_int16()
     {
         check_read_length(2);
@@ -79,8 +72,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_int32 reads 4 bytes from the datagram,
-    // returning a signed 32-bit integer in native endianness.
     int32_t read_int32()
     {
         check_read_length(4);
@@ -89,8 +80,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_int64 reads 8 bytes from the datagram,
-    // returning a signed 64-bit integer in native endianness.
     int64_t read_int64()
     {
         check_read_length(8);
@@ -99,8 +88,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_uint8 reads a byte from the datagram,
-    // returning an unsigned 8-bit integer.
     uint8_t read_uint8()
     {
         check_read_length(1);
@@ -109,8 +96,6 @@ class DatagramIterator
         return r;
     }
 
-    // read_uint16 reads 2 bytes from the datagram,
-    // returning an unsigned 16-bit integer in native endianness.
     uint16_t read_uint16()
     {
         check_read_length(2);
@@ -119,8 +104,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_uint32 reads 4 bytes from the datagram,
-    // returning an unsigned 32-bit integer in native endianness.
     uint32_t read_uint32()
     {
         check_read_length(4);
@@ -129,8 +112,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_uint64 reads 8 bytes from the datagram,
-    // returning an unsigned 64-bit integer in native endianness.
     uint64_t read_uint64()
     {
         check_read_length(8);
@@ -139,17 +120,6 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_size reads a sizetag_t from the datagram.
-    sizetag_t read_size()
-    {
-        check_read_length(sizeof(sizetag_t));
-        sizetag_t r = *(sizetag_t *)(m_dg->data() + m_offset);
-        m_offset += sizeof(sizetag_t);
-        return swap_le(r);
-    }
-
-    // read_float32 reads 4 bytes from the datagram,
-    // returning a 32-bit float in native endianness.
     float read_float32()
     {
         check_read_length(4);
@@ -158,13 +128,20 @@ class DatagramIterator
         return swap_le(r);
     }
 
-    // read_float64 reads 8 bytes from the datagram,
-    // returning a 64-bit float (double) in native endianness.
     double read_float64()
     {
         check_read_length(8);
         double r = *(double *)(m_dg->data() + m_offset);
         m_offset += 8;
+        return swap_le(r);
+    }
+
+    // reads a sizetag (either 16-bit or 32-bit depending on compile options)
+    sizetag_t read_size()
+    {
+        check_read_length(sizeof(sizetag_t));
+        sizetag_t r = *(sizetag_t *)(m_dg->data() + m_offset);
+        m_offset += sizeof(sizetag_t);
         return swap_le(r);
     }
 
@@ -179,6 +156,7 @@ class DatagramIterator
         m_offset += length;
         return str;
     }
+
     std::string read_string(sizetag_t length)
     {
         check_read_length(length);
@@ -195,19 +173,19 @@ class DatagramIterator
         sizetag_t length = read_size();
         return read_data(length);
     }
+
     std::vector<uint8_t> read_blob(sizetag_t length)
     {
         return read_data(length);
     }
 
-    // read_datagram reads a blob from the datagram and returns it as another datagram.
+    // read_datagram reads a var-sized blob from the datagram and returns it as another datagram.
     Datagram read_datagram()
     {
         sizetag_t length = read_size();
         return Datagram(m_dg->data() + m_offset, length);
     }
 
-    // read_data returns the next <length> bytes in the datagram.
     std::vector<uint8_t> read_data(sizetag_t length)
     {
         check_read_length(length);
@@ -216,18 +194,16 @@ class DatagramIterator
         return data;
     }
 
-    // read_remainder returns a vector containing the rest of the bytes in the datagram.
     std::vector<uint8_t> read_remainder()
     {
         return read_data(m_dg->size() - m_offset);
     }
 
-    // read_value interprets the data as a value for the Type in native endianness.
     Value read_value(const Type *);
 
     // read_packed returns a vector containing the native-endian data corresponding to the type.
+    //     Can also endian-swap packed data into a pre-existing buffer.
     std::vector<uint8_t> read_packed(const Type *);
-    // read_packed can also endian-swap packed data into a pre-existing buffer.
     void read_packed(const Type *, std::vector<uint8_t>&);
 
     // skip increments the current message offset by a length.
@@ -242,19 +218,16 @@ class DatagramIterator
     //     Throws DatagramIteratorEOF if it skips past the end of the datagram.
     void skip_type(const Type *);
 
-    // remaining returns the number of unread bytes left
     sizetag_t remaining() const
     {
         return m_dg->size() - m_offset;
     }
 
-    // tell returns the current message offset in std::vector<uint8_t>
     sizetag_t tell() const
     {
         return m_offset;
     }
 
-    // seek sets the current message offset in std::vector<uint8_t>
     void seek(sizetag_t to)
     {
         m_offset = to;

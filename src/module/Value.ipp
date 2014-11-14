@@ -1,5 +1,6 @@
 // Filename: Value.ipp
-namespace bamboo { // open namespace
+namespace bamboo
+{ // open namespace
 
 
 inline const Type *Value::type() const

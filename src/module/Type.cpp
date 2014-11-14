@@ -1,5 +1,7 @@
 // Filename: Type.cpp
 #include "Type.h"
+#include "Array.h"
+#include "Numeric.h"
 using namespace std;
 namespace bamboo   // open namespace bamboo
 {
@@ -42,56 +44,68 @@ string format_subtype(Subtype subtype)
         return "struct";
     case kTypeMethod:
         return "method";
-    case kTypeInvalid:
-        return "invalid";
+    case kTypeNone:
+        return "none";
     default:
-        return "error";
+        return "<invalid>";
     }
 }
 
-Type *Type::invalid = new Type();
+Type *Type::None = new Type();
+Type *Type::Char = new Numeric(kTypeChar);
+Type *Type::Int8 = new Numeric(kTypeInt8);
+Type *Type::Int16 = new Numeric(kTypeInt16);
+Type *Type::Int32 = new Numeric(kTypeInt32);
+Type *Type::Int64 = new Numeric(kTypeInt64);
+Type *Type::Uint8 = new Numeric(kTypeUint8);
+Type *Type::Uint16 = new Numeric(kTypeUint16);
+Type *Type::Uint32 = new Numeric(kTypeUint32);
+Type *Type::Uint64 = new Numeric(kTypeUint64);
+Type *Type::Float32 = new Numeric(kTypeFloat32);
+Type *Type::Float64 = new Numeric(kTypeFloat64);
+Type *Type::String = new Array(Type::Char, "string");
+Type *Type::Blob = new Array(Type::Uint8, "blob");
 
-// as_number returns this as a Numeric if it is numeric, or nullptr otherwise.
 Numeric *Type::as_numeric()
 {
     return nullptr;
 }
+
 const Numeric *Type::as_numeric() const
 {
     return nullptr;
 }
 
-// as_array returns this as an Array if it is an array, or nullptr otherwise.
 Array *Type::as_array()
 {
     return nullptr;
 }
+
 const Array *Type::as_array() const
 {
     return nullptr;
 }
 
-// as_struct returns this as a Struct if it is a struct, or nullptr otherwise.
 Struct *Type::as_struct()
 {
     return nullptr;
 }
+
 const Struct *Type::as_struct() const
 {
     return nullptr;
 }
 
-// as_method returns this as a Method if it is a method, or nullptr otherwise.
 Method *Type::as_method()
 {
     return nullptr;
 }
+
 const Method *Type::as_method() const
 {
     return nullptr;
 }
 
-// to_string returns a short string representation suitable for debug/development output.
 std::string Type::to_string() const
 {
     if(has_alias()) {

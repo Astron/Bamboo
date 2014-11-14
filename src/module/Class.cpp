@@ -3,25 +3,21 @@
 #include "../module/Module.h"
 #include "../module/Field.h"
 using namespace std;
-namespace bamboo   // open namespace
+namespace bamboo
 {
 
 
-// constructor
-Class::Class(Module *module, const string& name) : Struct(module, name) {}
-
-// as_class returns this Struct as a Class if it is a Class, or nullptr otherwise.
 Class *Class::as_class()
 {
     return this;
 }
+
 const Class *Class::as_class() const
 {
     return this;
 }
 
-// add_parent adds a new parent to the inheritance hierarchy of the class.
-//     Note: This is normally called only during parsing.
+// normally called only during parsing
 bool Class::add_parent(Class *parent)
 {
     if(parent == nullptr) { return false; }
@@ -33,7 +29,6 @@ bool Class::add_parent(Class *parent)
     const vector<Field *>& parent_fields = parent->m_fields;
     m_fields.reserve(m_fields.size() + parent_fields.size());
 
-    // Add all of the parents fields
     for(auto it = parent_fields.begin(); it != parent_fields.end(); ++it) {
         add_inherited_field(parent, *it);
     }
@@ -41,15 +36,11 @@ bool Class::add_parent(Class *parent)
     return true;
 }
 
-// add_child marks a class as a child of this class.
 void Class::add_child(Class *child)
 {
     m_children.push_back(child);
 }
 
-// add_field adds the newly-allocated field to the class.  The class becomes
-//     the owner of the pointer and will delete it when it destructs.
-//     Returns true if the field is successfully added, or false if the field cannot be added.
 bool Class::add_field(unique_ptr<Field> field)
 {
     Field *ref = field.get();
@@ -60,7 +51,7 @@ bool Class::add_field(unique_ptr<Field> field)
     }
 
     // Classes can't share fields.
-    if(field->record() != nullptr && field->record() != this) {
+    if(field->container() != nullptr && field->container() != this) {
         return false;
     }
 
@@ -69,43 +60,9 @@ bool Class::add_field(unique_ptr<Field> field)
         return false;
     }
 
-    // If the field has the same name as the class, it is a constructor
-    if(field->name() == m_name) {
-        // Make sure we don't already have a constructor
-        if(m_constructor != nullptr) {
-            return false;
-        }
-
-        // The constructor must be an atomic field.
-        if(field->as_molecular()) {
-            return false;
-        }
-
-        // The constructor has to be the first declared field.
-        //     Note: This is the case because the constructor should
-        //           always have the earliest field id.
-        if(m_owned_fields.size() > 0) {
-            return false;
-        }
-
-        // Add the field to the field dictionaries
-        m_module->add_field(ref);
-        m_fields_by_id[field->id()] = ref;
-        m_fields_by_name[field->name()] = ref;
-
-        // Transfer ownership of the Field to the Class
-        field->set_struct(this);
-        m_constructor = move(field);
-
-        return true;
-    }
-
-    // Add it to the set of our base field names
-    bool inserted = m_base_names.insert(field->name()).second;
-    // Fail if there is a name conflict
-    if(!inserted) {
-        return false;
-    }
+    // Declared fields must have unique names
+    bool inserted = m_declared_names.insert(field->name()).second;
+    if(!inserted) { return false; }
 
     // If a parent has a field with the same name, shadow it
     auto prev_field = m_fields_by_name.find(field->name());
@@ -113,11 +70,8 @@ bool Class::add_field(unique_ptr<Field> field)
         shadow_field(prev_field->second);
     }
 
-    // Add the field to our full field list
-    m_fields.push_back(ref); // Don't have to try to sort; id is always last
-
-    // Add the field to the field dictionaries
-    m_module->add_field(ref);
+    m_fields.push_back(ref); // Don't have to try to sort; id will always be the highest
+    m_module->add_field(ref); // Module gives us an id
     m_fields_by_id[field->id()] = ref;
     m_fields_by_name[field->name()] = ref;
     m_indices_by_name[field->name()] = (unsigned int)m_fields.size() - 1;
@@ -147,15 +101,15 @@ bool Class::add_field(unique_ptr<Field> field)
 // add_inherited_field updates a classes's fields after a parent adds a new field.
 void Class::add_inherited_field(Class *parent, Field *field)
 {
-    // If the field name matches any base field, it is shadowed.
-    if(m_base_names.find(field->name()) != m_base_names.end()) {
+    // If the field name matches any declared field, it is shadowed.
+    if(m_declared_names.find(field->name()) != m_declared_names.end()) {
         return;
     }
 
     // If another superclass provides a field with that name, the first parent takes precedence
     auto prev_field = m_fields_by_name.find(field->name());
     if(prev_field != m_fields_by_name.end()) {
-        Struct *parentB = prev_field->second->record();
+        Struct *parentB = prev_field->second->container();
         for(auto it = m_parents.begin(); it != m_parents.end(); ++it) {
             if((*it) == parentB) {
                 // The early parent's field takes precedence over the new field
@@ -180,7 +134,7 @@ void Class::add_inherited_field(Class *parent, Field *field)
         // Note: Iterate in reverse because fields added later are more likely to be at the end
         for(auto it = m_fields.rbegin(); it != m_fields.rend(); ++it) {
             if((*it)->id() < field->id()) {
-                m_fields.insert(it.base(), field);
+                m_fields.emplace(it.base(), field);
                 m_indices_by_name[field->name()] = index;
                 break;
             }

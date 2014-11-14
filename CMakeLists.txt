@@ -130,22 +130,18 @@ source_group("Bits" FILES ${BITS_FILES})
 # depends: bits
 set(MODULE_FILES
   src/module/Type.h
-  src/module/Type.ipp
   src/module/Type.cpp
   src/module/Numeric.h
   src/module/Numeric.ipp
   src/module/Numeric.cpp
   src/module/Array.h
-  src/module/Array.ipp
   src/module/Array.cpp
   src/module/Struct.h
   src/module/Struct.ipp
   src/module/Struct.cpp
   src/module/Class.h
-  src/module/Class.ipp
   src/module/Class.cpp
   src/module/Method.h
-  src/module/Method.ipp
   src/module/Method.cpp
   src/module/KeywordList.h
   src/module/KeywordList.cpp
@@ -153,7 +149,6 @@ set(MODULE_FILES
   src/module/Module.ipp
   src/module/Module.cpp
   src/module/Field.h
-  src/module/Field.ipp
   src/module/Field.cpp
   src/module/MolecularField.h
   src/module/MolecularField.cpp
@@ -161,36 +156,31 @@ set(MODULE_FILES
   src/module/Numeric.ipp
   src/module/Numeric.cpp
   src/module/Parameter.h
-  src/module/Parameter.ipp
   src/module/Parameter.cpp
   src/module/Value.h
-  src/module/Value.cpp)
+  src/module/Value.cpp
+  src/module/Value.ipp)
 set(MODULE_EXPORTED
   module/module
   module/Type.h
-  module/Type.ipp
   module/Numeric.h
   module/Numeric.ipp
   module/Array.h
-  module/Array.ipp
   module/Struct.h
   module/Struct.ipp
   module/Class.h
-  module/Class.ipp
   module/Method.h
-  module/Method.ipp
   module/KeywordList.h
   module/Module.h
   module/Module.ipp
   module/Field.h
-  module/Field.ipp
   module/MolecularField.h
   module/Numeric.h
   module/Numeric.ipp
   module/NumericRange.h
   module/Parameter.h
-  module/Parameter.ipp
-  module/Value.h)
+  module/Value.h
+  module/Value.ipp)
 source_group("Module" FILES ${MODULE_FILES})
 
 # depends: module
@@ -229,13 +219,13 @@ source_group("Wire" FILES ${WIRE_FILES})
 set(BAMBOO_SOURCES
   ${BITS_FILES}
   ${MODULE_FILES}
-  ${DCFILE_FILES}
+#  ${DCFILE_FILES}
   ${TRAITS_FILES}
   ${WIRE_FILES})
 set(BAMBOO_HEADERS
   ${BITS_EXPORTED}
   ${MODULE_EXPORTED}
-  ${DCFILE_EXPORTED}
+#  ${DCFILE_EXPORTED}
   ${TRAITS_EXPORTED}
   ${WIRE_EXPORTED})
 
@@ -306,9 +296,9 @@ find_package(CxxTest)
 if(CXXTEST_FOUND)
     include_directories(${CXXTEST_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/include)
     enable_testing()
-    CXXTEST_ADD_TEST(dcfile_test dcfile_test.cpp
-                     ${CMAKE_CURRENT_SOURCE_DIR}/test/dcfile/ParseValueTests.h)
-    target_link_libraries(dcfile_test bamboo)
+#    CXXTEST_ADD_TEST(dcfile_test dcfile_test.cpp
+#                     ${CMAKE_CURRENT_SOURCE_DIR}/test/dcfile/ParseValueTests.h)
+#    target_link_libraries(dcfile_test bamboo)
 endif()
 
 # Is Python installed, and should Python interfaces be generated?

@@ -16,7 +16,7 @@ print() # Newline after prompt
 print('Imports')
 for import_num in range(0, mod.num_imports()):
     # python module path
-    pyimport = mod.get_import(import_num)
+    pyimport = mod.nth_import(import_num)
     print('  ' + pyimport.module)
     for symbol in pyimport.symbols:
         # Figure out the names of used classes
@@ -31,7 +31,7 @@ print() # Newline after imports
 # Inspect module keywords
 print('Keywords')
 for keyword_num in range(0, mod.num_keywords()):
-    print('  ' + mod.get_keyword(keyword_num))
+    print('  ' + mod.nth_keyword(keyword_num))
 
 print() # Newline after keywords
 
@@ -41,8 +41,8 @@ def print_type(typ, indent):
     subtype = typ.subtype()
     if subtype == module.kTypeMethod:
         method = typ.as_method()
-        for param_num in range(0, method.num_parameters()):
-            param = method.get_parameter(param_num)
+        for param_num in range(0, method.num_params()):
+            param = method.nth_param(param_num)
             if not param.name():
                 print(tab + param.type().to_string())
             else:
@@ -52,7 +52,7 @@ def print_type(typ, indent):
     elif subtype == module.kTypeStruct:
         struct = typ.as_struct()
         for field_num in range(0, struct.num_fields()):
-            field = struct.get_field(field_num)
+            field = struct.nth_field(field_num)
             if not field.name():
                 print(tab + field.type().to_string())
             else:
@@ -62,10 +62,10 @@ def print_type(typ, indent):
 # Inspect module classes
 print('Classes')
 for class_num in range(0, mod.num_classes()):
-    cls = mod.get_class(class_num)
+    cls = mod.nth_class(class_num)
     print('  ' + cls.name())
     for field_num in range(0, cls.num_fields()):
-        field = cls.get_field(field_num)
+        field = cls.nth_field(field_num)
         print('    ' + field.name() + ' : ' + field.type().to_string())
         print_type(field.type(), 3)
 

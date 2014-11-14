@@ -6,10 +6,9 @@ from mappings import *
 from wrappers import *
 
 # FIXME: https://github.com/Astron/Bamboo/issues/1
-
 def generate(file_):
     # Declare modules
-    bamboo = Module('bamboo', cpp_namespace="::bamboo")
+    bamboo = Module('bamboo', cpp_namespace = "::bamboo")
     bits = SubModule('bits', bamboo)
     module = SubModule('module', bamboo)
     traits = SubModule('traits', bamboo)
@@ -19,7 +18,6 @@ def generate(file_):
     # Declare includes
     bits.add_include('"bits/byteorder.h"')
     bits.add_include('"bits/sizetag.h"')
-    bits.add_include('"bits/errors.h"')
     module.add_include('"module/Array.h"')
     module.add_include('"module/Class.h"')
     module.add_include('"module/Type.h"')
@@ -45,11 +43,6 @@ def generate(file_):
         custom_name = 'IndexError',
         foreign_cpp_namespace = 'std',
         message_rvalue = 'exc.what()',
-        is_standard_error = True)
-    nullError = bamboo.add_exception('invalid_argument',
-        custom_name = 'TypeError',
-        foreign_cpp_namespace = 'std',
-        message_rvalue = "'\"NoneType' object\" + exc.reason()",
         is_standard_error = True)
     clsKeywordList = module.add_class('KeywordList',
         docstring = classDocstrings['KeywordList'])
@@ -86,7 +79,7 @@ def generate(file_):
     enumSubtype = module.add_enum('Subtype', [
         'kTypeInt8', 'kTypeInt16', 'kTypeInt32', 'kTypeInt64', 'kTypeUint8', 'kTypeUint16',
         'kTypeUint32', 'kTypeUint64', 'kTypeChar', 'kTypeFloat32', 'kTypeFloat64', 'kTypeString',
-        'kTypeVarstring', 'kTypeBlob', 'kTypeVarblob', 'kTypeStruct', 'kTypeMethod', 'kTypeInvalid'])
+        'kTypeBlob', 'kTypeArray', 'kTypeStruct', 'kTypeMethod', 'kTypeNone'])
     enumNumtype = structNumber.add_enum('Type', ['kNaN', 'kInt', 'kUint', 'kFloat'])
 
     # Wrap STL containers
@@ -115,7 +108,7 @@ def generate(file_):
     add_method(clsKeywordList, 'has_matching_keywords', retval('bool'),
                [param('const bamboo::KeywordList&', 'other')], is_const = True)
     add_method(clsKeywordList, 'num_keywords', retval('size_t'), [], is_const = True)
-    add_method(clsKeywordList, 'get_keyword', retval('std::string'),
+    add_method(clsKeywordList, 'nth_keyword', retval('std::string'),
                [param('unsigned int', 'n')],
                is_const = True, throw = [indexError])
     add_method(clsKeywordList, 'add_keyword', retval('bool'), [param('std::string', 'keyword')])
@@ -124,11 +117,11 @@ def generate(file_):
     add_method(clsModule, 'num_classes', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_structs', retval('size_t'), [], is_const = True)
     add_method(clsModule, 'num_types', retval('size_t'), [], is_const = True)
-    add_method(clsModule, 'get_class',
+    add_method(clsModule, 'nth_class',
                retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
-    add_method(clsModule, 'get_struct',
+    add_method(clsModule, 'nth_struct',
                retval_ref('bamboo::Struct *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
@@ -148,14 +141,14 @@ def generate(file_):
                retval_ref('bamboo::Field *'),
                [param('unsigned int', 'id')])
     add_method(clsModule, 'num_imports', retval('size_t'), [], is_const = True)
-    add_method(clsModule, 'get_import',
+    add_method(clsModule, 'nth_import',
                retval_ref('bamboo::Import *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsModule, 'has_keyword', retval('bool'),
                [param('std::string', 'keyword')], is_const = True)
     add_method(clsModule, 'num_keywords', retval('size_t'), [], is_const = True)
-    add_method(clsModule, 'get_keyword', retval('std::string'),
+    add_method(clsModule, 'nth_keyword', retval('std::string'),
                [param('unsigned int', 'n')],
                is_const = True, throw = [indexError])
     add_method(clsModule, 'add_class', retval('bool'),
@@ -197,13 +190,13 @@ def generate(file_):
     add_method(clsArrType, 'has_range', retval('bool'), [], is_const = True)
     add_method(clsArrType, 'range', retval('bamboo::NumericRange'), [], is_const = True)
     clsMethod.add_constructor([])
-    add_method(clsMethod, 'num_parameters', retval('size_t'), [], is_const = True)
-    add_method(clsMethod, 'get_parameter', retval_ref('bamboo::Parameter *'),
+    add_method(clsMethod, 'num_params', retval('size_t'), [], is_const = True)
+    add_method(clsMethod, 'nth_param', retval_ref('bamboo::Parameter *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
-    add_method(clsMethod, 'parameter_by_name', retval_ref('bamboo::Parameter *'),
+    add_method(clsMethod, 'param_by_name', retval_ref('bamboo::Parameter *'),
                [param('std::string', 'name')]),
-    add_method(clsMethod, 'add_parameter', retval('bool'), [param('std::unique_ptr<Parameter>', 'param')])
+    add_method(clsMethod, 'add_param', retval('bool'), [param('std::unique_ptr<Parameter>', 'param')])
     clsStruct.add_constructor([
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('std::string', 'name')])
@@ -211,7 +204,7 @@ def generate(file_):
     add_method(clsStruct, 'name', retval('std::string'), [], is_const = True)
     add_method(clsStruct, 'module', retval_ref('bamboo::Module *'), [])
     add_method(clsStruct, 'num_fields', retval('size_t'), [], is_const = True)
-    add_method(clsStruct, 'get_field', retval_ref('bamboo::Field *'),
+    add_method(clsStruct, 'nth_field', retval_ref('bamboo::Field *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsStruct, 'field_by_id', retval_ref('bamboo::Field *'),
@@ -224,17 +217,15 @@ def generate(file_):
                param('bamboo::Module *', 'module', transfer_ownership = False),
                param('std::string', 'name')])
     add_method(clsClass, 'num_parents', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_parent', retval_ref('bamboo::Class *'),
+    add_method(clsClass, 'nth_parent', retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsClass, 'num_children', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_child', retval_ref('bamboo::Class *'),
+    add_method(clsClass, 'nth_child', retval_ref('bamboo::Class *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
-    add_method(clsClass, 'has_constructor', retval('bool'), [], is_const = True)
-    add_method(clsClass, 'constructor', retval_ref('bamboo::Field *'), [])
-    add_method(clsClass, 'num_base_fields', retval('size_t'), [], is_const = True)
-    add_method(clsClass, 'get_base_field', retval_ref('bamboo::Field *'),
+    add_method(clsClass, 'num_declared_fields', retval('size_t'), [], is_const = True)
+    add_method(clsClass, 'nth_declared_field', retval_ref('bamboo::Field *'),
                [param('unsigned int', 'n')],
                throw = [indexError])
     add_method(clsClass, 'add_parent', retval('bool'),
@@ -244,7 +235,7 @@ def generate(file_):
                param('std::string', 'name', default_value = '""')])
     add_method(clsParam, 'name', retval('std::string'), [], is_const = False)
     add_method(clsParam, 'type', retval_ref('bamboo::Type *'), [])
-    add_method(clsParam, 'get_method', retval_ref('bamboo::Method *'), [])
+    add_method(clsParam, 'method', retval_ref('bamboo::Method *'), [])
     add_method(clsParam, 'has_default_value', retval('bool'), [], is_const = True),
     #add_method(clsParam, 'default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsParam, 'set_name', retval('bool'), [param('std::string', 'name')])
@@ -258,7 +249,7 @@ def generate(file_):
     add_method(clsField, 'id', retval('unsigned int'), [], is_const = True)
     add_method(clsField, 'name', retval('std::string'), [], is_const = False)
     add_method(clsField, 'type', retval_ref('bamboo::Type *'), [])
-    add_method(clsField, 'record', retval_ref('bamboo::Struct *'), [])
+    add_method(clsField, 'container', retval_ref('bamboo::Struct *'), [])
     add_method(clsField, 'has_default_value', retval('bool'), [], is_const = True),
     #add_method(clsField, 'default_value', retval('const bamboo::Value'), [], is_const = True)
     add_method(clsField, 'set_name', retval('bool'), [param('std::string', 'name')])

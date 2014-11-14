@@ -1,48 +1,40 @@
 // Filename: KeywordList.h
 #pragma once
-#include <string>        // std::string
-#include <vector>        // std::vector
-#include <unordered_set> // std::unordered_set
-namespace bamboo   // open namespace bamboo
+#include <string>
+#include <vector>
+#include <unordered_set>
+namespace bamboo
 {
 
-
-// Forward declaration
-class HashGenerator;
 
 // KeywordList this is a list of keywords (see Keyword) that may be set on a particular field.
 class KeywordList
 {
   public:
-    KeywordList();
+    KeywordList() {}
     KeywordList(const KeywordList&);
     KeywordList& operator=(KeywordList);
     friend void swap(KeywordList& lhs, KeywordList& rhs);
-    virtual ~KeywordList() {}
+    virtual ~KeywordList() {} // provide vtable for python bindings
 
-    // has_keyword returns true if this list includes the indicated keyword, false otherwise.
-    bool has_keyword(const std::string& name) const;
-    // num_keywords returns the number of keywords in the list.
-    size_t num_keywords() const;
-    // get_keyword returns the nth keyword in the list.
-    const std::string& get_keyword(unsigned int n) const;
+    inline bool has_keyword(const std::string& name) const
+    {
+        return m_keywords_by_name.find(name) != m_keywords_by_name.end();
+    }
+    inline bool has_matching_keywords(const KeywordList& other) const
+    {
+        return m_keywords_by_name == other.m_keywords_by_name; // order-independent comparison
+    }
+    inline size_t num_keywords() const { return m_keywords.size(); }
+    inline const std::string& nth_keyword(unsigned int n) const { return m_keywords[n]; }
 
-    // has_matching_keywords returns true if this list has the same keywords as the other list,
-    //     false if some keywords differ. Order is not considered important.
-    bool has_matching_keywords(const KeywordList& other) const;
-
-    // copy_keywords replaces this keyword list with those from the other list.
     void copy_keywords(const KeywordList& other);
-
-    // add_keyword adds the indicated keyword to the list.
-    //     Returns true if it is added, false if it was already there.
     bool add_keyword(const std::string& keyword);
 
   private:
-    std::vector<std::string> m_keywords; // the actual list of keywords
-    std::unordered_set<std::string> m_keywords_by_name; // a map of name to keywords in list
+    std::vector<std::string> m_keywords;
+    std::unordered_set<std::string> m_keywords_by_name;
 };
-
 
 void swap(KeywordList& lhs, KeywordList& rhs);
 

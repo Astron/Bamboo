@@ -2,8 +2,9 @@
 #pragma once
 #include <string> // std::string
 #include <vector> // std::vector
-#include "../module/Type.h"
 #include "../module/NumericRange.h"
+#include "../module/Type.h"
+#include "../module/Value.h"
 namespace bamboo   // open namespace bamboo
 {
 
@@ -45,12 +46,12 @@ class DCToken
         Numeric *dnumeric;
     };
 
-    // Have a bloated Token for MSVC
     std::string str;
     std::vector<uint8_t> buffer;
     std::vector<std::string> strings;
     NumericRange range;
     NameType nametype;
+    Value value = Value(Type::None);
 };
 
 

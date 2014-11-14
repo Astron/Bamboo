@@ -1,12 +1,12 @@
 // Filename: Value.h
 #pragma once
-#include <string> // std::string
-#include <vector> // std::vector
-#include <map>    // std::map
+#include <string>
+#include <vector>
+#include <map>
 #include "../module/Type.h"
 #include "../module/Field.h"
 #include "../module/Parameter.h"
-namespace bamboo   // open namespace bamboo
+namespace bamboo
 {
 
 
@@ -17,11 +17,12 @@ class InvalidValue : public std::runtime_error
     InvalidValue(const std::string& what) : std::runtime_error(what) {}
 };
 
-// An InvalidCast error is thrown when
+// An InvalidCast error is thrown when a dynamic cast of a Value fails
 class InvalidCast : public std::exception
 {
   public:
-    InvalidCast(const Type *from, Subtype to) : m_from(from), m_to(to) {
+    InvalidCast(const Type *from, Subtype to) : m_from(from), m_to(to)
+    {
         m_what = "value for '" + from->to_string() + "' cannot be used as " + format_subtype(to);
     }
 
@@ -36,18 +37,18 @@ class InvalidCast : public std::exception
 };
 
 // A Value is a variant that can represent the value of any Bamboo::Type.
-// Value's constructor throws null_error if the type is null or invalid_type if the type is invalid.
 class Value {
   public:
-    explicit Value(const Type *);
+    Value() {}
     Value(const Value&);
     Value& operator=(Value rhs);
+    explicit Value(const Type *);
     friend void swap(Value&, Value&);
     ~Value();
 
     typedef std::vector<Value> array_t;
-    typedef std::map<const Field *, Value, Field::sort_by_id> struct_t;
-    typedef std::map<const Parameter *, Value, Parameter::sort_by_position> method_t;
+    typedef std::map<const Field *, Value, Field::SortById> struct_t;
+    typedef std::map<const Parameter *, Value, Parameter::SortByPosition> method_t;
 
     // parse reads a Value from a formatted string; throws InvalidValue
     static Value parse(const Type *, const std::string& formatted);
@@ -65,7 +66,7 @@ class Value {
 
     inline const Type *type() const;
 
-    // as_t returns the appropriate cast for a value
+    // as_<T> performs a dynamic cast of the value to the given type; throws InvalidCast
     inline char as_char() const;
     inline int8_t as_int8() const;
     inline int16_t as_int16() const;
@@ -84,10 +85,7 @@ class Value {
     inline const struct_t& as_struct() const;
     inline const method_t& as_method() const;
 
-  private:
-    Value() {}
-
-    const Type *m_type;
+    // Value member variables can be accessed directly to access the value without type-checking
     union {
         char m_char;
         int8_t m_int8;
@@ -119,6 +117,8 @@ class Value {
     method_t m_method;
 #endif
 
+  private:
+    const Type *m_type = Type::None;
 };
 
 void swap(Value&, Value&);

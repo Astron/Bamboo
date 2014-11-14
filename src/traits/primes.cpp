@@ -1,8 +1,8 @@
 // Filename: primes.cpp
 #include "primes.h"
-#include <vector> // for std::vector
+#include <vector>
 using namespace std;
-namespace bamboo   // open namespace
+namespace bamboo
 {
 
 
