@@ -41,78 +41,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   endif()
 endif()
 
-## Check for Bison and Flex to enable parser generation
-set(BISON_VERSION "0.0.0")
-find_package(BISON)
-find_package(FLEX)
-
-if(FLEX_FOUND AND BISON_FOUND AND
-   ${BISON_VERSION} VERSION_GREATER "3.0.0")
-  set(GENERATE_PARSER_DEFAULT On)
-else()
-  set(GENERATE_PARSER_DEFAULT Off)
-endif()
-
-option(GENERATE_PARSER
-  "Uses bison and flex to generate parser files automatically.
-  Uses prebuilt files when disabled."
-  ${GENRATE_PARSER_DEFAULT})
-
-if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  set(LINE_DIRECTIVES_DEFAULT On)
-else()
-  set(LINE_DIRECTIVES_DEFAULT Off)
-endif()
-
-option(PARSER_LINE_DIRECTIVES
-  "Causes bison and flex file to have #line directives if included.
-  Useful for debugging but should not be commited to the git tree..
-  "
-  ${LINE_DIRECTIVES_DEFAULT})
-
-if(GENERATE_PARSER)
-  if(NOT FLEX_FOUND)
-    message(FATAL_ERROR
-      "Generating parser files is enabled, but flex not found.")
-  endif()
-  if(NOT BISON_FOUND)
-    message(FATAL_ERROR
-      "Generating parser files is enabled, but bison not found.")
-  endif()
-  if(${BISON_VERSION} VERSION_LESS "3.0.0")
-    message(FATAL_ERROR
-      "Generating parser files is enabled, but bison-version < 3")
-  endif()
-
-  if(NOT PARSER_LINE_DIRECTIVES)
-    set(BISON_ARGS "--no-lines")
-    set(FLEX_ARGS "--noline")
-  endif()
-
-  if(BISON_FOUND)
-    add_custom_command(
-      SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp
-      COMMAND ${BISON_EXECUTABLE} ${BISON_ARGS}
-      ARGS --defines=${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser-defs.h
-           -o ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.cpp
-           ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp
-      COMMENT "Generating dcfile/parser.cpp"
-      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.cpp
-      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/parser.ypp)
-  endif(BISON_FOUND)
-
-  if(FLEX_FOUND)
-    add_custom_command(
-      SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp
-      COMMAND ${FLEX_EXECUTABLE} ${FLEX_ARGS}
-      ARGS -o${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.cpp
-           ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp
-      COMMENT "Generating dcfile/lexer.cpp"
-      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.cpp
-      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/dcfile/lexer.lpp)
-  endif(FLEX_FOUND)
-endif()
-
 ## Source files
 include_directories(src)
 
@@ -196,13 +124,13 @@ source_group("Traits" FILES ${TRAITS_FILES})
 
 # depends: bits, module
 set(DCFILE_FILES
-  src/dcfile/parser.cpp
   src/dcfile/lexer.cpp
-  src/dcfile/write.cpp
-  src/dcfile/format.cpp)
+  src/dcfile/lexer.h
+  src/dcfile/parser.cpp
+  src/dcfile/parser.h)
 set(DCFILE_EXPORTED
-  dcfile/format.h
-  dcfile/parse.h)
+  dcfile/lexer.h
+  dcfile/parser.h)
 source_group("DCFile" FILES ${DCFILE_FILES})
 
 # depends: bits, module
@@ -219,13 +147,13 @@ source_group("Wire" FILES ${WIRE_FILES})
 set(BAMBOO_SOURCES
   ${BITS_FILES}
   ${MODULE_FILES}
-#  ${DCFILE_FILES}
+  ${DCFILE_FILES}
   ${TRAITS_FILES}
   ${WIRE_FILES})
 set(BAMBOO_HEADERS
   ${BITS_EXPORTED}
   ${MODULE_EXPORTED}
-#  ${DCFILE_EXPORTED}
+  ${DCFILE_EXPORTED}
   ${TRAITS_EXPORTED}
   ${WIRE_EXPORTED})
 

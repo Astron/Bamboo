@@ -5,8 +5,8 @@
 #include "../module/Struct.h"
 #include "../module/Method.h"
 #include "../module/Numeric.h"
-#include "../dcfile/parse.h"
-#include "../dcfile/format.h"
+#include "../dcfile_old/parse.h"
+#include "../dcfile_old/format.h"
 using namespace std;
 namespace bamboo   // open namespace bamboo
 {

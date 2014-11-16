@@ -391,8 +391,7 @@
 		return result;
 	}
 
-	// eat_c_comment scans past all characters up until the first */
-	// encountered.
+	// eat_c_comment scans past all characters up until the first "*/" encountered.
 	static void eat_c_comment()
 	{
 		// As above, we'll operate on our own local copies of line_number
