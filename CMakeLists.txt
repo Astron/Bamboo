@@ -113,13 +113,13 @@ source_group("Module" FILES ${MODULE_FILES})
 
 # depends: module
 set(TRAITS_FILES
-  src/traits/hashes.h
-  src/traits/hashLegacy.cpp
+  src/traits/hash_module.h
+  src/traits/hash_legacy.cpp
   src/traits/HashGenerator.h
   src/traits/HashGenerator.cpp
   src/traits/primes.h
   src/traits/primes.cpp)
-set(TRAITS_EXPORTED traits/hashes.h)
+set(TRAITS_EXPORTED traits/hash_module.h)
 source_group("Traits" FILES ${TRAITS_FILES})
 
 # depends: bits, module

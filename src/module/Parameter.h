@@ -44,9 +44,10 @@ class Parameter
     };
 
   private:
+    friend class Method;
+
     void set_position(unsigned int);
     void set_method(Method *method);
-    friend class Method;
 
     Type *m_type;
     std::string m_type_alias;

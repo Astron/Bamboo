@@ -14,11 +14,11 @@ namespace bamboo
 class Array : public Type
 {
   public:
-    Array(Type *element_type, const NumericRange& size = NumericRange());
-    Array(Type *element_type, const std::string& alias);
+    Array(Type *element_type, bool transfer_ownership, const NumericRange& size = NumericRange());
     Array(const Array&) = delete;
     Array& operator=(const Array&) = delete;
-    virtual ~Array() {};
+    virtual ~Array();
+
     Array *as_array() override;
     const Array *as_array() const override;
 
@@ -31,8 +31,12 @@ class Array : public Type
     inline bool has_range() const { return !m_array_range.is_nan(); }
     inline NumericRange range() const { return m_array_range; }
 
+    // Primitive array constructor
+    Array(Type *element_type, const std::string& alias);
+
   private:
-    Type *m_element_type;
+    bool m_element_owned = false;
+    Type *m_element_type = nullptr;
     unsigned int m_array_size = 0; // number of elements in a fixed-size array (or 0)
     NumericRange m_array_range;
 };

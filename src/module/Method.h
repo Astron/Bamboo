@@ -34,6 +34,8 @@ class Method : public Type
         return it == m_params_by_name.end() ? nullptr : it->second;
     }
 
+    // TODO: Add `Param *add_param(...)`
+    // TODO: Change to (Param *, bool transerf_ownership);
     bool add_param(std::unique_ptr<Parameter> param);
 
   private:

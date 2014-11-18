@@ -1,10 +1,10 @@
-// Filename: hashLegacy.cpp
-#include "hashes.h"
-#include "HashGenerator.h"
+// Filename: hash_legacy.cpp
+#include "hash_module.h"
 
 #include <cmath>    // std::floor
 #include <iostream> // std::cerr
 #include <set>
+#include "../traits/HashGenerator.h"
 #include "../module/Module.h"
 #include "../module/Class.h"
 #include "../module/Method.h"
@@ -62,7 +62,7 @@ void hash_module(HashGenerator& hashgen, const Module *file)
     hashgen.add_int(1); // (dc_virtual_inheritance && dc_sort_inheritance_by_file)
     hashgen.add_int(int(file->num_structs() + file->num_classes()));
 
-    size_t num_types = file->num_types();
+    size_t num_types = file->num_ids();
     for(unsigned int i = 0; i < num_types; ++i) {
         const Type *type = file->type_by_id(i);
         if(!type->as_struct()) {
@@ -118,11 +118,11 @@ void hash_field(HashGenerator& hashgen, const Field *field)
         hashgen.add_int(field->id());
 
         const MolecularField *mol = field->as_molecular();
-        size_t num_fields = mol->num_fields();
+        size_t num_fields = mol->num_atomics();
 
         hashgen.add_int(int(num_fields)); // _fields.size();
         for(unsigned int i = 0; i < num_fields; ++i) {
-            hash_field(hashgen, mol->nth_field(i));
+            hash_field(hashgen, mol->nth_atomic(i));
         }
         return;
     }

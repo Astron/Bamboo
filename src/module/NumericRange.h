@@ -72,6 +72,8 @@ struct Number {
 
 };
 
+// TODO: Implement other comparison operators
+// FIXME: Allow operator== to perform conversions and compare numerically
 inline bool operator==(const Number& a, const Number& b)
 {
     return a.type == b.type && a.uinteger == b.uinteger;
@@ -91,6 +93,7 @@ struct NumericRange {
         min.floating = std::numeric_limits<double>::lowest();
         max.floating = std::numeric_limits<double>::max();
     }
+    inline NumericRange(Number size)                : type(size.type),      min(size), max(size) {}
     inline NumericRange(int32_t min, int32_t max)   : type(Number::kInt),   min(min), max(max) {}
     inline NumericRange(int64_t min, int64_t max)   : type(Number::kInt),   min(min), max(max) {}
     inline NumericRange(uint32_t min, uint32_t max) : type(Number::kUint),  min(min), max(max) {}
@@ -103,11 +106,20 @@ struct NumericRange {
         case Number::kNaN:
             return true;
         case Number::kInt:
-            return (min.integer <= num.integer && num.integer <= max.integer);
+            {
+                int64_t val = int64_t(num);
+                return (min.integer <= val && val <= max.integer);
+            }
         case Number::kUint:
-            return (min.uinteger <= num.uinteger && num.uinteger <= max.uinteger);
+            {
+                uint64_t val = uint64_t(num);
+                return (min.uinteger <= val && val <= max.uinteger);
+            }
         case Number::kFloat:
-            return (min.floating <= num.floating && num.floating <= max.floating);
+            {
+                double val = double(num);
+                return (min.floating <= val && val <= max.floating);
+            }
         }
     }
 

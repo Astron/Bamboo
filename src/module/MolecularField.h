@@ -8,31 +8,32 @@ namespace bamboo   // open namespace bamboo
 
 // A MolecularField is an abstract field which provides an interface that can
 //     be used to access multiple other fields at the same time.
-// MolecularField's constructor throws null_error if the class is null.
-class MolecularField : public Field, public Struct
+class MolecularField : public Field, private Struct
 {
   public:
-    MolecularField(Class *cls, const std::string& name); // TODO: Throw null error
+    MolecularField(const std::string& name);
     MolecularField(const MolecularField&) = delete;
     MolecularField& operator=(const MolecularField&) = delete;
     virtual ~MolecularField() {}
     MolecularField *as_molecular() override;
     const MolecularField *as_molecular() const override;
 
-    // Use the field interface by default and not the struct interface
-    using Field::id;
-    using Field::name;
-    using Field::type;
-    using Field::set_name;
+    inline size_t num_atomics() const { return m_fields.size(); }
+    inline Field *nth_atomic(unsigned int n) const { return m_fields[n]; }
 
-    bool set_default_value(const Value&) override; // always returns false; no explicit defaults
-    bool set_default_value(const Value *) override;
+    bool add_atomic(Field* field);
 
-    bool add_field(Field *field);
-    bool add_field(std::unique_ptr<Field> field) override;
+    // MolecularFields have implicit type
+    bool set_type(Type *, bool) override { return false; }
 
-  protected:
-    using Field::set_id;
+    // MolecularFields have implicit default values
+    bool set_default_value(const Value&) override { return false; }
+    bool set_default_value(const Value *) override { return false; }
+
+  private:
+    // MolecularFields have implicit fields
+    Field *add_field(const std::string&, Type *) override { return nullptr; }
+    bool register_field(std::unique_ptr<Field>) override { return false; }
 };
 
 

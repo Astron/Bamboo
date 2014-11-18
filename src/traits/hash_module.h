@@ -1,4 +1,4 @@
-// Filename: hashes.h
+// Filename: hash_module.h
 #pragma once
 #include <cstdint> // uint32_t
 namespace bamboo

@@ -11,7 +11,7 @@ namespace bamboo
 
 
 static const array<string, 20> keywords = {
-    "keyword", "struct", "class", "typedef", "from", "import",
+    "keyword", "struct", "class", "typedef", "import", "from",
     "char", "int8", "int16", "int32", "int64",
     "uint8", "uint16", "uint32", "uint64",
     "float32", "float64", "string", "blob",
@@ -20,7 +20,7 @@ static const array<string, 20> keywords = {
 };
 
 static const array<TokenType, 20> keyword_types = {
-    Token_Keyword, Token_Struct, Token_Class, Token_Typedef, Token_From, Token_Import,
+    Token_Keyword, Token_Struct, Token_Class, Token_Typedef, Token_Import, Token_ImportFrom,
     Token_Char, Token_Int8, Token_Int16, Token_Int32, Token_Int64,
     Token_Uint8, Token_Uint16, Token_Uint32, Token_Uint64,
     Token_Float32, Token_Float64, Token_String, Token_Blob,
@@ -28,7 +28,7 @@ static const array<TokenType, 20> keyword_types = {
     Token_Class
 };
 
-static void print_error(const LineInfo& where, const string& what);
+static void add_error(Lexer *lexer, const LineInfo& where, const string& what);
 static char next_char(Lexer *lexer);
 static char peek_char(Lexer *lexer);
 static void eat_char(Lexer *lexer);
@@ -36,7 +36,87 @@ static void set_token_data(Token& token, const vector<uint8_t>& data);
 static void set_token_text(Token& token, const string& text);
 static string scan_quoted_text(Lexer *lexer, const LineInfo& start);
 
-Lexer::Lexer(char *buf, size_t bufsize) :
+
+static char format_buf[8];
+const char *format_tokentype(TokenType type)
+{
+    switch(type) {
+    case Token_NotAToken:
+        return "uninitialized-token";
+    case Token_Eof:
+        return "end-of-input";
+    case Token_Identifier:
+        return "identifier";
+    case Token_Class:
+        return "keyword \"class\"";
+    case Token_Struct:
+        return "keyword \"struct\"";
+    case Token_Typedef:
+        return "keyword \"typedef\"";
+    case Token_Keyword:
+        return "keyword \"keyword\"";
+    case Token_Import:
+        return "keyword \"import\"";
+    case Token_ImportFrom:
+        return "keyword \"from\"";
+    case Token_Char:
+        return "type \"char\"";
+    case Token_Int8:
+        return "type \"int8\"";
+    case Token_Int16:
+        return "type \"int16\"";
+    case Token_Int32:
+        return "type \"int32\"";
+    case Token_Int64:
+        return "type \"int64\"";
+    case Token_Uint8:
+        return "type \"uint8\"";
+    case Token_Uint16:
+        return "type \"uint16\"";
+    case Token_Uint32:
+        return "type \"uint32\"";
+    case Token_Uint64:
+        return "type \"uint64\"";
+    case Token_Float32:
+        return "type \"float32\"";
+    case Token_Float64:
+        return "type \"float64\"";
+    case Token_String:
+        return "type \"string\"";
+    case Token_Blob:
+        return "type \"blob\"";
+    case Token_Character:
+        return "character literal";
+    case Token_Integer:
+        return "integer literal";
+    case Token_Real:
+        return "float literal";
+    case Token_Text:
+        return "string literal";
+    case Token_Hexstring:
+        return "hexstring literal";
+    case '+':
+        return "unary operator '+'";
+    case '-':
+        return "unary operator '-'";
+    case '=':
+        return "operator '='";
+    case '/':
+        return "operator '/'";
+    case '%':
+        return "operator '%'";
+    default:
+        if(isprint(type)) {
+            snprintf(format_buf, sizeof(format_buf), "'%c'", type);
+            return format_buf;
+        } else {
+            snprintf(format_buf, sizeof(format_buf), "\\x%x", type);
+            return format_buf;
+        }
+    }
+}
+
+Lexer::Lexer(const char *buf, size_t bufsize) :
     input_buf(buf),
     input_pos(buf),
     input_size(bufsize)
@@ -83,7 +163,7 @@ Token Lexer::scan_token()
     } else if(isdigit(c) || c == '.') {
         // Scan number literal
 
-        char *start = input_pos;
+        const char *start = input_pos;
 
         bool has_decimal_point = false;
         bool has_zero_prefix = false;
@@ -110,16 +190,16 @@ Token Lexer::scan_token()
         while(c != EOF) {
             if(c == '.') {
                 if(has_decimal_point) {
-                    print_error(here, "Too many decimal points in number");
+                    add_error(this, here, "Too many decimal points in number");
                 } else if(has_bin_prefix) {
-                    print_error(here, "Invalid prefix \"0b\" for float literal");
+                    add_error(this, here, "Invalid prefix \"0b\" for float literal");
                 }
                 has_decimal_point = true;
             } else if(c == 'e' || c == 'E') {
                 if(has_exponent) {
-                    print_error(here, "Too many decimal points in number");
+                    add_error(this, here, "Too many decimal points in number");
                 } else if(!has_bin_prefix) {
-                    print_error(here, "Invalid prefix \"0b\" for float literal");
+                    add_error(this, here, "Invalid prefix \"0b\" for float literal");
                 }
                 has_exponent = true;
 
@@ -132,7 +212,7 @@ Token Lexer::scan_token()
                     string error = "Forbidden character '";
                     error += c;
                     error += "' at end of numeric literal";
-                    print_error(here, error);
+                    add_error(this, here, error);
                 }
             } else {
                 if(!isalnum(c)) { break; }
@@ -140,21 +220,21 @@ Token Lexer::scan_token()
                     string error = "Forbidden character '";
                     error += c;
                     error += "' at end of numeric literal";
-                    print_error(here, error);
+                    add_error(this, here, error);
                 }
                 if(has_bin_prefix) {
                     if(c != '0' && c != '1') {
                         string error = "Invalid digit '";
                         error += c;
                         error += "'' in binary literal";
-                        print_error(here, error);
+                        add_error(this, here, error);
                     }
                 } else if(has_zero_prefix) {
                     if(c == '8' || c == '9') {
                         string error = "Invalid digit '";
                         error += c;
                         error += "'' in octal literal";
-                        print_error(here, error);
+                        add_error(this, here, error);
                     }
                 }
             }
@@ -172,7 +252,7 @@ Token Lexer::scan_token()
             // Scan binary integer normally
             uint64_t bin = 0;
 
-            char *end = input_pos;
+            const char *end = input_pos;
             input_pos = start;
             c = next_char(this);
             while(c == '0' || c == '1') {
@@ -207,7 +287,7 @@ Token Lexer::scan_token()
         // Scan character literal
         string text = scan_quoted_text(this, here);
         if(text.length() > 1) {
-            print_error(here, "Multiple characters in character literal");
+            add_error(this, here, "Multiple characters in character literal");
         }
 
         Token token;
@@ -224,7 +304,7 @@ Token Lexer::scan_token()
         while(c != '>' && c != EOF) {
             uint8_t digit;
             if(!isxdigit(c)) {
-                print_error(here, "Non-hexidecimal character in hexstring");
+                add_error(this, here, "Non-hexidecimal character in hexstring");
 
                 // Assume literal stops at the first whitespace
                 while(!isspace(c)) { c = next_char(this); }
@@ -249,9 +329,9 @@ Token Lexer::scan_token()
         }
 
         if(c == EOF) {
-            print_error(here, "Missing terminating '>' for hexstring");
+            add_error(this, here, "Missing terminating '>' for hexstring");
         } else if(odd) {
-            print_error(here, "Odd number of hexidecimal digits in hexstring");
+            add_error(this, here, "Odd number of hexidecimal digits in hexstring");
         }
 
         Token token;
@@ -297,9 +377,9 @@ Token Lexer::scan_token()
 
             if(c == EOF && block_depth > 0) {
                 if(is_nested) {
-                    print_error(here, "More \"/*\" than \"/*\" nested in block comment");
+                    add_error(this, here, "More \"/*\" than \"/*\" nested in block comment");
                 } else {
-                    print_error(here, "Missing terminating \"*/\" for block comment");
+                    add_error(this, here, "Missing terminating \"*/\" for block comment");
                 }
             }
             return scan_token();
@@ -355,14 +435,15 @@ Token& Token::operator=(Token other)
 }
 */
 
-static void print_error(const LineInfo& where, const std::string& what)
+static void add_error(Lexer* lexer, const LineInfo& where, const std::string& what)
 {
+    lexer->num_errors += 1;
     fprintf(stderr, "Error at line %d, column %d:\n", where.num, where.col);
     fprintf(stderr, "  %s\n", what.c_str());
 
-    char *eol = strpbrk(where.text_pos, "\n\r");
+    const char *eol = strpbrk(where.text_pos, "\n\r");
     string line(where.text_pos, eol);
-    fprintf(stderr, "%s\n%*c", what.c_str(), where.col, '^');
+    fprintf(stderr, "%s\n%*c\n", what.c_str(), where.col, '^');
 }
 
 static char next_char(Lexer *lexer)
@@ -373,7 +454,11 @@ static char next_char(Lexer *lexer)
 
 static char peek_char(Lexer *lexer)
 {
-    return *lexer->input_pos;
+    if((size_t)(lexer->input_pos - lexer->input_buf) < lexer->input_size) {
+        return *lexer->input_pos;
+    } else {
+        return EOF;
+    }
 }
 
 static void eat_char(Lexer *lexer)
@@ -495,8 +580,9 @@ static string scan_quoted_text(Lexer *lexer, const LineInfo& start)
         }
     }
 
-    if(c == EOF) { print_error(start, "Missing terminating '\"' character"); }
+    if(c == EOF) { add_error(lexer, start, "Missing terminating '\"' character"); }
     return text;
 }
+
 
 } // close namespace bamboo

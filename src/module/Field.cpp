@@ -7,16 +7,19 @@ using namespace std;
 namespace bamboo
 {
 
-
-Field::Field(Type *type, const string& name) : m_type(type), m_name(name)
+Field::Field(Type *type, bool transfer_ownership) : Field("", type, transfer_ownership) {}
+Field::Field(const string& name, Type *type, bool transfer_ownership) :
+    m_name(name),
+    m_type(type),
+    m_type_owned(transfer_ownership)
 {
     if(m_type == nullptr) { m_type = Type::None; }
 }
 
 Field::~Field()
 {
-    delete m_type;
-    delete m_default_value;
+    if(m_type_owned) { delete m_type; }
+    if(m_default_value != nullptr) { delete m_default_value; }
 }
 
 MolecularField *Field::as_molecular()
@@ -40,8 +43,20 @@ bool Field::set_name(const string& name)
     return true;
 }
 
-void Field::set_type(Type *type)
+bool Field::set_type(Type *type, bool transfer_ownership)
 {
+    // Can't change the type of a field that has been added to a struct
+    if(m_struct != nullptr) {
+        return false;
+    }
+
+    // Field can't have null type
+    if(type == nullptr) {
+        return false;
+    }
+
+    if(m_type_owned) { delete m_type; }
+    m_type_owned = transfer_ownership;
     m_type = type;
 
     // Reset our default value, if we had one
@@ -49,29 +64,30 @@ void Field::set_type(Type *type)
         delete m_default_value;
         m_default_value = nullptr;
     }
-}
 
-void Field::set_id(unsigned int id)
-{
-    m_id = id;
-}
-
-void Field::set_struct(Struct *strct)
-{
-    m_struct = strct;
+    return true;
 }
 
 bool Field::set_default_value(const Value& default_value)
 {
-    if(default_value.type() != this->type()) { return false; }
-    if(m_default_value != nullptr) { delete m_default_value; }
-    m_default_value = new Value(default_value);
-    return true;
+    return set_default_value(&default_value);
 }
 
 bool Field::set_default_value(const Value *default_value)
 {
-    return set_default_value(*default_value);
+    if(default_value == nullptr) {
+        if(m_default_value != nullptr) { delete m_default_value; }
+        m_default_value = nullptr;
+        return true;
+    }
+
+    if(default_value->type() != this->type()) {
+        return false;
+    }
+
+    if(m_default_value != nullptr) { delete m_default_value; }
+    m_default_value = new Value(*default_value);
+    return true;
 }
 
 

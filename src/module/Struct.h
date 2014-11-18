@@ -18,8 +18,10 @@ class Class;
 // Struct's constructor throws null_error if module is null.
 class Struct : public Type
 {
+    friend class Module;
+
   public:
-    Struct(Module *module, const std::string& name); // TODO: Throw null error
+    explicit Struct(const std::string& name);
     Struct(const Struct&) = delete;
     Struct& operator=(const Struct&) = delete;
     virtual ~Struct() {};
@@ -30,7 +32,7 @@ class Struct : public Type
     Struct *as_struct() override;
     const Struct *as_struct() const override;
 
-    inline unsigned int id() const;
+    inline int id() const;
     inline const std::string& name() const;
 
     inline Module *module();
@@ -39,24 +41,26 @@ class Struct : public Type
     inline size_t num_fields() const;
     inline Field *nth_field(unsigned int n);
     inline const Field *nth_field(unsigned int n) const;
-    inline Field *field_by_id(unsigned int id);
-    inline const Field *field_by_id(unsigned int id) const;
+    inline Field *field_by_id(int id);
+    inline const Field *field_by_id(int id) const;
     inline Field *field_by_name(const std::string& name);
     inline const Field *field_by_name(const std::string& name) const;
 
-    virtual bool add_field(std::unique_ptr<Field> field);
+    virtual Field *add_field(const std::string& name, Type *type);
+    virtual bool register_field(std::unique_ptr<Field> field); //, bool transfer_ownership
+    // TODO: Rename back to add_field and add ownership param
 
   protected:
-    Struct(Module *module);
+    Struct(Module *module, const std::string& name, int id);
 
-    void set_id(unsigned int id);
-    friend class Module;
+    // update_field_id registers the id for a field if it isn't shadowed
+    void update_field_id(Field *field, int id);
 
-    unsigned int m_id = 0;
-    Module *m_module;
+    int m_id = -1;
+    Module *m_module = nullptr;
     std::string m_name;
 
-    std::vector<Field *> m_fields;
+    std::vector<Field *> m_fields; // TODO: Deal with keeping this vector ordered
     std::vector<std::unique_ptr<Field>> m_owned_fields;
     std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Field *> m_fields_by_name;

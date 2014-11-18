@@ -3,7 +3,7 @@ namespace bamboo
 {
 
 
-inline unsigned int Struct::id() const
+inline int Struct::id() const
 {
     return m_id;
 }
@@ -38,13 +38,13 @@ inline const Field *Struct::nth_field(unsigned int n) const
     return n < m_fields.size() ? m_fields[n] : nullptr;
 }
 
-inline Field *Struct::field_by_id(unsigned int id)
+inline Field *Struct::field_by_id(int id)
 {
     auto it = m_fields_by_id.find(id);
     return it == m_fields_by_id.end() ? nullptr : it->second;
 }
 
-inline const Field *Struct::field_by_id(unsigned int id) const
+inline const Field *Struct::field_by_id(int id) const
 {
     auto it = m_fields_by_id.find(id);
     return it == m_fields_by_id.end() ? nullptr : it->second;
@@ -60,11 +60,6 @@ inline const Field *Struct::field_by_name(const std::string& name) const
 {
     auto it = m_fields_by_name.find(name);
     return it == m_fields_by_name.end() ? nullptr : it->second;
-}
-
-inline void Struct::set_id(unsigned int id)
-{
-    m_id = id;
 }
 
 

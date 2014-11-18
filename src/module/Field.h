@@ -16,14 +16,15 @@ class MolecularField;
 class Field : public KeywordList
 {
   public:
-    Field(Type *type, const std::string& name = "");
+    Field(Type *type, bool transfer_ownership);
+    Field(const std::string& name, Type *type, bool transfer_ownership);
     Field(const Field&) = delete;
     Field& operator=(const Field&) = delete;
     virtual ~Field();
     virtual MolecularField *as_molecular();
     virtual const MolecularField *as_molecular() const;
 
-    inline unsigned int id() const { return m_id; }
+    inline int id() const { return m_id; }
     inline const std::string& name() const { return m_name; }
 
     inline Type *type() { return m_type; }
@@ -35,8 +36,9 @@ class Field : public KeywordList
     inline bool has_default_value() const { return m_default_value != nullptr; }
     inline const Value *default_value() const { return m_default_value; }
 
-    bool set_name(const std::string&); // return false if it would cause a name conflict
-    void set_type(Type *);
+
+    bool set_name(const std::string&); // returns false if it would cause a name conflict
+    virtual bool set_type(Type *type, bool transfer_ownership);
     virtual bool set_default_value(const Value&);
     virtual bool set_default_value(const Value *);
 
@@ -49,19 +51,17 @@ class Field : public KeywordList
     };
 
   protected:
-    void set_id(unsigned int id);
     friend class Module;
-
-    void set_struct(Struct *);
     friend class Struct;
     friend class Class;
 
-    Type *m_type;
     std::string m_name;
+    Type *m_type = nullptr;
+    bool m_type_owned = false;
 
+    int m_id = -1;
     Struct *m_struct = nullptr;
     Value *m_default_value = nullptr;
-    unsigned int m_id = 0;
 };
 
 

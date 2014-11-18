@@ -16,7 +16,7 @@ namespace bamboo
 class Class : public Struct
 {
   public:
-    Class(Module *module, const std::string& name) : Struct(module, name) {}
+    explicit Class(const std::string& name) : Struct(name) {}
     Class(const Class&) = delete;
     Class& operator=(const Class&) = delete;
     virtual ~Class() {};
@@ -36,9 +36,15 @@ class Class : public Struct
     inline const Field *nth_declared_field(unsigned int n) const { return m_owned_fields[n].get(); }
 
     bool add_parent(Class *parent);
-    bool add_field(std::unique_ptr<Field> field) override;
+
+    Field *add_field(const std::string& name, Type *type) override;
+    bool register_field(std::unique_ptr<Field> field) override;
 
   private:
+    friend class Module;
+
+    Class(Module *module, const std::string& name, int id) : Struct(module, name, id) {}
+
     void add_child(Class *child);
 
     // add_inherited_field updates this Class's fields after a parent adds a new field.

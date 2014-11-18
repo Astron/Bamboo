@@ -17,7 +17,6 @@ const Class *Class::as_class() const
     return this;
 }
 
-// normally called only during parsing
 bool Class::add_parent(Class *parent)
 {
     if(parent == nullptr) { return false; }
@@ -41,7 +40,7 @@ void Class::add_child(Class *child)
     m_children.push_back(child);
 }
 
-bool Class::add_field(unique_ptr<Field> field)
+bool Class::register_field(unique_ptr<Field> field)
 {
     Field *ref = field.get();
 
@@ -71,8 +70,11 @@ bool Class::add_field(unique_ptr<Field> field)
     }
 
     m_fields.push_back(ref); // Don't have to try to sort; id will always be the highest
-    m_module->add_field(ref); // Module gives us an id
-    m_fields_by_id[field->id()] = ref;
+    if(m_module != nullptr) {
+        // Get a module-wide id
+        m_module->register_field(ref);
+        m_fields_by_id[field->id()] = ref;
+    }
     m_fields_by_name[field->name()] = ref;
     m_indices_by_name[field->name()] = (unsigned int)m_fields.size() - 1;
 
@@ -92,7 +94,7 @@ bool Class::add_field(unique_ptr<Field> field)
     }
 
     // Transfer ownership of the Field to the Class
-    field->set_struct(this);
+    field->m_struct = this;
     m_owned_fields.push_back(move(field));
 
     return true;
@@ -122,19 +124,27 @@ void Class::add_inherited_field(Class *parent, Field *field)
     }
 
     // Add the field to our lookup tables
-    m_fields_by_id[field->id()] = field;
     m_fields_by_name[field->name()] = field;
+    if(field->id() >= 0) {
+        m_fields_by_id[field->id()] = field;
+    }
 
     // Add the field to the list of fields, sorted by id
     if(m_fields.size() == 0) {
         m_fields.push_back(field);
         m_indices_by_name[field->name()] = 1;
+    } else if(field->id() == -1) {
+
     } else {
+        // Note: Iterate in reverse because fields added later are more likely to have higher ids
         unsigned int index = (unsigned int)m_fields.size() - 1;
-        // Note: Iterate in reverse because fields added later are more likely to be at the end
         for(auto it = m_fields.rbegin(); it != m_fields.rend(); ++it) {
-            if((*it)->id() < field->id()) {
-                m_fields.emplace(it.base(), field);
+
+            // Note: Compare ids as unsigned integers, because a field without an id
+            //       has the value '-1' and we want these fields to be last because they
+            //       are less likely to need sorting later (ids increase monotonically).
+            if((unsigned int)(*it)->id() < (unsigned int)field->id()) {
+                m_fields.insert(it.base(), field);
                 m_indices_by_name[field->name()] = index;
                 break;
             }
@@ -178,7 +188,7 @@ void Class::shadow_field(Field *field)
     // Tell our children to shadow the field
     for(auto it = m_children.begin(); it != m_children.end(); ++it) {
         Class *child = (*it);
-        if(child->field_by_id(field->id()) == field) {
+        if(child->field_by_name(field->name()) == field) {
             child->shadow_field(field);
         }
     }

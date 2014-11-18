@@ -1,32 +1,30 @@
 // Filename: MolecularField.cpp
 #include "MolecularField.h"
 #include "../bits/buffers.h"
-#include "module/Class.h"
-#include "module/Value.h"
+#include "../module/Class.h"
+#include "../module/Value.h"
 using namespace std;
 namespace bamboo   // open namespace bamboo
 {
 
 
-MolecularField::MolecularField(Class *cls, const string& name) :
-    Field(cls, name), Struct(cls->module())
+MolecularField::MolecularField(const string& name) :
+    Field(name, Type::None, false), Struct("molecular_" + name)
 {
     Field::m_type = this;
 }
 
-// as_molecular returns this as a MolecularField if it is molecular, or nullptr otherwise.
 MolecularField *MolecularField::as_molecular()
 {
     return this;
 }
+
 const MolecularField *MolecularField::as_molecular() const
 {
     return this;
 }
 
-// add_field adds a new Field as part of the Molecular.
-//     Returns false if the field could not be added.
-bool MolecularField::add_field(Field *field)
+bool MolecularField::add_atomic(Field *field)
 {
     // Moleculars cannot be nested
     if(field->as_molecular()) { return false; }
@@ -49,22 +47,6 @@ bool MolecularField::add_field(Field *field)
     }
 
     return true;
-}
-
-// add_field with a unique_ptr always returns false; molecular fields don't own fields.
-bool MolecularField::add_field(unique_ptr<Field>)
-{
-    return false;
-}
-
-// set_default_value always returns false; molecular fields don't have default values.
-bool MolecularField::set_default_value(const Value&)
-{
-    return false;
-}
-bool MolecularField::set_default_value(const Value *)
-{
-    return false;
 }
 
 

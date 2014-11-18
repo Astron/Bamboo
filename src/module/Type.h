@@ -19,6 +19,9 @@ enum Subtype {
     kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
     kTypeFloat32, kTypeFloat64,
 
+    // TODO: Merge all numeric types into single subtype kTypeNumeric,
+    //       use separate numeric typedef in Numeric.h
+
     kTypeFixed, // FIXME: Need a better model for loading and storing bounded numeric types
 
     /* Array Types */
@@ -42,7 +45,6 @@ class Type
     Type() {}
     Type(const Type&) = delete;
     Type& operator=(const Type&) = delete;
-    explicit Type(const std::string& alias) : m_alias(alias) {}
     virtual ~Type() {}
 
     // Unbounded primitive data types
@@ -82,6 +84,9 @@ class Type
     virtual std::string to_string() const; // representation for debug/development output
 
   protected:
+    explicit Type(Subtype subtype) : m_subtype(subtype) {}
+    Type(Subtype subtype, const std::string& alias) : m_subtype(subtype), m_alias(alias) {}
+
     Subtype m_subtype = kTypeNone;
     size_t m_size = 0; // a value of 0 indicates the size is variable
     std::string m_alias;
