@@ -26,13 +26,15 @@ static const array<Subtype, 13> token_to_subtype = {
 static Type *to_primitive(TokenType type) { return token_to_primitive[type - Token_Char]; }
 static Subtype to_subtype(TokenType type) { return token_to_subtype[type - Token_Char]; }
 
+static void unexpected_token(Parser *parser, const char *expected);
+static void unexpected_token(Parser *parser, const char *expected, const char *info);
 static void add_warning(Parser *parser, const LineInfo& where, const char *what);
 static void add_error(Parser *parser, const LineInfo& where, const char *what);
 static void add_error(Parser *parser, const LineInfo& where, const char *what, const char *info);
 static void eat_token(Parser *parser);
+static void eat_unary(Parser *parser);
 static void eat_until_end_of_statement_or_line(Parser *parser, const LineInfo& start);
 static void eat_until_end_of_block_or_topdecl(Parser *parser);
-static void eat_unary(Parser *parser);
 
 Parser::Parser(Lexer *lexer) : lexer(lexer) {}
 Parser::Parser(Lexer *lexer, Module *module) : lexer(lexer), module(module) {}
@@ -155,11 +157,7 @@ Struct *Parser::parse_struct()
     bool error_occured = false;
     LineInfo start = curr_token.line;
     if(curr_token.type != Token_Struct) {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type)
-              << ", expecting keyword \"struct\"";
-        add_error(this, curr_token.line, error.str().c_str(),
-                  "Attempting to parse struct definition");
+        unexpected_token(this, "keyword \"struct\"", "Attempting to parse struct definition");
         return nullptr;
     }
     eat_token(this);
@@ -196,10 +194,9 @@ Struct *Parser::parse_struct()
 
     // Parse struct body
     if(curr_token.type != (TokenType)'{') {
-        stringstream error, info;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting '{'";
+        stringstream info;
         info << "Missing struct body for \"struct " << struct_name << '"';
-        add_error(this, curr_token.line, error.str().c_str(), info.str().c_str());
+        unexpected_token(this, "'{'", info.str().c_str());
         mask_next_error = true;
         return nullptr;
     }
@@ -276,11 +273,7 @@ Class *Parser::parse_class()
     bool error_occured = false;
     LineInfo start = curr_token.line;
     if(curr_token.type != Token_Class) {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type)
-              << ", expecting keyword \"class\"";
-        add_error(this, curr_token.line, error.str().c_str(),
-                  "Attempting to parse class definition");
+        unexpected_token(this, "keyword \"class\"", "Attempting to parse class definition");
         return nullptr;
     }
     eat_token(this);
@@ -328,10 +321,7 @@ Class *Parser::parse_class()
                     error_occured = true;
                     break;
                 } else if(curr_token.type != Token_Identifier) {
-                    stringstream error;
-                    error << "Unexpected " << format_tokentype(curr_token.type)
-                          << ", expecting identifier";
-                    add_error(this, curr_token.line, error.str().c_str());
+                    unexpected_token(this, "identifier");
                     return nullptr;
                 }
 
@@ -394,10 +384,9 @@ Class *Parser::parse_class()
 
     // Parse Class Body
     if(curr_token.type != (TokenType)'{') {
-        stringstream error, info;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting '{'";
+        stringstream info;
         info << "Missing class body for \"class " << class_name << "\"";
-        add_error(this, curr_token.line, error.str().c_str(), info.str().c_str());
+        unexpected_token(this, "'{'", info.str().c_str());
         mask_next_error = true;
         return nullptr;
     }
@@ -508,10 +497,7 @@ Field *Parser::parse_struct_field()
             }
         }
     } else if(!curr_token.is_type()) {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting a type name";
-        add_error(this, curr_token.line, error.str().c_str(),
-                  "Attempting to parse fields in a struct");
+        unexpected_token(this, "a type name", "Attempting to parse fields in a struct");
         return nullptr;
     }
 
@@ -622,9 +608,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
             caller_owns_return = true;
         }
     } else {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting a type name";
-        add_error(this, curr_token.line, error.str().c_str());
+        unexpected_token(this, "a type name");
         return nullptr;
     }
     eat_token(this);
@@ -718,11 +702,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                 } else if(curr_token.type != Token_Integer) {
                     modulus = (double)curr_token.value.integer;
                 } else {
-                    stringstream error;
-                    error << "Unexpected " << format_tokentype(curr_token.type)
-                          << ", expecting number";
-                    add_error(this, curr_token.line, error.str().c_str(),
-                              "Attempting to parse modulus for type");
+                    unexpected_token(this, "number", "Attempting to parse modulus for type");
                     if(caller_owns_return) { delete type; }
                     return nullptr;
                 }
@@ -841,10 +821,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
 NumericRange Parser::parse_range_expr()
 {
     if(curr_token.type != '(') {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting '('";
-        add_error(this, curr_token.line, error.str().c_str(),
-                  "Attempting to parse range for numeric, string, or blob");
+        unexpected_token(this, "'('", "Attempting to parse range for numeric, string, or blob");
         return NumericRange();
     }
     eat_token(this);
@@ -868,11 +845,11 @@ NumericRange Parser::parse_range_expr()
             lhs = curr_token.value.real;
         }
     } else if(curr_token.type == (TokenType)')') {
-        // TODO: Custom error
+        add_error(this, curr_token.line, "Missing size before ')' in range");
         mask_next_error = true;
         return NumericRange();
     } else {
-        // TODO: Generic error
+        unexpected_token(this, "number", "Attempting to parse first value in range for numeric, string, or blob");
         mask_next_error = true;
         return NumericRange();
     }
@@ -884,12 +861,35 @@ NumericRange Parser::parse_range_expr()
     if(curr_token.type == (TokenType)')') {
         eat_token(this);
         return NumericRange(lhs);
-    } else if(curr_token.type == Token_Integer || curr_token.type == Token_Real) {
-        // TODO: Custom error
+    } else if(curr_token.type == '+' || curr_token.type == '-') {
+        // As a special cass, lets print a nice error method if it looks like math
+        if(next_token.type == Token_Integer || next_token.type == Token_Real) {
+            if(next_token.line.col - curr_token.line.col > 1) {
+                add_error(this, curr_token.line,
+                          "Unexpected integer, expecting ',' or ')'",
+                          "Addition and subtraction are not supported");
+                mask_next_error = true;
+                return NumericRange();
+            }
+        }
+
+        unexpected_token(this, "',' or ')'", "Attempting to parse range for numeric, string, or blob");
         mask_next_error = true;
         return NumericRange();
+    } else if(curr_token.type == Token_Integer || curr_token.type == Token_Real) {
+        if(next_token.type == ')') {
+            eat_token(this); // Eat number
+            eat_token(this); // Eat ')'
+        } else {
+            mask_next_error = true;
+        }
+
+        add_error(this, curr_token.line,
+                  "Unexpected integer, expecting ',' or ')'",
+                  "Must separate numbers in numeric range with ','");
+        return NumericRange();
     } else if(curr_token.type != ',') {
-        // TODO: Generic error
+        unexpected_token(this, "',' or ')'", "Attempting to parse range for numeric, string, or blob");
         mask_next_error = true;
         return NumericRange();
     }
@@ -914,11 +914,11 @@ NumericRange Parser::parse_range_expr()
             rhs = curr_token.value.real;
         }
     } else if(curr_token.type == (TokenType)')') {
-        // TODO: Custom error
+        add_error(this, curr_token.line, "Missing max value before ')' in range");
         mask_next_error = true;
         return NumericRange();
     } else {
-        // TODO: Generic error
+        unexpected_token(this, "number", "Attempting to parse first value in range for numeric, string, or blob");
         mask_next_error = true;
         return NumericRange();
     }
@@ -966,10 +966,7 @@ NumericRange Parser::parse_range_expr()
 NumericRange Parser::parse_array_expr()
 {
     if(curr_token.type != '[') {
-        stringstream error;
-        error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting '['";
-        add_error(this, curr_token.line, error.str().c_str(),
-                  "Attempting to parse array size/range");
+        unexpected_token(this, "'['", "Attempting to parse array size/range");
         return NumericRange();
     }
     eat_token(this);
@@ -1091,6 +1088,20 @@ static void add_error(Parser *parser, const LineInfo& where, const char *what, c
     const char *eol = strpbrk(where.text_pos, "\n\r");
     string line(where.text_pos, eol);
     fprintf(stderr, "%s\n%*c\n", line.c_str(), where.col, '^');
+}
+
+static void unexpected_token(Parser *parser, const char *expected)
+{
+    stringstream error;
+    error << "Unexpected " << format_tokentype(parser->curr_token.type) << ", expecting " << expected;
+    add_error(parser, parser->curr_token.line, error.str().c_str());
+}
+
+static void unexpected_token(Parser *parser, const char *expected, const char *info)
+{
+    stringstream error;
+    error << "Unexpected " << format_tokentype(parser->curr_token.type) << ", expecting " << expected;
+    add_error(parser, parser->curr_token.line, error.str().c_str(), info);
 }
 
 static void eat_token(Parser *parser)
