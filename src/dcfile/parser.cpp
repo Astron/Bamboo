@@ -1355,6 +1355,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                     }
 
                     type = new Array(Type::Char, false, range);
+                    type->set_alias("string");
                     caller_owns_return = true;
                 } else if(type->subtype() == kTypeBlob) {
                     if(range.type != Number::kUint) {
@@ -1363,6 +1364,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                     }
 
                     type = new Array(Type::Uint8, false, range);
+                    type->set_alias("blob");
                     caller_owns_return = true;
                 } else if(type->as_numeric()) {
                     Numeric *num = type->as_numeric();
@@ -1671,7 +1673,7 @@ NumericRange Parser::parse_array_expr()
     }
 }
 
-Value *Parser::parse_value_expr(Type *type)
+Value *Parser::parse_value_expr(const Type *type)
 {
     // TODO: Implement
 }

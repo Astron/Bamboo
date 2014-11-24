@@ -347,7 +347,7 @@ Token Lexer::scan_token()
         c = next_char(this);
         if(c == '/') {
             // Eat line-comment
-            while(c == '\n' && c == '\r' && c != EOF) { c = next_char(this); }
+            while(c != '\n' && c != '\r' && c != EOF) { c = next_char(this); }
             if(c != EOF) eat_char(this); // eat newline character
             return scan_token();
         } else if(c == '*') {
@@ -434,7 +434,7 @@ static char peek_char(Lexer *lexer)
 static void eat_char(Lexer *lexer)
 {
     char c = peek_char(lexer);
-    LineInfo line = lexer->curr_line;
+    LineInfo& line = lexer->curr_line;
     if(c == '\n' || c == '\r') {
         line.text_pos = lexer->input_pos + 1;
         line.num += 1;

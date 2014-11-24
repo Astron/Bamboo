@@ -1,16 +1,31 @@
 // Filename: Value.cpp
 #include "Value.h"
+#include <cctype>  // std::isprint
+#include <sstream> // std::ostringstream
 #include "../bits/buffers.h"
 #include "../module/Array.h"
 #include "../module/Struct.h"
 #include "../module/Method.h"
 #include "../module/Numeric.h"
-#include "../dcfile_old/parse.h"
-#include "../dcfile_old/format.h"
+#include "../dcfile/lexer.h"
+#include "../dcfile/parser.h"
 using namespace std;
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+#define snprintf sprintf_s
+#endif
+
 namespace bamboo   // open namespace bamboo
 {
 
+
+static std::string format_value(const Value& value);
+static void format_value(const Value& value, std::ostream& out);
+static void format_hex(const std::vector<uint8_t>& blob, std::ostream& out);
+// format_quoted outputs a string enclosed in quotes after escaping the string.
+//     Any instances of backslash (\) or the quoute character in the string are escaped.
+//     Non-printable characters are replaced with an escaped hexidecimal constant.
+static void format_quoted(char quote_mark, const std::string& str, std::ostream& out);
 
 Value::Value(const Type *type) : m_type(type)
 {
@@ -190,10 +205,13 @@ Value::~Value()
 
 Value Value::parse(const Type *type, const std::string& formatted)
 {
-    bool err = false;
-    Value value = parse_dcvalue(type, formatted, err);
-    if(err) { throw InvalidValue("encountered errors parsing formatted value"); }
-    return value;
+    auto lexer = Lexer(formatted.c_str(), formatted.length());
+    auto parser = Parser(&lexer);
+    parser.start();
+
+    Value *value = parser.parse_value_expr(type);
+    if(value == nullptr) { throw InvalidValue("encountered errors parsing formatted value"); }
+    return *value;
 }
 
 Value Value::unpack(const Type *type, const vector<uint8_t>& packed, size_t offset)
@@ -406,7 +424,7 @@ Value Value::unpack32(const Type *type, const vector<uint8_t>& packed, size_t of
 
 std::string Value::format() const
 {
-    return format_value(this);
+    return format_value(*this);
 }
 
 vector<uint8_t> Value::pack() const
@@ -646,6 +664,177 @@ void swap(Value& lhs, Value& rhs)
     }
 }
 
+static string format_value(const Value& value)
+{
+    ostringstream ss;
+    format_value(value, ss);
+    return ss.str();
+}
+
+static void format_value(const Value& value, ostream& out)
+{
+    const Type *type = value.type();
+    Subtype subtype = type->subtype();
+    switch(subtype) {
+    case kTypeNone:
+        out << "<None>";
+        break;
+    case kTypeInt8:
+        out << int(value.m_int8);
+        break;
+    case kTypeInt16:
+        out << int(value.m_int16);
+        break;
+    case kTypeInt32:
+        out << int(value.m_int32);
+        break;
+    case kTypeInt64:
+        out << int64_t(value.m_int64);
+        break;
+    case kTypeUint8:
+        out << uint32_t(value.m_uint8);
+        break;
+    case kTypeUint16:
+        out << uint32_t(value.m_uint16);
+        break;
+    case kTypeUint32:
+        out << uint32_t(value.m_uint32);
+        break;
+    case kTypeUint64:
+        out << uint64_t(value.m_uint64);
+        break;
+    case kTypeFloat32:
+        out << value.m_float32;
+        break;
+    case kTypeFloat64:
+        out << value.m_float64;
+        break;
+    case kTypeChar:
+        format_quoted('\'', string(1, value.m_char), out);
+        break;
+    case kTypeString:
+        {
+            // If we have a string alias format as a quoted string
+            if(type->has_alias() && type->alias() == "string") {
+                // Enquoute and escape string then output
+                format_quoted('"', value.m_string, out);
+            } else {
+                // Otherwise format as an array of chars
+                out << '[';
+                if(value.m_string.size() > 0) {
+                    format_quoted('\'', string(1, value.m_string[0]), out);
+                }
+                for(size_t i = 1; i < value.m_string.size(); ++i) {
+                    out << ", ";
+                    format_quoted('\'', string(1, value.m_string[i]), out);
+                }
+                out << ']';
+            }
+        }
+        break;
+    case kTypeBlob:
+        {
+            // If we have a blob alias format as a hex constant
+            if(type->has_alias() && type->alias() == "blob") {
+                // Format blob as a hex constant then output
+                format_hex(value.m_blob, out);
+            } else {
+                // Otherwise format as an array of uint8
+                out << '[';
+                if(value.m_blob.size() > 0) {
+                    out << uint32_t(value.m_blob[0]);
+                }
+                for(size_t i = 1; i < value.m_blob.size(); ++i) {
+                    out << ", " << uint32_t(value.m_blob[i]);
+                }
+                out << ']';
+            }
+        }
+        break;
+    case kTypeArray:
+        {
+            out << '[';
+            if(value.m_array.size() > 0) {
+                format_value(value.m_array[0], out);
+            }
+            for(size_t i = 1; i < value.m_array.size(); ++i) {
+                out << ", ";
+                format_value(value.m_array[i], out);
+            }
+            out << ']';
+        }
+        break;
+    case kTypeStruct: {
+        out << '{';
+        const Struct *struct_ = type->as_struct();
+        size_t num_fields = struct_->num_fields();
+        if(num_fields > 0) {
+            const Field *field = struct_->nth_field(0);
+            if(field->as_molecular() == nullptr) {
+                format_value(value.m_struct.at(field), out);
+            }
+        }
+        for(unsigned int i = 1; i < num_fields; ++i) {
+            out << ", ";
+            const Field *field = struct_->nth_field(i);
+            if(field->as_molecular() == nullptr) {
+                format_value(value.m_struct.at(field), out);
+            }
+        }
+        out << '}';
+        break;
+    }
+    case kTypeMethod: {
+        out << '(';
+        const Method *method_ = type->as_method();
+        size_t num_params = method_->num_params();
+        if(num_params > 0) {
+            const Parameter *param = method_->nth_param(0);
+            format_value(value.m_method.at(param), out);
+        }
+        for(unsigned int i = 1; i < num_params; ++i) {
+            const Parameter *param = method_->nth_param(i);
+            format_value(value.m_method.at(param), out);
+        }
+        out << ')';
+        break;
+    }
+    default:
+        out << "<error>";
+    }
+}
+
+static void format_hex(const vector<uint8_t>& bytes, ostream& out)
+{
+    out << '<';
+    for(auto it = bytes.begin(); it != bytes.end(); ++it) {
+        char infer[10];
+        snprintf(infer, 10, "%02x", (uint8_t)(*it));
+        out << infer;
+    }
+    out << '>';
+}
+
+static void format_quoted(char quote_mark, const string& str, ostream& out)
+{
+    out << quote_mark;
+    for(auto it = str.begin(); it != str.end(); ++it) {
+        char c = *it;
+        if(c == quote_mark || c == '\\') {
+            // escape the character
+            out << '\\' << c;
+
+        } else if(!isprint(c)) { // character is not a printable ascii character
+            // print the character as an escaped hexidecimal character constant
+            char infer[10];
+            snprintf(infer, 10, "%02x", (unsigned char)c);
+            out << "\\x" << infer;
+        } else {
+            out << c;
+        }
+    }
+    out << quote_mark;
+}
 
 
 } // close namespace bamboo

@@ -81,7 +81,7 @@ struct Token
 
     unsigned int size = 0;
     union {
-        uint8_t *data = nullptr;
+        uint8_t *data;
         char *text;
 
         double real;

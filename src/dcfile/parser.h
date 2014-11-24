@@ -58,7 +58,7 @@ struct Parser
     NumericRange parse_range_expr();
     NumericRange parse_array_expr();
 
-    Value *parse_value_expr(Type *type);
+    Value *parse_value_expr(const Type *type);
 
     // Parser internals -- use with caution
     Module *module = nullptr;
