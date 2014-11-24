@@ -45,25 +45,17 @@ bool Field::set_name(const string& name)
 
 bool Field::set_type(Type *type, bool transfer_ownership)
 {
-    // Can't change the type of a field that has been added to a struct
-    if(m_struct != nullptr) {
-        return false;
-    }
-
-    // Field can't have null type
-    if(type == nullptr) {
-        return false;
-    }
-
-    if(m_type_owned) { delete m_type; }
-    m_type_owned = transfer_ownership;
-    m_type = type;
-
     // Reset our default value, if we had one
     if(m_default_value != nullptr) {
         delete m_default_value;
         m_default_value = nullptr;
     }
+
+    // Update the type
+    if(m_struct != nullptr) { m_struct->update_field_type(this, type, m_type); }
+    if(m_type_owned && m_type != nullptr) { delete m_type; }
+    m_type_owned = transfer_ownership;
+    m_type = type;
 
     return true;
 }

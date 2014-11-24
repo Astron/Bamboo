@@ -15,6 +15,7 @@ class MolecularField : public Field, private Struct
     MolecularField(const MolecularField&) = delete;
     MolecularField& operator=(const MolecularField&) = delete;
     virtual ~MolecularField() {}
+
     MolecularField *as_molecular() override;
     const MolecularField *as_molecular() const override;
 
@@ -32,8 +33,8 @@ class MolecularField : public Field, private Struct
 
   private:
     // MolecularFields have implicit fields
-    Field *add_field(const std::string&, Type *) override { return nullptr; }
-    bool register_field(std::unique_ptr<Field>) override { return false; }
+    Field *add_field(const std::string&, Type *, bool) override { return nullptr; }
+    bool add_field(Field *) override { return false; }
 };
 
 

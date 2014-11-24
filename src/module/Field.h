@@ -21,6 +21,7 @@ class Field : public KeywordList
     Field(const Field&) = delete;
     Field& operator=(const Field&) = delete;
     virtual ~Field();
+
     virtual MolecularField *as_molecular();
     virtual const MolecularField *as_molecular() const;
 

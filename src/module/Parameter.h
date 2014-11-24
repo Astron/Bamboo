@@ -14,9 +14,11 @@ class Value;
 class Parameter
 {
   public:
-    Parameter(Type *type, const std::string& name = "");
+    Parameter(Type *type, bool transfer_ownership);
+    Parameter(const std::string& name, Type *type, bool transfer_ownership);
     Parameter(const Parameter&) = delete;
     Parameter& operator=(const Parameter&) = delete;
+    ~Parameter();
 
     inline const std::string& name() const { return m_name; }
     inline unsigned int position() const { return m_position; }
@@ -31,7 +33,7 @@ class Parameter
     inline const Value *default_value() const { return m_default_value; }
 
     bool set_name(const std::string& name);  // return false if it would cause a name conflict
-    bool set_type(Type *type); // return false if the parameter can't represent the type
+    bool set_type(Type *type, bool transfer_ownership); // return false if the parameter can't represent the type
     bool set_default_value(const Value& default_value);
     bool set_default_value(const Value *default_value);
 
@@ -46,12 +48,9 @@ class Parameter
   private:
     friend class Method;
 
-    void set_position(unsigned int);
-    void set_method(Method *method);
-
-    Type *m_type;
-    std::string m_type_alias;
     std::string m_name;
+    Type *m_type = nullptr;
+    bool m_type_owned = false;
 
     Method *m_method = nullptr;
     Value *m_default_value = nullptr;

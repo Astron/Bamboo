@@ -46,22 +46,24 @@ class Struct : public Type
     inline Field *field_by_name(const std::string& name);
     inline const Field *field_by_name(const std::string& name) const;
 
-    virtual Field *add_field(const std::string& name, Type *type);
-    virtual bool register_field(std::unique_ptr<Field> field); //, bool transfer_ownership
-    // TODO: Rename back to add_field and add ownership param
+    virtual Field *add_field(const std::string& name, Type *type, bool field_owns_type);
+    virtual bool add_field(Field *field); // If true, Struct owns field
 
   protected:
+    friend class Field;
+
     Struct(Module *module, const std::string& name, int id);
 
     // update_field_id registers the id for a field if it isn't shadowed
     void update_field_id(Field *field, int id);
+    void update_field_type(Field *field, Type *new_type, Type *old_type = nullptr);
 
     int m_id = -1;
     Module *m_module = nullptr;
     std::string m_name;
 
     std::vector<Field *> m_fields; // TODO: Deal with keeping this vector ordered
-    std::vector<std::unique_ptr<Field>> m_owned_fields;
+    std::vector<std::unique_ptr<Field>> m_declared_fields;
     std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Field *> m_fields_by_name;
     std::unordered_map<unsigned int, Field *> m_fields_by_id;

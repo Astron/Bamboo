@@ -21,16 +21,16 @@ const Method *Method::as_method() const
     return this;
 }
 
-bool Method::add_param(unique_ptr<Parameter> param)
+Parameter *add_param(const std::string& name, Type *type, bool param_owns_type)
 {
-    Parameter *ref = param.get();
+    // TODO: Implement
+}
 
-    // Param should not be null
-    if(param == nullptr) { return false; }
-
+bool Method::add_param(Parameter *param)
+{
     // Parameters must have unique names
     if(!param->name().empty()) {
-        bool inserted = m_params_by_name.emplace(param->name(), ref).second;
+        bool inserted = m_params_by_name.emplace(param->name(), param).second;
         if(!inserted) { return false; }
         m_positions_by_name[param->name()] = (unsigned int) m_params.size();
     }
@@ -45,12 +45,18 @@ bool Method::add_param(unique_ptr<Parameter> param)
     }
 
     // Transfer ownership of the Parameter to the Method
-    param->set_position((unsigned int)m_params.size());
-    param->set_method(this);
-    m_params.push_back(move(param));
+    param->m_method = this;
+    param->m_position = (unsigned int)m_params.size();
+    m_params.push_back(unique_ptr<Parameter>(param));
 
     return true;
 }
+
+void Method::update_param_type(Parameter *param, Type *new_type, Type *old_type)
+{
+    // TODO: Implement
+}
+
 
 
 } // close namespace bamboo

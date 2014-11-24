@@ -8,9 +8,19 @@ namespace bamboo
 {
 
 
-Parameter::Parameter(Type *type, const string& name) : m_type(type), m_name(name)
+Parameter::Parameter(Type *type, bool transfer_ownership) : Parameter("", type, transfer_ownership) {}
+Parameter::Parameter(const string& name, Type *type, bool transfer_ownership) :
+    m_name(name),
+    m_type(type),
+    m_type_owned(transfer_ownership)
 {
     if(m_type == nullptr) { m_type = Type::None; }
+}
+
+Parameter::~Parameter()
+{
+    if(m_type_owned) { delete m_type; }
+    if(m_default_value != nullptr) { delete m_default_value; }
 }
 
 bool Parameter::set_name(const string& name)
@@ -24,7 +34,7 @@ bool Parameter::set_name(const string& name)
     return true;
 }
 
-bool Parameter::set_type(Type *type)
+bool Parameter::set_type(Type *type, bool transfer_ownership)
 {
     // Parameters can't have method types for now
     if(type->subtype() == kTypeMethod) {
@@ -36,14 +46,17 @@ bool Parameter::set_type(Type *type)
         return false;
     }
 
-    // Set the type
-    m_type = type;
-
     // Reset our default value, if we had one
     if(m_default_value != nullptr) {
         delete m_default_value;
         m_default_value = nullptr;
     }
+
+    // Set the type
+    if(m_method != nullptr) { m_method->update_param_type(this, type, m_type); }
+    if(m_type_owned && m_type != nullptr) { delete m_type; }
+    m_type = type;
+    m_type_owned = transfer_ownership;
 
     return true;
 }
@@ -59,16 +72,6 @@ bool Parameter::set_default_value(const Value& default_value)
 bool Parameter::set_default_value(const Value *default_value)
 {
     return set_default_value(*default_value);
-}
-
-void Parameter::set_position(unsigned int pos)
-{
-    m_position = pos;
-}
-
-void Parameter::set_method(Method *method)
-{
-    m_method = method;
 }
 
 

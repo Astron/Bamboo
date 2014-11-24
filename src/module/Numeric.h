@@ -20,6 +20,7 @@ class Numeric : public Type
     Numeric(const Numeric&) = delete;
     Numeric& operator=(const Numeric&) = delete;
     virtual ~Numeric() {};
+
     Numeric *as_numeric() override;
     const Numeric *as_numeric() const override;
 

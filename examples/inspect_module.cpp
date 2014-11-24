@@ -4,12 +4,12 @@
 #include <bamboo/module/Module.h>
 #include <bamboo/module/Class.h>
 #include <bamboo/module/Method.h>
-#include <bamboo/dcfile/parse.h>
+#include <bamboo/dcfile/parser.h>
 using namespace bamboo;
 using namespace std;
 
-vector<string> astron_keywords {"clsend", "ownsend", "clrecv", "ownrecv",
-                                "airecv", "broadcast", "ram", "required", "db"};
+string astron_keywords[] = {"clsend", "ownsend", "clrecv", "ownrecv",
+                            "airecv", "broadcast", "ram", "required", "db"};
 
 
 /* Helper function for printing complex types */
@@ -36,12 +36,30 @@ void print_type(Type *typ, int indent) {
     }
 }
 
+
+// NOTE(Kevin): Temporarily read the file and run the parser manually until
+// the load_module method has been implemented in dcfile/parser.cpp
+#include <stdio.h>
+#include <bamboo/dcfile/lexer.h>
+
 int main(void) {
     Module *mod = new Module();
     for(string keyword : astron_keywords) {
         mod->add_keyword(keyword);
     }
-    parse_dcfile(mod, "simple_example.dc");
+
+    // Read file into memory
+    const size_t bufsize = 1024 * 4;
+    char *buffer = (char *)malloc(bufsize);
+    FILE *file = fopen("simple_example.dc", "r");
+    size_t read = fread((void *)buffer, sizeof(char), bufsize - 1, file);
+    buffer[read] = '\0';
+
+    // Parse module from file
+    auto lexer = Lexer(buffer, read + 1);
+    auto parser = Parser(&lexer);
+    parser.start();
+    parser.parse_module(mod);
 
     cout << '\n'; // Newline after prompt
 

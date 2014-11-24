@@ -20,6 +20,7 @@ class Class : public Struct
     Class(const Class&) = delete;
     Class& operator=(const Class&) = delete;
     virtual ~Class() {};
+
     Class *as_class() override;
     const Class *as_class() const override;
 
@@ -31,14 +32,14 @@ class Class : public Struct
     inline Class *nth_child(unsigned int n) { return m_children[n]; }
     inline const Class *nth_child(unsigned int n) const { return m_children[n]; }
 
-    inline size_t num_declared_fields() const { return m_owned_fields.size(); }
-    inline Field *nth_declared_field(unsigned int n) { return m_owned_fields[n].get(); }
-    inline const Field *nth_declared_field(unsigned int n) const { return m_owned_fields[n].get(); }
+    inline size_t num_declared_fields() const { return m_declared_fields.size(); }
+    inline Field *nth_declared_field(unsigned int n) { return m_declared_fields[n].get(); }
+    inline const Field *nth_declared_field(unsigned int n) const { return m_declared_fields[n].get(); }
 
     bool add_parent(Class *parent);
 
-    Field *add_field(const std::string& name, Type *type) override;
-    bool register_field(std::unique_ptr<Field> field) override;
+    Field *add_field(const std::string& name, Type *type, bool field_owns_type) override;
+    bool add_field(Field *) override;  // If true, Class owns field
 
   private:
     friend class Module;

@@ -18,25 +18,40 @@ class Method;
 class Parameter;
 class Value;
 
+
 bool load_module(const char *filename, Module *module);
 bool parse_module(const char *buf, size_t bufsize, Module *module);
 Module *load_module(const char *filename);
 Module *parse_module(const char *buf, size_t bufsize);
 
+// A Parser consumes tokens from the Lexer and attempts to parse any
+// requested production, printing errors out as they occur.
+//
+// When parsing an entire module, an existing module may be provided and new
+// items will be added to the existing module.
+//
+// Currently, this parser is guaranteed to leave a user-provided module
+// in a consistent state when an error occurs; although some keywords,
+// complete classes and structs, typedefs, or imports may have been added.
 struct Parser
 {
+    Parser() = default;
     Parser(Lexer *lexer);
-    Parser(Lexer *lexer, Module *module);
     void start();
 
+    Lexer *lexer = nullptr;
+
     Module *parse_module();
+    Module *parse_module(Module *module);
     Struct *parse_struct();
     Class *parse_class();
     Import *parse_import();
-    const char *parse_keyword_decl();
+    bool parse_keywords_into_module(Module *module);
+    bool parse_typedef_into_module(Module *module);
 
     Field *parse_struct_field();
-    Field *parse_class_field();
+    Field *parse_class_field(Class *);
+    bool parse_keywords_for_field(Field *field);
 
     Type *parse_typedef(bool& caller_owns_return);
     Type *parse_type_expr(bool& caller_owns_return);
@@ -45,17 +60,19 @@ struct Parser
 
     Value *parse_value_expr(Type *type);
 
-    Lexer *lexer = nullptr;
+    // Parser internals -- use with caution
     Module *module = nullptr;
     bool parser_owns_module = false;
-
-    /* Parser-specific internals -- use with caution */
-    bool mask_next_error = false;
     int num_errors = 0;
     int num_warnings = 0;
     Token curr_token = Token(Token_NotAToken);
     Token next_token = Token(Token_NotAToken);
     Token prev_token = Token(Token_NotAToken);
+
+    // TODO(Kevin): Maybe have the individual parse methods return a parser result with
+    // results for "success", "error but finished expression", "error and could not recover"
+    // so that we can avoid masking valid errors and produce fewer meaningless errors.
+    bool mask_next_error = false;
 };
 
 

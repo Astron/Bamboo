@@ -40,17 +40,15 @@ void Class::add_child(Class *child)
     m_children.push_back(child);
 }
 
-bool Class::register_field(unique_ptr<Field> field)
+Field *Class::add_field(const string& name, Type *type, bool field_owns_type)
 {
-    Field *ref = field.get();
+    // TODO: Implement
+}
 
-    // Field can't be null
-    if(field == nullptr) {
-        return false;
-    }
-
-    // Classes can't share fields.
-    if(field->container() != nullptr && field->container() != this) {
+bool Class::add_field(Field *field)
+{
+    // Classes can't share fields, and can't re-add field to this
+    if(field->container() != nullptr) {
         return false;
     }
 
@@ -69,13 +67,13 @@ bool Class::register_field(unique_ptr<Field> field)
         shadow_field(prev_field->second);
     }
 
-    m_fields.push_back(ref); // Don't have to try to sort; id will always be the highest
+    m_fields.push_back(field); // Don't have to try to sort; id will always be the latest
     if(m_module != nullptr) {
         // Get a module-wide id
-        m_module->register_field(ref);
-        m_fields_by_id[field->id()] = ref;
+        m_module->register_field(field);
+        m_fields_by_id[field->id()] = field;
     }
-    m_fields_by_name[field->name()] = ref;
+    m_fields_by_name[field->name()] = field;
     m_indices_by_name[field->name()] = (unsigned int)m_fields.size() - 1;
 
     // Update our size
@@ -89,13 +87,13 @@ bool Class::register_field(unique_ptr<Field> field)
     }
 
     // Tell our children about the new field
-    for(auto it = m_children.begin(); it != m_children.end(); ++it) {
-        (*it)->add_inherited_field(this, ref);
+    for(Class *child : m_children) {
+        child->add_inherited_field(this, field);
     }
 
     // Transfer ownership of the Field to the Class
     field->m_struct = this;
-    m_owned_fields.push_back(move(field));
+    m_declared_fields.push_back(unique_ptr<Field>(field));
 
     return true;
 }

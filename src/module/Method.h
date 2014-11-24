@@ -17,6 +17,7 @@ class Method : public Type
     Method(const Method&) = delete;
     Method& operator=(const Method&) = delete;
     virtual ~Method() {};
+
     Method *as_method() override;
     const Method *as_method() const override;
 
@@ -34,11 +35,13 @@ class Method : public Type
         return it == m_params_by_name.end() ? nullptr : it->second;
     }
 
-    // TODO: Add `Param *add_param(...)`
-    // TODO: Change to (Param *, bool transerf_ownership);
-    bool add_param(std::unique_ptr<Parameter> param);
+    Parameter *add_param(const std::string& name, Type *type, bool param_owns_type);
+    bool add_param(Parameter *param); // If true, method own parameter
 
   private:
+    friend class Parameter;
+    void update_param_type(Parameter *param, Type *new_type, Type *old_type = nullptr);
+
     std::vector<std::unique_ptr<Parameter>> m_params;
     std::unordered_map<std::string, unsigned int> m_positions_by_name;
     std::unordered_map<std::string, Parameter *> m_params_by_name;

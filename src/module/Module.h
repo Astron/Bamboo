@@ -64,13 +64,16 @@ class Module
 
     Class *add_class(const char *name);
     Class *add_class(const std::string& name);
-    bool add_class(Class *class_, bool transfer_ownership);
+    bool add_class(Class *class_); // If true, Module owns Class
+
     Struct *add_struct(const char *name);
     Struct *add_struct(const std::string& name);
-    bool add_struct(Struct *struct_, bool transfer_ownership);
+    bool add_struct(Struct *struct_); // If true, Module owns struct
+
     Import *add_import(const char *name);
     Import *add_import(const std::string& pymodule);
-    bool add_import(Import *import, bool transfer_ownership);
+    bool add_import(Import *import); // If true, Module owns import
+
     bool add_typedef(const std::string& name, Type *type, bool transfer_ownership);
     bool add_keyword(const std::string& name);
 
@@ -80,13 +83,11 @@ class Module
 
     void register_field(Field *field); // sets the field's id
 
-    std::unordered_set<Type *> m_types;
     std::vector<Struct *> m_structs;
     std::vector<Class *> m_classes;
 
-    std::vector<std::unique_ptr<Type>> m_owned_types;
-    std::vector<std::unique_ptr<Import>> m_imports; // list of python imports, for legacy panda3d
-
+    std::unordered_set<Type *> m_types;
+    std::vector<std::unique_ptr<Type>> m_owned_types; // Builtin-types are statically allocated
     std::vector<Type *> m_types_by_id;
     std::unordered_map<std::string, Type *> m_types_by_name;
     std::unordered_map<std::string, Import *> m_imports_by_module;
@@ -95,6 +96,8 @@ class Module
 
     std::vector<std::string> m_keywords;
     std::unordered_set<std::string> m_keywords_by_name;
+
+    std::vector<std::unique_ptr<Import>> m_imports; // list of python imports, for legacy panda3d
 };
 
 

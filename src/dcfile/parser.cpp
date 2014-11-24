@@ -2,7 +2,7 @@
 #include "parser.h"
 #include <cstring>
 #include <array>
-#include <sstream> // @FUTURE: Benchmark uses of this for performance
+#include <sstream> // @TODO(Kevin): Benchmark stringstreams and replace for better performance
 using namespace std;
 
 #include "../dcfile/lexer.h"
@@ -11,13 +11,13 @@ namespace bamboo
 {
 
 
-static const array<Type *, 13> token_to_primitive = {
+const array<Type *, 13> token_to_primitive = {
     Type::Char, Type::Int8, Type::Int16, Type::Int32, Type::Int64,
     Type::Uint8, Type::Uint16, Type::Uint32, Type::Uint64,
     Type::Float32, Type::Float64, Type::String, Type::Blob
 };
 
-static const array<Subtype, 13> token_to_subtype = {
+const array<Subtype, 13> token_to_subtype = {
     kTypeChar, kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
     kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
     kTypeFloat32, kTypeFloat64, kTypeString, kTypeBlob
@@ -36,12 +36,27 @@ static void eat_unary(Parser *parser);
 static void eat_until_end_of_statement_or_line(Parser *parser, const LineInfo& start);
 static void eat_until_end_of_block_or_topdecl(Parser *parser);
 
-Parser::Parser(Lexer *lexer) : lexer(lexer) {}
-Parser::Parser(Lexer *lexer, Module *module) : lexer(lexer), module(module) {}
+struct MoleculeDefn
+{
+    string name;
+    unordered_map<string, LineInfo> fields;
+};
+static MoleculeDefn *parse_molecule(Parser *parser);
+
+Parser::Parser(Lexer *lex) : lexer(lex) {}
 
 void Parser::start()
 {
-    eat_token(this);
+    if(lexer == nullptr) {
+        curr_token.type = Token_Eof;
+    } else {
+        eat_token(this);
+    }
+}
+
+Module *Parser::parse_module(Module *mod) {
+    module = mod;
+    return parse_module();
 }
 
 Module *Parser::parse_module()
@@ -59,7 +74,7 @@ Module *Parser::parse_module()
                 if(struct_ == nullptr) {
                     eat_until_end_of_block_or_topdecl(this);
                 } else {
-                    module->add_struct(struct_, true);
+                    module->add_struct(struct_);
                     mask_next_error = false;
                 }
             }
@@ -70,29 +85,24 @@ Module *Parser::parse_module()
                 if(class_ == nullptr) {
                     eat_until_end_of_block_or_topdecl(this);
                 } else {
-                    module->add_class(class_, true);
+                    module->add_class(class_);
                     mask_next_error = false;
                 }
             }
             break;
         case Token_Typedef:
             {
-                bool caller_owns_return;
-                Type *type = parse_typedef(caller_owns_return);
-                if(type == nullptr) {
+                bool ok = parse_typedef_into_module(module);
+                if(!ok) {
                     eat_until_end_of_statement_or_line(this, curr_token.line);
-                } else {
-                    module->add_typedef(type->alias(), type, caller_owns_return);
                 }
             }
             break;
         case Token_Keyword:
             {
-                const char *keyword = parse_keyword_decl();
-                if(keyword == nullptr) {
+                bool ok = parse_keywords_into_module(module);
+                if(!ok) {
                     eat_until_end_of_statement_or_line(this, curr_token.line);
-                } else {
-                    module->add_keyword(keyword);
                 }
             }
             break;
@@ -263,7 +273,7 @@ Struct *Parser::parse_struct()
     // Actually construct the struct.  If anything fails here, it is
     // an internal parser error and needs to be caught up above.
     Struct *struct_ = new Struct(struct_name);
-    for(Field *field : fields) { struct_->register_field(unique_ptr<Field>(field)); }
+    for(Field *field : fields) { struct_->add_field(field); }
     return struct_;
 }
 
@@ -297,7 +307,7 @@ Class *Parser::parse_class()
     }
 
     // Parse class parents
-    vector<Class *> parents;
+    vector<Class *> parents; // Track parents in list so we don't modify a parent if parsing fields
     if(curr_token.type == Token_Identifier) {
         add_error(this, curr_token.line,
                   "Unexpected identifier, expecting ':' or '{'",
@@ -331,10 +341,11 @@ Class *Parser::parse_class()
                 Class *base_class = nullptr;
 
                 // If the parser doesn't have a module, all other class names are undeclared
-                if(module != nullptr) {
+                if(module == nullptr) {
                     stringstream error;
                     error << "Type \"class " << name << "\" has not been declared";
                     add_error(this, curr_token.line, error.str().c_str());
+                    mask_next_error = true;
                     error_occured = true;
                     goto next_parent;
                 }
@@ -392,11 +403,51 @@ Class *Parser::parse_class()
     }
     eat_token(this);
 
-    vector<Field *> fields;
-    unordered_map<string, LineInfo> field_names;
-    while(curr_token.type != '}' && curr_token.type != Token_Eof) {
+    // @TODO(Kevin): Potential for a lot of cleanup/simplification if we can
+    // just update the fields after the fact to be in the correct order.
+    //
+    // We keep track of a lot of state here because we don't want to add our parents
+    // (and their fields) to the class until we know parsing will be successful.
+    vector<string> fields;
+    unordered_map<string, LineInfo> field_definitions;
+    unordered_map<string, Field *> atomics;
+    unordered_map<string, MoleculeDefn *> molecules;
+    while(curr_token.type != (TokenType)'}' && curr_token.type != Token_Eof) {
         LineInfo field_start = curr_token.line;
-        Field *field = parse_class_field();
+        if(curr_token.type == Token_Identifier && next_token.type == (TokenType)':') {
+            MoleculeDefn *molecule = parse_molecule(this);
+            if(molecule == nullptr) {
+                error_occured = true;
+                if(curr_token.type == Token_Eof) { break; }
+                if(curr_token.type == (TokenType)'}') { break; }
+
+                eat_until_end_of_statement_or_line(this, start);
+                mask_next_error = true;
+            } else if(molecule->name.empty()) {
+                add_error(this, field_start, "Fields in classes must have names");
+                error_occured = true;
+                delete molecule;
+            } else if(field_definitions.find(molecule->name) != field_definitions.end()) {
+                stringstream error, info;
+                LineInfo prev = field_definitions[molecule->name];
+                error << "A field with the name \"" << molecule->name
+                      << "\" was already defined in \"class " << class_name << '\"';
+                info << "Previous definition at line " << prev.num << ", column " << prev.col;
+
+                add_error(this, field_start, error.str().c_str(), info.str().c_str());
+                error_occured = true;
+                delete molecule;
+            } else {
+                mask_next_error = false;
+
+                fields.push_back(molecule->name);
+                field_definitions.emplace(molecule->name, field_start);
+                molecules.emplace(molecule->name, molecule);
+            }
+            continue;
+        }
+
+        Field *field = parse_class_field(nullptr);
         if(field == nullptr) {
             error_occured = true;
             if(curr_token.type == Token_Eof) { break; }
@@ -404,35 +455,34 @@ Class *Parser::parse_class()
 
             eat_until_end_of_statement_or_line(this, start);
             mask_next_error = true;
-        } else {
-            fields.push_back(field);
-            mask_next_error = false;
-
-            if(field->name().empty()) {
+        } else if(field->name().empty()) {
                 add_error(this, field_start, "Fields in classes must have names");
                 error_occured = true;
-            } else if(field_names.find(field->name()) != field_names.end()) {
+        } else if(field_definitions.find(field->name()) != field_definitions.end()) {
                 stringstream error, info;
-                LineInfo prev = field_names[field->name()];
+                LineInfo prev = field_definitions[field->name()];
                 error << "A field with the name \"" << field->name()
                       << "\" was already defined in \"class " << class_name << '\"';
                 info << "Previous definition at line " << prev.num << ", column " << prev.col;
 
                 add_error(this, field_start, error.str().c_str(), info.str().c_str());
                 error_occured = true;
-            } else {
-                field_names.emplace(field->name(), field_start);
-            }
+        } else {
+            mask_next_error = false;
+
+            fields.push_back(field->name());
+            field_definitions.emplace(field->name(), field_start);
+            atomics.emplace(field->name(), field);
         }
 
         // Consume any extra semi-colons before the next field
         while(curr_token.type == (TokenType)';') { eat_token(this); }
     }
+
     if(curr_token.type == Token_Eof) {
         add_error(this, start, "Missing closing brace '}' at end of class definition");
-        for(Field *field : fields) {
-            delete field;
-        }
+        for(auto it : atomics) { delete it.second; }
+        for(auto it : molecules) { delete it.second; }
         return nullptr;
     }
     eat_token(this);
@@ -440,46 +490,274 @@ Class *Parser::parse_class()
     if(curr_token.type == (TokenType)';') {
         eat_token(this);
         // Semicolons are a good point to begin unmasking errors, and this
-        // one is likely to be ours because it is after a closing brace
+        // one is likely to cbe ours because it is after a closing brace
         mask_next_error = false;
     } else {
         add_error(this, start, "Missing ';' after struct definition");
-        for(Field *field : fields) {
-            delete field;
-        }
+        for(auto it : atomics) { delete it.second; }
+        for(auto it : molecules) { delete it.second; }
         return nullptr;
+    }
+
+    // Actually construct the class
+    Class *class_ = new Class(class_name);
+    for(Class *parent : parents) { class_->add_parent(parent); }
+    for(string field : fields) {
+        if(atomics.find(field) != atomics.end()) {
+            class_->add_field(atomics[field]);
+            continue;
+        }
+
+        // FIXME(Kevin): I'm breaking the "keep module in consistent-state" rule
+        // with molecular fields so I can get basic parsing implemented and testable;
+        // fix as soon as the parser can accept the .dc files that are currently in-use
+        MoleculeDefn *defn = molecules[field];
+        MolecularField *molecule = new MolecularField(defn->name);
+        for(auto atom_decl : defn->fields) {
+            const string& atom_name = atom_decl.first;
+            const LineInfo& atom_line = atom_decl.second;
+
+            Field *atom = class_->field_by_name(atom_name);
+            if(atom == nullptr) {
+                error_occured = true;
+
+                stringstream error;
+                error << "No field with name \"" << atom_name << "\" defined in class";
+                add_error(this, atom_line, error.str().c_str());
+            } else if(atom->as_molecular() != nullptr) {
+                error_occured = true;
+                add_error(this, atom_line, "Molecular field cannot use a molecular as an atom");
+            } else {
+                bool ok = molecule->add_atomic(atom);
+                if(!ok) {
+                    error_occured = true;
+
+                    stringstream error;
+                    error << "Atomic field \"" << atom_name
+                          << "\" has incompatible keywords with previous atoms";
+                    add_error(this, atom_line, error.str().c_str());
+                }
+            }
+        }
     }
 
     if(error_occured) {
-        for(Field *field : fields) {
-            delete field;
-        }
+        // @FIXME(Kevin): This leaves dangling pointers in any parents!
+        delete class_;
         return nullptr;
     }
 
-    // Actually construct the class.  If anything fails here, it is
-    // an internal parser error and needs to be caught up above.
-    Class *class_ = new Class(class_name);
-    for(Class *parent : parents) { class_->add_parent(parent); }
-    for(Field *field : fields) { class_->register_field(unique_ptr<Field>(field)); }
     return class_;
 }
 
-Import *parse_import()
+Import *Parser::parse_import()
 {
-    // TODO: Implement
+    bool has_symbols;
+    LineInfo start = curr_token.line;
+    if(curr_token.type == Token_Import) {
+        has_symbols = false;
+    } else if(curr_token.type == Token_ImportFrom) {
+        has_symbols = true;
+    } else {
+        unexpected_token(this, "keyword \"import\" or \"from\"", "Attempting to parse import");
+        return nullptr;;
+    }
+    eat_token(this);
+
+    if(curr_token.type != Token_Identifier && curr_token.type != (TokenType)'.') {
+        if(has_symbols) {
+            add_error(this, start, "Missing module name after \"from\"");
+        } else {
+            add_error(this, start, "Missing module name after \"import\"");
+        }
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    string module_path;
+    while(true) {
+        if(curr_token.type == Token_Identifier) {
+            module_path += curr_token.value.text;
+        } else if(curr_token.type == '.') {
+            module_path += '.';
+        } else {
+            break;
+        }
+        eat_token(this);
+    }
+
+    if(!has_symbols) { return new Import(module_path); }
+    if(curr_token.type != Token_Import) {
+        add_error(this, start, "Missing \"import\" after \"from <module>\" in import");
+        mask_next_error = true;
+        return nullptr;
+    }
+    eat_token(this);
+
+    if(curr_token.type != Token_Identifier) {
+        unexpected_token(this, "symbol name", "Attempting to parse list of imported symbols");
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    bool error_occured = false;
+    string curr_symbol;
+    Import *import = new Import(module_path);
+    while(true) {
+        if(curr_token.type == Token_Identifier) {
+            curr_symbol += curr_token.value.text;
+        } else if(curr_token.type == (TokenType)'/') {
+            curr_symbol += '/';
+        } else if(curr_token.type == (TokenType)',') {
+            if(curr_symbol.empty()) {
+                error_occured = true;
+                add_error(this, curr_token.line, "Missing symbol name before ','");
+            } else {
+                import->symbols.push_back(curr_symbol);
+                curr_symbol.clear();
+            }
+        } else if(curr_token.type == (TokenType)';') {
+            if(curr_symbol.empty()) {
+                error_occured = true;
+                add_error(this, curr_token.line, "Missing symbol name before ';'");
+            } else {
+                import->symbols.push_back(curr_symbol);
+                curr_symbol.clear();
+            }
+            break;
+        } else {
+            if(curr_symbol.empty()) {
+                unexpected_token(this, "symbol name", "Attempting to parse list of imported symbols");
+                mask_next_error = true;
+                return nullptr;
+            } else {
+                unexpected_token(this, "',' or ';'", "Attempting to parse list of imported symbols");
+                mask_next_error = true;
+                return nullptr;                
+            }
+        }
+        eat_token(this);
+    }
+
+    if(error_occured) {
+        delete import;
+        return nullptr;
+    }
+
+    return import;
 }
 
-bool parse_keyword_decl()
+bool Parser::parse_typedef_into_module(Module *module)
 {
-    // TODO: Implement
+    if(curr_token.type != Token_Typedef) {
+        unexpected_token(this, "keyword \"typedef\"", "Attempting to parse typedef declaration");
+        return false;
+    }
+    eat_token(this);
+
+    // Parse the existing type that we want to alias
+    bool caller_owns_return;
+    Type *type = parse_type_expr(caller_owns_return);
+    if(type == nullptr) { return false; }
+
+    // Look for the new type name as an identifier
+    if(curr_token.type == (TokenType)';') {
+        add_error(this, curr_token.line, "Missing new type name before ';' in typedef");
+        if(caller_owns_return) { delete type; }
+        return false;
+    } else if(curr_token.type != Token_Identifier) {
+        unexpected_token(this, "identifier", "Attempting to parse typedef");
+        if(caller_owns_return) { delete type; }
+        return false;
+    }
+
+    string name = curr_token.value.text;
+    if(module->type_by_name(name) != nullptr) {
+        stringstream error;
+        error << "Type \"" << name << "\" has already been declared";
+        add_error(this, curr_token.line, error.str().c_str());
+        if(caller_owns_return) { delete type; }
+        return false;
+    }
+    eat_token(this);
+
+    if(curr_token.type != (TokenType)';') {
+        add_error(this, prev_token.line, "Missing ';' after typedef declaration");
+        if(caller_owns_return) { delete type; }
+        return false;
+    }
+
+    if(!type->has_alias()) { type->set_alias(name); }
+    module->add_typedef(name, type, caller_owns_return);
+    return true;
+}
+
+bool Parser::parse_keywords_into_module(Module *module)
+{
+    if(curr_token.type != Token_Keyword) {
+        unexpected_token(this, "keyword \"keyword\"", "Attempting to parse keyword declaration");
+        return false;
+    }
+    eat_token(this);
+
+    if(curr_token.type != Token_Identifier) {
+        unexpected_token(this, "identifier",
+                         "Attempting to parse keyword declaration"
+                         "Declaration must include at least one word.");
+        mask_next_error = true;
+        return false;
+    }
+
+    while(curr_token.type == Token_Identifier) {
+        module->add_keyword(curr_token.value.text);
+        eat_token(this);
+    }
+    return true;
+
+// @NOTE(Kevin): Eventually I want to separate keywords with commas, and end the keyword list
+// with a semicolon.  We may consider storing keywords in groups if we want to be able to reproduce
+// a particular file.
+
+/*
+    bool error_occured = false;
+
+    while(true) {
+        if(curr_token.type != Token_Identifier) {
+            module->add_keyword(curr_token.value.text);
+        } else {
+            unexpected_token(this, "identifier", "Attempting to parse keyword declaration");
+            mask_next_error = true;
+            return false;
+        }
+        eat_token(this);
+
+        while(curr_token.type == Token_Identifier) {
+            error_occured = true;
+            add_error(this, curr_token.line, "Missing ',' between declared keywords");
+            eat_token(this);
+        }
+
+        if(curr_token.type == ';') {
+            break;
+        } else if(curr_token.type != ',') {
+            unexpected_token(this, "',' or ';'", "Attempting to parse keyword declaration");
+            mask_next_error = true;
+            return false;
+        }
+        eat_token(this); // Eat ','
+    }
+
+    if(error_occured) { return false; }
+    eat_token(this); // Eat ';'
+    return true;
+*/
 }
 
 // if(Error) { Recover: Scan to end of line or first ';' }
 Field *Parser::parse_struct_field()
 {
     if(curr_token.type == Token_Identifier) {
-        if(module->type_by_name(curr_token.value.text) == nullptr) {
+        if(module == nullptr || module->type_by_name(curr_token.value.text) == nullptr) {
             if(next_token.type == (TokenType)'(') {
                 // We think this is supposed to look like a method
                 stringstream error;
@@ -556,6 +834,7 @@ Field *Parser::parse_struct_field()
                   "Attempting to parse fields in a struct");
         if(caller_owns_return) { delete type; }
         if(value != nullptr) { delete value; }
+        mask_next_error = true;
         return nullptr;
     }
 
@@ -570,22 +849,331 @@ Field *Parser::parse_struct_field()
 
     if(value != nullptr) {
         field->set_default_value(value);
+        delete value;
     }
 
     return field;
 }
 
-Field *parse_class_field()
+enum ClassFieldParseMode {
+    ClassParseMode_None,
+    ClassParseMode_Field,
+    ClassParseMode_Method,
+    ClassParseMode_Molecular
+};
+
+// if(Error) { Recover: Scan to end of line or first ';' }
+Field *Parser::parse_class_field(Class *class_)
 {
-    // TODO: Implement
+    LineInfo start = curr_token.line;
+    ClassFieldParseMode parse_mode;
+    if(curr_token.type == Token_Identifier) {
+        if(module != nullptr && module->type_by_name(curr_token.value.text) != nullptr) {
+            parse_mode = ClassParseMode_Field;
+        } else if(next_token.type == (TokenType)'(') {
+            parse_mode = ClassParseMode_Method;
+        } else if(next_token.type == (TokenType)':') {
+            parse_mode = ClassParseMode_Molecular;
+        } else {
+            stringstream error;
+            error << "Cannot find type \"" << curr_token.value.text << "\"";
+            add_error(this, curr_token.line, error.str().c_str(), "Attempting to parse class field");
+            return nullptr;
+        }
+    } else if(!curr_token.is_type()) {
+        unexpected_token(this, "identifier or type name", "Attempting to parse class field");
+        return nullptr;
+    } else {
+        parse_mode = ClassParseMode_Field;
+    }
+
+    Field *field = nullptr;
+    switch(parse_mode) {
+    case ClassParseMode_Field:
+        {
+            // Get field type
+            bool field_owns_type;
+            Type *type = parse_type_expr(field_owns_type);
+            if(type == nullptr) { return nullptr; }
+
+            // Class fields must have a name
+            if(curr_token.type != Token_Identifier) {
+                add_error(this, start, "Missing field name after type; class fields must be named");
+                return nullptr;
+            }
+            string field_name = curr_token.value.text;
+            eat_token(this);
+
+            // Class fields can have default values
+            Value *value = nullptr;
+            if(curr_token.type == (TokenType)'=') {
+                eat_token(this);
+                value = parse_value_expr(type);
+                if(value == nullptr) {
+                    if(field_owns_type) { delete type; }
+                    return nullptr;
+                }
+            }
+
+            // Actually construct the field
+            field = new Field(field_name, type, field_owns_type);
+            if(value != nullptr) {
+                field->set_default_value(value);
+                delete value;
+            }
+
+            // Class fields can have keywords
+            bool ok = parse_keywords_for_field(field);
+            if(!ok) {
+                delete field;
+                return nullptr;
+            }
+        }
+        break;
+    case ClassParseMode_Method:
+        {
+            string method_name = curr_token.value.text;
+            eat_token(this); // Eat identifier
+            eat_token(this); // Eat '('
+
+            // Parse function
+            Method *method = new Method();
+            while(curr_token.type != (TokenType)')') {
+                LineInfo param_start = curr_token.line;
+
+                bool param_owns_type;
+                Type *type = parse_type_expr(param_owns_type);
+                if(type == nullptr) {
+                    delete method;
+                    return nullptr;
+                } else if(type->subtype() == kTypeStruct && type->as_struct()->as_class()) {
+                    add_error(this, param_start, "Parameter type cannot be a class");
+                    if(param_owns_type) { delete type; }
+                    delete method;
+                    return nullptr;
+                }
+
+                string param_name; // = curr_token.value.text;
+                if(curr_token.type == Token_Identifier) {
+                    param_name = curr_token.value.text;
+                    if(method->param_by_name(param_name) != nullptr) {
+                        stringstream error;
+                        error << "Duplicate parameter name \"" << param_name
+                              << "\" in method definition";
+                        add_error(this, curr_token.line, error.str().c_str());
+                        if(param_owns_type) { delete type; }
+                        return nullptr;
+                    }
+                    eat_token(this);
+                }
+
+                Value *value = nullptr;
+                if(curr_token.type == (TokenType)'=') {
+                    value = parse_value_expr(type);
+                    if(value == nullptr) {
+                        if(param_owns_type) { delete type; }
+                        return nullptr;
+                    }
+                }
+
+                if(curr_token.type == (TokenType)',') {
+                    eat_token(this);
+                } else if(curr_token.type != (TokenType)')') {
+                    unexpected_token(this, "',' or ')'", "Attempting to parse method parameters");
+                }
+
+                Parameter *param;
+                param = method->add_param(param_name, type, param_owns_type);
+                if(value != nullptr) { param->set_default_value(value); }
+            }
+
+            // @NOTE(Kevin): I want to remove support for assigning a default value to methods
+            // Parameters already support having a default value, so we should rely on that tool
+            Value *value = nullptr;
+            if(curr_token.type == (TokenType)'=') {
+                value = parse_value_expr(method);
+                if(value == nullptr) {
+                    delete method;
+                    return nullptr;
+                }
+            }
+
+            // Actually construct the field
+            field = new Field(method_name, method, true);
+            if(value != nullptr) { field->set_default_value(value); }
+
+            // Class methods can have keywords
+            bool ok = parse_keywords_for_field(field);
+            if(!ok) {
+                delete field;
+                return nullptr;
+            }
+
+            return field;
+        }
+        break;
+    case ClassParseMode_Molecular:
+        {
+            if(class_ == nullptr) {
+                add_error(this, curr_token.line,
+                          "Unable to parse molecular field outside the scope of a class");
+                return nullptr;
+            }
+
+            // @TODO(Kevin): Factored into parse_molecular(Parser *), which could probably
+            // be reused here;  Maybe some of the other parse_class cleanup will help inform this
+            MolecularField *molecular = new MolecularField(curr_token.value.text);
+            eat_token(this); // Eat identifier
+            eat_token(this); // Eat ':'
+
+            bool error_occured = true;
+            while(curr_token.type != (TokenType)';') {
+                if(curr_token.type == (TokenType)',') {
+                    add_error(this, curr_token.line,
+                              "Missing atomic field before ',' in molecular field definition");
+                    error_occured = true;
+                    eat_token(this);
+                    continue;
+                } else if(curr_token.type != Token_Identifier) {
+                    unexpected_token(this, "identifier", "Attempting to parse molecular field");
+                    mask_next_error = true;
+                    delete molecular;
+                    return nullptr;
+                }
+
+                const char *field_name = curr_token.value.text;
+                Field *field = class_->field_by_name(curr_token.value.text);
+                if(field == nullptr) {
+                    error_occured = true;
+
+                    stringstream error;
+                    error << "No field with name \"" << field_name << "\" defined in class";
+                    add_error(this, curr_token.line, error.str().c_str());
+                } else if(field->as_molecular() != nullptr) {
+                    error_occured = true;
+                    add_error(this, curr_token.line, "Molecular field cannot use a molecular as an atom");
+                } else {
+                    bool ok = molecular->add_atomic(field);
+                    if(!ok) {
+                        error_occured = true;
+
+                        stringstream error;
+                        error << "Atomic field \"" << field_name
+                              << "\" has incompatible keywords with previous atoms";
+                        add_error(this, curr_token.line, error.str().c_str());
+                    }
+                }
+                eat_token(this);
+
+                if(curr_token.type == (TokenType)',') {
+                    eat_token(this);
+                }
+            }
+
+            if(error_occured) {
+                delete molecular;
+                return nullptr;
+            }
+
+            field = molecular;
+        }
+        break;
+    default:
+        add_error(this, curr_token.line, "Internal parser error: Unexpected parse_mode for field");
+        return nullptr;
+    }
+
+    // Handle semicolon at end of field
+    if(curr_token.type != ';') {
+        unexpected_token(this, "';'", "Attempting to parse a class field");
+        delete field;
+        return nullptr;
+    }
+    eat_token(this);
+
+    return field;
+}
+
+MoleculeDefn *parse_molecule(Parser *parser)
+{
+    MoleculeDefn *molecule = new MoleculeDefn();
+    molecule->name = parser->curr_token.value.text;
+    eat_token(parser); // Eat identifier
+    eat_token(parser); // Eat ':'
+
+    bool error_occured = false;
+    while(parser->curr_token.type != (TokenType)';') {
+        if(parser->curr_token.type == (TokenType)',') {
+            error_occured = true;
+            add_error(parser, parser->curr_token.line,
+                      "Missing atomic field before ',' in molecular field definition");
+            eat_token(parser);
+            continue;
+        } else if(parser->curr_token.type != Token_Identifier) {
+            unexpected_token(parser, "identifier", "Attempting to parse molecular field");
+            parser->mask_next_error = true;
+
+            delete molecule;
+            return nullptr;
+        }
+
+        molecule->fields.emplace(parser->curr_token.value.text, parser->curr_token.line);
+        eat_token(parser);
+
+        if(parser->curr_token.type == (TokenType)',') {
+            eat_token(parser);
+        }
+    }
+
+    if(error_occured) {
+        delete molecule;
+        return nullptr;
+    }
+
+    return molecule;
+}
+
+bool Parser::parse_keywords_for_field(Field *field)
+{
+    bool error_occured = false;
+    while(curr_token.type == Token_Identifier) {
+        if(!module->has_keyword(curr_token.value.text)) {
+            stringstream error;
+            error << "Keyword \"" << curr_token.value.text << "\" not declared before use";
+            add_warning(this, curr_token.line, error.str().c_str());
+
+            // Declare the keyword so we only show this once per keyword
+            if(module != nullptr && parser_owns_module) {
+                module->add_keyword(curr_token.value.text);
+            }
+        }
+
+        const char * keyword = curr_token.value.text;
+        bool added = field->add_keyword(keyword);
+        if(!added) {
+            stringstream error;
+            error << "Duplicate keyword \"" << keyword << " for field \"" << field->name() << '"';
+            add_error(this, curr_token.line, error.str().c_str());
+            error_occured = false;
+        }
+        eat_token(this);
+    }
+
+    return error_occured;
 }
 
 Type *Parser::parse_type_expr(bool& caller_owns_return)
 {
-    Type* type;
+    Type* type = nullptr;
     if(curr_token.type == Token_Identifier) {
-        type = module->type_by_name(curr_token.value.text);
+        if(module != nullptr) {
+            type = module->type_by_name(curr_token.value.text);
+        }
+
         if(type == nullptr) {
+            stringstream error;
+            error << "Type \"" << curr_token.value.text << "\" has not been declared";
+            add_error(this, curr_token.line, error.str().c_str());
             return nullptr;
         }
 
@@ -820,6 +1408,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
 
 NumericRange Parser::parse_range_expr()
 {
+    LineInfo start = curr_token.line;
     if(curr_token.type != '(') {
         unexpected_token(this, "'('", "Attempting to parse range for numeric, string, or blob");
         return NumericRange();
@@ -915,10 +1504,10 @@ NumericRange Parser::parse_range_expr()
         }
     } else if(curr_token.type == (TokenType)')') {
         add_error(this, curr_token.line, "Missing max value before ')' in range");
-        mask_next_error = true;
+        eat_token(this);
         return NumericRange();
     } else {
-        unexpected_token(this, "number", "Attempting to parse first value in range for numeric, string, or blob");
+        unexpected_token(this, "number", "Attempting to parse fixed-size/min value in numeric range");
         mask_next_error = true;
         return NumericRange();
     }
@@ -928,16 +1517,19 @@ NumericRange Parser::parse_range_expr()
 
     // Close expression
     if(curr_token.type != ')') {
-        // TODO: Generic error
+        unexpected_token(this, "')'", "Looking for closing paren to numeric range");
         mask_next_error = true;
         return NumericRange();
     }
     eat_token(this);;
 
     // Actually build the numeric range
-    // TODO: Generate error if (lhs > rhs)
     if(lhs.type == Number::kFloat || rhs.type == Number::kFloat) {
-        return NumericRange((double)lhs, (double)rhs);
+        if((double)lhs > (double)rhs) {
+            add_error(this, start, "Min value of range greater than max");
+        } else {
+            return NumericRange((double)lhs, (double)rhs);
+        }
     } else if(lhs.type == Number::kInt || rhs.type == Number::kInt) {
         // Check left integer overflow
         if(lhs.type != Number::kInt) {
@@ -957,16 +1549,25 @@ NumericRange Parser::parse_range_expr()
             }
         }
 
-        return NumericRange((int64_t)lhs, (int64_t)rhs);
+        if((int64_t)lhs > (int64_t)rhs) {
+            add_error(this, start, "Min value of range greater than max");
+        } else {
+            return NumericRange((int64_t)lhs, (int64_t)rhs);
+        }
     } else {
-        return NumericRange(lhs.uinteger, rhs.uinteger);
+        if(lhs.uinteger > rhs.uinteger) {
+            add_error(this, start, "Min value of range greater than max");
+        } else {
+            return NumericRange(lhs.uinteger, rhs.uinteger);
+        }
     }
 }
 
 NumericRange Parser::parse_array_expr()
 {
+    LineInfo start = curr_token.line;
     if(curr_token.type != '[') {
-        unexpected_token(this, "'['", "Attempting to parse array size/range");
+        unexpected_token(this, "'['", "Attempting to parse sized array expression");
         return NumericRange();
     }
     eat_token(this);
@@ -976,14 +1577,18 @@ NumericRange Parser::parse_array_expr()
     if(curr_token.type == Token_Integer) {
         lhs = (uint64_t)curr_token.value.integer;
     } else if(curr_token.type == Token_Real) {
+        if(next_token.type == (TokenType)']') {
+            add_error(this, curr_token.line, "Array size must be integer");
+        } else {
+            add_error(this, curr_token.line, "Array min must be integer");
+        }
         lhs = Number(); // NaN signals error
-        return NumericRange();
     } else if(curr_token.type == (TokenType)']') {
-        // TODO: Custom error
+        add_error(this, curr_token.line, "Missing size before closing ']' in sized array");
         mask_next_error = true;
         return NumericRange();
     } else {
-        // TODO: Generic error
+        unexpected_token(this, "number", "Attempting to parse array expression");
         mask_next_error = true;
         return NumericRange();
     }
@@ -991,21 +1596,33 @@ NumericRange Parser::parse_array_expr()
     if(prev_token.type == (TokenType)'-' ||
        prev_token.type == (TokenType)'+')
     {
-        // TODO: ErrorButContinue
+        if(next_token.type == (TokenType)']') {
+            add_error(this, curr_token.line, "Array size must be unsigned");
+        } else {
+            add_error(this, curr_token.line, "Array min must be unsigned");
+        }
         lhs = Number(); // NaN signals error
     }
     eat_token(this);
 
-    // Range can be ( A ) or ( A , B )
+    // Array expression can be [ A ] or [ A , B ]
     if(curr_token.type == (TokenType)']') {
         eat_token(this);
         return NumericRange(lhs);
     } else if(curr_token.type == Token_Integer || curr_token.type == Token_Real) {
-        // TODO: Custom error
-        mask_next_error = true;
+        if(next_token.type == ']') {
+            eat_token(this); // Eat number
+            eat_token(this); // Eat ']'
+        } else {
+            mask_next_error = true;
+        }
+
+        add_error(this, curr_token.line,
+                  "Unexpected integer, expecting ',' or ']'",
+                  "Must separate numbers in array expression with ','");
         return NumericRange();
     } else if(curr_token.type != ',') {
-        // TODO: Generic error
+        unexpected_token(this, "',' or ']'", "Attempting to parse array expression");
         mask_next_error = true;
         return NumericRange();
     }
@@ -1016,15 +1633,14 @@ NumericRange Parser::parse_array_expr()
     if(curr_token.type == Token_Integer) {
         rhs = (uint64_t)curr_token.value.integer;
     } else if(curr_token.type == Token_Real) {
-        // TODO: Custom error
-        mask_next_error = true;
-        return NumericRange();
+        add_error(this, curr_token.line, "Array max must be integer");
+        rhs = Number(); // NaN signals error
     } else if(curr_token.type == (TokenType)']') {
-        // TODO: Custom error
-        mask_next_error = true;
+        add_error(this, curr_token.line, "Missing max value before ']' in array range");
+        eat_token(this);
         return NumericRange();
     } else {
-        // TODO: Generic error
+        unexpected_token(this, "unsigned integer", "Attempting to parse array expression");
         mask_next_error = true;
         return NumericRange();
     }
@@ -1032,21 +1648,23 @@ NumericRange Parser::parse_array_expr()
     if(prev_token.type == (TokenType)'-' ||
        prev_token.type == (TokenType)'+')
     {
-        // TODO: ErrorButContinue
+        add_error(this, curr_token.line, "Array max must be unsigned");
         rhs = Number(); // NaN signals error
     }
     eat_token(this);
 
     if(curr_token.type != ']') {
-        // TODO: Generic error
+        unexpected_token(this, "']'", "Looking for closing bracket to array range");
         mask_next_error = true;
         return NumericRange();
     }
     eat_token(this);;
 
     // Actually build the array range
-    // TODO: Generate error if (lhs > rhs)
     if(lhs.type == Number::kNaN || rhs.type == Number::kNaN) {
+        return NumericRange();
+    } else if(lhs.uinteger > rhs.uinteger) {
+        add_error(this, start, "Min size of array range greater than max");
         return NumericRange();
     } else {
         return NumericRange(lhs.uinteger, rhs.uinteger);
@@ -1107,7 +1725,7 @@ static void unexpected_token(Parser *parser, const char *expected, const char *i
 static void eat_token(Parser *parser)
 {
     if(parser->curr_token.type == Token_Eof) {
-        add_error(parser, parser->curr_token.line, "Internal-Parser-Error: Tried to eat EOF");
+        add_error(parser, parser->curr_token.line, "Internal parser error: Tried to eat EOF");
     } else {
         parser->prev_token = move(parser->curr_token);
         parser->curr_token = move(parser->next_token);

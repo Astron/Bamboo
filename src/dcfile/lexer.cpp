@@ -10,16 +10,16 @@ namespace bamboo
 {
 
 
-static const array<string, 20> keywords = {
+const array<string, 20> keywords = {
     "keyword", "struct", "class", "typedef", "import", "from",
     "char", "int8", "int16", "int32", "int64",
     "uint8", "uint16", "uint32", "uint64",
     "float32", "float64", "string", "blob",
 
-    "dclass" // FUTURE(Kevin): I want to deprecate "dclass" in favor of "class"
+    "dclass" // NOTE(Kevin): I want to deprecate "dclass" in favor of "class"
 };
 
-static const array<TokenType, 20> keyword_types = {
+const array<TokenType, 20> keyword_types = {
     Token_Keyword, Token_Struct, Token_Class, Token_Typedef, Token_Import, Token_ImportFrom,
     Token_Char, Token_Int8, Token_Int16, Token_Int32, Token_Int64,
     Token_Uint8, Token_Uint16, Token_Uint32, Token_Uint64,
@@ -143,8 +143,8 @@ Token Lexer::scan_token()
 
         for(unsigned int i = 0; i < keywords.size(); ++i) {
             if(name == "dclass") {
-                // FUTURE: If Bamboo works for everything else eventually, this change can be made
-                //print_warning(here, "\"dclass\" is deprecated, use \"class\" instead");
+                // NOTE(Kevin): If Bamboo works for everything, this change can be made
+                /* print_warning(here, "\"dclass\" is deprecated, use \"class\" instead"); */
             }
             if(name == keywords[i]) {
                 Token token;
@@ -288,6 +288,8 @@ Token Lexer::scan_token()
         string text = scan_quoted_text(this, here);
         if(text.length() > 1) {
             add_error(this, here, "Multiple characters in character literal");
+        } else if(text.length() < 1) {
+            add_error(this, here, "Empty character literal");
         }
 
         Token token;
@@ -402,38 +404,6 @@ Token Lexer::scan_token()
         return token;
     }
 }
-
-/*
-Token::Token(const Token& other) :
-    type(other.type),
-    line(other.line),
-    size(other.size)
-{
-    if(size == 0) {
-        value = other.value;
-    } else {
-        if(type == Token_Text || type == Token_Identifier) {
-            value.text = (char *)malloc(size);
-            memcpy(value.text, other.value.text, size);
-        } else if(type == Token_Hexstring) {
-            value.data = (uint8_t *)malloc(size);
-            memcpy(value.data, other.value.data, size);
-        } else {
-            value = other.value;
-        }
-    }
-}
-
-Token& Token::operator=(Token other)
-{
-    using std::swap;
-    swap(this->type, other.type);
-    swap(this->line, other.line);
-    swap(this->size, other.size);
-    swap(this->value, other.value);
-    return *this;
-}
-*/
 
 static void add_error(Lexer* lexer, const LineInfo& where, const std::string& what)
 {

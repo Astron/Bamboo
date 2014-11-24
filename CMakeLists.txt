@@ -130,7 +130,8 @@ set(DCFILE_FILES
   src/dcfile/parser.h)
 set(DCFILE_EXPORTED
   dcfile/lexer.h
-  dcfile/parser.h)
+  dcfile/parser.h
+  dcfile/token.h)
 source_group("DCFile" FILES ${DCFILE_FILES})
 
 # depends: bits, module
@@ -366,10 +367,10 @@ endif()
 
 # Install header files
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/bamboo
-  DESTINATION include/bamboo
+  DESTINATION include
   FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/bamboo
-  DESTINATION include/bamboo
+  DESTINATION include
   FILES_MATCHING PATTERN "*.ipp")
 
 # Create symlinks on linux

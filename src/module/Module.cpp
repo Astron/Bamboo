@@ -36,7 +36,7 @@ Struct *Module::add_struct(const string& name)
     return add_struct(name.c_str());
 }
 
-bool Module::add_class(Class *class_, bool transfer_ownership)
+bool Module::add_class(Class *class_)
 {
     // TODO: Implement
 
@@ -65,7 +65,7 @@ Struct *Module::add_struct(const char *name)
     return struct_;
 }
 
-bool Module::add_struct(Struct *struct_, bool transfer_ownership)
+bool Module::add_struct(Struct *struct_)
 {
     // TODO: Implement
 
@@ -95,7 +95,7 @@ Import *Module::add_import(const char *pymodule)
     return import;
 }
 
-bool Module::add_import(Import *import, bool transfer_ownership)
+bool Module::add_import(Import *import)
 {
     // TODO: Implement
 }
