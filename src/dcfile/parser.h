@@ -37,6 +37,7 @@ struct Parser
 {
     Parser() = default;
     Parser(Lexer *lexer);
+    ~Parser();
     void start();
 
     Lexer *lexer = nullptr;
@@ -65,9 +66,9 @@ struct Parser
     bool parser_owns_module = false;
     int num_errors = 0;
     int num_warnings = 0;
-    Token curr_token = Token(Token_NotAToken);
-    Token next_token = Token(Token_NotAToken);
-    Token prev_token = Token(Token_NotAToken);
+    Token curr_token;
+    Token next_token;
+    Token prev_token;
 
     // TODO(Kevin): Maybe have the individual parse methods return a parser result with
     // results for "success", "error but finished expression", "error and could not recover"

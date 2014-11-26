@@ -389,7 +389,7 @@ Token Lexer::scan_token()
             // Its just a '/' operator
             Token token;
             token.line = here;
-            token.type = (TokenType)c;
+            token.type = (TokenType)'/';
             return token;
         }
     } else if(c == EOF) {
@@ -398,6 +398,7 @@ Token Lexer::scan_token()
         token.type = Token_Eof;
         return token;
     } else {
+        eat_char(this);
         Token token;
         token.line = here;
         token.type = (TokenType)c;
@@ -458,8 +459,9 @@ static void set_token_text(Token& token, const string& text)
 {
     size_t len = text.length();
     token.size = len;
-    token.value.text = (char *)malloc(len);
-    memcpy(token.value.text, text.c_str(), len);
+    token.value.text = (char *)malloc(len + 1);
+    strncpy(token.value.text, text.c_str(), len);
+    token.value.text[len] = '\0'; // Ensure null termination
 }
 
 static string scan_quoted_text(Lexer *lexer, const LineInfo& start)

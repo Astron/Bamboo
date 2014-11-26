@@ -76,12 +76,12 @@ const char *format_tokentype(TokenType); // implemented in lexer.cpp
 
 struct Token
 {
-    TokenType type;
+    TokenType type = Token_NotAToken;
     LineInfo line;
 
     unsigned int size = 0;
     union {
-        uint8_t *data;
+        uint8_t *data = nullptr;
         char *text;
 
         double real;
@@ -89,21 +89,18 @@ struct Token
         char character;
     } value;
 
-    explicit Token(TokenType type) : type(type) {}
-
-    // Token is Movable but not copyable
-    Token() = default;
-    Token(Token&& other) = default;
-    Token& operator=(Token&& other) = default;
-    Token(const Token& other) = delete;
-    Token& operator=(const Token& other) = delete;
-
-    ~Token()
+    void destroy()
     {
         if(type == Token_Text || type == Token_Identifier) {
-            if(value.text != nullptr) free(value.text);
+            if(value.text != nullptr) {
+                free(value.text);
+                value.text = nullptr;
+            }
         } else if(type == Token_Hexstring) {
-            if(value.data != nullptr) free(value.data);
+            if(value.data != nullptr) {
+                free(value.data);
+                value.data = nullptr;
+            }
         }
     }
 

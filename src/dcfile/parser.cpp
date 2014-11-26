@@ -44,12 +44,20 @@ struct MoleculeDefn
 static MoleculeDefn *parse_molecule(Parser *parser);
 
 Parser::Parser(Lexer *lex) : lexer(lex) {}
+Parser::~Parser()
+{
+    prev_token.destroy();
+    curr_token.destroy();
+    next_token.destroy();
+}
 
 void Parser::start()
 {
     if(lexer == nullptr) {
         curr_token.type = Token_Eof;
     } else {
+        // Scan the first two tokens into curr_token and next_token
+        eat_token(this);
         eat_token(this);
     }
 }
@@ -109,11 +117,17 @@ Module *Parser::parse_module()
         case Token_Import:
         case Token_ImportFrom:
             {
-
+                Import *import = parse_import();
+                if(import == nullptr) {
+                    eat_until_end_of_statement_or_line(this, curr_token.line);
+                } else {
+                    module->add_import(import);
+                    mask_next_error = false;
+                }
             }
-            parse_import();
             break;
         case ';':
+            eat_token(this);
             break;
         default:
             if(curr_token.is_operator()) {
@@ -222,7 +236,7 @@ Struct *Parser::parse_struct()
             if(curr_token.type == Token_Eof) { break; }
             if(curr_token.type == (TokenType)'}') { break; }
 
-            eat_until_end_of_statement_or_line(this, start);
+            eat_until_end_of_statement_or_line(this, field_start);
             mask_next_error = true;
         } else {
             fields.push_back(field);
@@ -414,6 +428,8 @@ Class *Parser::parse_class()
     unordered_map<string, MoleculeDefn *> molecules;
     while(curr_token.type != (TokenType)'}' && curr_token.type != Token_Eof) {
         LineInfo field_start = curr_token.line;
+
+        // Try parsing as molecular
         if(curr_token.type == Token_Identifier && next_token.type == (TokenType)':') {
             MoleculeDefn *molecule = parse_molecule(this);
             if(molecule == nullptr) {
@@ -421,7 +437,7 @@ Class *Parser::parse_class()
                 if(curr_token.type == Token_Eof) { break; }
                 if(curr_token.type == (TokenType)'}') { break; }
 
-                eat_until_end_of_statement_or_line(this, start);
+                eat_until_end_of_statement_or_line(this, field_start);
                 mask_next_error = true;
             } else if(molecule->name.empty()) {
                 add_error(this, field_start, "Fields in classes must have names");
@@ -447,13 +463,14 @@ Class *Parser::parse_class()
             continue;
         }
 
+        // Try parsing as function or variable
         Field *field = parse_class_field(nullptr);
         if(field == nullptr) {
             error_occured = true;
             if(curr_token.type == Token_Eof) { break; }
             if(curr_token.type == (TokenType)'}') { break; }
 
-            eat_until_end_of_statement_or_line(this, start);
+            eat_until_end_of_statement_or_line(this, field_start);
             mask_next_error = true;
         } else if(field->name().empty()) {
                 add_error(this, field_start, "Fields in classes must have names");
@@ -600,6 +617,7 @@ Import *Parser::parse_import()
         return nullptr;
     }
 
+    int last_line = curr_token.line.num;
     bool error_occured = false;
     string curr_symbol;
     Import *import = new Import(module_path);
@@ -625,6 +643,12 @@ Import *Parser::parse_import()
                 curr_symbol.clear();
             }
             break;
+        } else if(curr_token.line.num > last_line) {
+            if(!curr_symbol.empty()) {
+                import->symbols.push_back(curr_symbol);
+                curr_symbol.clear();
+            }
+            break;
         } else {
             if(curr_symbol.empty()) {
                 unexpected_token(this, "symbol name", "Attempting to parse list of imported symbols");
@@ -636,6 +660,7 @@ Import *Parser::parse_import()
                 return nullptr;                
             }
         }
+        last_line = curr_token.line.num;
         eat_token(this);
     }
 
@@ -1729,8 +1754,9 @@ static void eat_token(Parser *parser)
     if(parser->curr_token.type == Token_Eof) {
         add_error(parser, parser->curr_token.line, "Internal parser error: Tried to eat EOF");
     } else {
-        parser->prev_token = move(parser->curr_token);
-        parser->curr_token = move(parser->next_token);
+        parser->prev_token.destroy();
+        parser->prev_token = parser->curr_token;
+        parser->curr_token = parser->next_token;
         parser->next_token = parser->lexer->scan_token();
     }
 }
@@ -1747,22 +1773,26 @@ static void eat_unary(Parser *parser)
 static void eat_until_end_of_statement_or_line(Parser *parser, const LineInfo& start)
 {
     while(true) {
-        if(parser->curr_token.type == (TokenType)';') { break; }
         if(parser->curr_token.type == Token_Eof) { break; }
         if(parser->curr_token.type == Token_NotAToken) { break; }
         if(parser->curr_token.line.num > start.num) { break; }
+
         eat_token(parser);
+
+        if(parser->curr_token.type == (TokenType)';') { break; }
     }
 }
 
 static void eat_until_end_of_block_or_topdecl(Parser *parser)
 {
     while(true) {
-        if(parser->curr_token.type == (TokenType)'}') { break; }
         if(parser->curr_token.is_keyword()) { break; }
         if(parser->curr_token.type == Token_Eof) { break; }
         if(parser->curr_token.type == Token_NotAToken) { break; }
+
         eat_token(parser);
+
+        if(parser->curr_token.type == (TokenType)'}') { break; }
     }
 }
 

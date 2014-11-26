@@ -59,7 +59,7 @@ int main(void) {
     auto lexer = Lexer(buffer, read + 1);
     auto parser = Parser(&lexer);
     parser.start();
-    parser.parse_module(mod);
+    mod = parser.parse_module(mod);
 
     cout << '\n'; // Newline after prompt
 
