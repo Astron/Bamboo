@@ -10,19 +10,19 @@ namespace bamboo
 {
 
 
-const array<string, 20> keywords = {
+const array<string, 21> keywords = {
     "keyword", "struct", "class", "typedef", "import", "from",
     "char", "int8", "int16", "int32", "int64",
-    "uint8", "uint16", "uint32", "uint64",
+    "byte", "uint8", "uint16", "uint32", "uint64",
     "float32", "float64", "string", "blob",
 
     "dclass" // @NOTE(Kevin): I want to deprecate "dclass" in favor of "class"
 };
 
-const array<TokenType, 20> keyword_types = {
+const array<TokenType, 21> keyword_types = {
     Token_Keyword, Token_Struct, Token_Class, Token_Typedef, Token_Import, Token_ImportFrom,
     Token_Char, Token_Int8, Token_Int16, Token_Int32, Token_Int64,
-    Token_Uint8, Token_Uint16, Token_Uint32, Token_Uint64,
+    Token_Byte, Token_Uint8, Token_Uint16, Token_Uint32, Token_Uint64,
     Token_Float32, Token_Float64, Token_String, Token_Blob,
 
     Token_Class

@@ -59,6 +59,7 @@ source_group("Bits" FILES ${BITS_FILES})
 set(MODULE_FILES
   src/module/Type.h
   src/module/Type.cpp
+  src/module/TypeAlias.h
   src/module/Numeric.h
   src/module/Numeric.ipp
   src/module/Numeric.cpp
@@ -91,6 +92,7 @@ set(MODULE_FILES
 set(MODULE_EXPORTED
   module/module
   module/Type.h
+  module/TypeAlias.h
   module/Numeric.h
   module/Numeric.ipp
   module/Array.h

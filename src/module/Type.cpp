@@ -1,5 +1,6 @@
 // Filename: Type.cpp
 #include "Type.h"
+#include "TypeAlias.h"
 #include "Array.h"
 #include "Numeric.h"
 using namespace std;
@@ -51,20 +52,33 @@ string format_subtype(Subtype subtype)
     }
 }
 
+
 Type *Type::None = new Type();
-Type *Type::Char = new Numeric(kTypeChar, "char");
-Type *Type::Int8 = new Numeric(kTypeInt8, "int8");
-Type *Type::Int16 = new Numeric(kTypeInt16, "int16");
-Type *Type::Int32 = new Numeric(kTypeInt32, "int32");
-Type *Type::Int64 = new Numeric(kTypeInt64, "int64");
-Type *Type::Uint8 = new Numeric(kTypeUint8, "uint8");
-Type *Type::Uint16 = new Numeric(kTypeUint16, "uint16");
-Type *Type::Uint32 = new Numeric(kTypeUint32, "uint32");
-Type *Type::Uint64 = new Numeric(kTypeUint64, "uint64");
-Type *Type::Float32 = new Numeric(kTypeFloat32, "float32");
-Type *Type::Float64 = new Numeric(kTypeFloat64, "float64");
-Type *Type::String = new Array(Type::Char, "string");
-Type *Type::Blob = new Array(Type::Uint8, "blob");
+Type *Type::Char = new Numeric(kTypeChar);
+Type *Type::Int8 = new Numeric(kTypeInt8);
+Type *Type::Int16 = new Numeric(kTypeInt16);
+Type *Type::Int32 = new Numeric(kTypeInt32);
+Type *Type::Int64 = new Numeric(kTypeInt64);
+Type *Type::Uint8 = new Numeric(kTypeUint8);
+Type *Type::Uint16 = new Numeric(kTypeUint16);
+Type *Type::Uint32 = new Numeric(kTypeUint32);
+Type *Type::Uint64 = new Numeric(kTypeUint64);
+Type *Type::Float32 = new Numeric(kTypeFloat32);
+Type *Type::Float64 = new Numeric(kTypeFloat64);
+
+Type *Type::Byte = new TypeAlias("byte", Type::Uint8, false);
+Type *Type::String = new TypeAlias("string", new Array(Type::Char, false), true);
+Type *Type::Blob = new TypeAlias("blob", new Array(Type::Byte, false), true);
+
+TypeAlias *Type::as_aliased()
+{
+    return nullptr;
+}
+
+const TypeAlias *Type::as_aliased() const
+{
+    return nullptr;
+}
 
 Numeric *Type::as_numeric()
 {
@@ -108,11 +122,7 @@ const Method *Type::as_method() const
 
 std::string Type::to_string() const
 {
-    if(has_alias()) {
-        return alias();
-    } else {
-        return format_subtype(m_subtype);
-    }
+    return format_subtype(m_subtype);
 }
 
 

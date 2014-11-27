@@ -250,11 +250,7 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
         break;
     case kTypeBlob:
         {
-            if(type->alias() == "blob") {
-                hashgen.add_int(L_BLOB); // _type
-            } else {
-                hashgen.add_int(L_UINT8); // _type
-            }
+            hashgen.add_int(L_BLOB); // _type
             hashgen.add_int(1); // _divisor
 
             const Array *blob = type->as_array();
@@ -269,11 +265,7 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
         break;
     case kTypeString:
         {
-            if(type->alias() == "string") {
-                hashgen.add_int(L_STRING); // _type
-            } else {
-                hashgen.add_int(L_CHAR); // _type
-            }
+            hashgen.add_int(L_STRING); // _type
             hashgen.add_int(1); // _divisor
 
             const Array *str = type->as_array();

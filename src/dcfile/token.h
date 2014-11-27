@@ -50,6 +50,7 @@ enum TokenType
     Token_ImportFrom,
 
     // Types
+    Token_Byte,
     Token_Char,
     Token_Int8,
     Token_Int16,

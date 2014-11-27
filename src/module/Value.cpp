@@ -713,43 +713,12 @@ static void format_value(const Value& value, ostream& out)
         format_quoted('\'', string(1, value.m_char), out);
         break;
     case kTypeString:
-        {
-            // If we have a string alias format as a quoted string
-            if(type->has_alias() && type->alias() == "string") {
-                // Enquoute and escape string then output
-                format_quoted('"', value.m_string, out);
-            } else {
-                // Otherwise format as an array of chars
-                out << '[';
-                if(value.m_string.size() > 0) {
-                    format_quoted('\'', string(1, value.m_string[0]), out);
-                }
-                for(size_t i = 1; i < value.m_string.size(); ++i) {
-                    out << ", ";
-                    format_quoted('\'', string(1, value.m_string[i]), out);
-                }
-                out << ']';
-            }
-        }
+        // Only arrays using the built-in char-type (Type::Char) have kTypeString
+        format_quoted('"', value.m_string, out);
         break;
     case kTypeBlob:
-        {
-            // If we have a blob alias format as a hex constant
-            if(type->has_alias() && type->alias() == "blob") {
-                // Format blob as a hex constant then output
-                format_hex(value.m_blob, out);
-            } else {
-                // Otherwise format as an array of uint8
-                out << '[';
-                if(value.m_blob.size() > 0) {
-                    out << uint32_t(value.m_blob[0]);
-                }
-                for(size_t i = 1; i < value.m_blob.size(); ++i) {
-                    out << ", " << uint32_t(value.m_blob[i]);
-                }
-                out << ']';
-            }
-        }
+        // Format blob as a hex constant then output
+        format_hex(value.m_blob, out);
         break;
     case kTypeArray:
         {
@@ -764,41 +733,43 @@ static void format_value(const Value& value, ostream& out)
             out << ']';
         }
         break;
-    case kTypeStruct: {
-        out << '{';
-        const Struct *struct_ = type->as_struct();
-        size_t num_fields = struct_->num_fields();
-        if(num_fields > 0) {
-            const Field *field = struct_->nth_field(0);
-            if(field->as_molecular() == nullptr) {
-                format_value(value.m_struct.at(field), out);
+    case kTypeStruct:
+        {
+            out << '{';
+            const Struct *struct_ = type->as_struct();
+            size_t num_fields = struct_->num_fields();
+            if(num_fields > 0) {
+                const Field *field = struct_->nth_field(0);
+                if(field->as_molecular() == nullptr) {
+                    format_value(value.m_struct.at(field), out);
+                }
             }
-        }
-        for(unsigned int i = 1; i < num_fields; ++i) {
-            out << ", ";
-            const Field *field = struct_->nth_field(i);
-            if(field->as_molecular() == nullptr) {
-                format_value(value.m_struct.at(field), out);
+            for(unsigned int i = 1; i < num_fields; ++i) {
+                out << ", ";
+                const Field *field = struct_->nth_field(i);
+                if(field->as_molecular() == nullptr) {
+                    format_value(value.m_struct.at(field), out);
+                }
             }
+            out << '}';
         }
-        out << '}';
         break;
-    }
-    case kTypeMethod: {
-        out << '(';
-        const Method *method_ = type->as_method();
-        size_t num_params = method_->num_params();
-        if(num_params > 0) {
-            const Parameter *param = method_->nth_param(0);
-            format_value(value.m_method.at(param), out);
+    case kTypeMethod:
+        {
+            out << '(';
+            const Method *method_ = type->as_method();
+            size_t num_params = method_->num_params();
+            if(num_params > 0) {
+                const Parameter *param = method_->nth_param(0);
+                format_value(value.m_method.at(param), out);
+            }
+            for(unsigned int i = 1; i < num_params; ++i) {
+                const Parameter *param = method_->nth_param(i);
+                format_value(value.m_method.at(param), out);
+            }
+            out << ')';
         }
-        for(unsigned int i = 1; i < num_params; ++i) {
-            const Parameter *param = method_->nth_param(i);
-            format_value(value.m_method.at(param), out);
-        }
-        out << ')';
         break;
-    }
     default:
         out << "<error>";
     }

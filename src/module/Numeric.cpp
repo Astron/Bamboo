@@ -42,41 +42,6 @@ Numeric::Numeric(Subtype type) : Type(type)
     }
 }
 
-Numeric::Numeric(Subtype type, const std::string& alias) : Type(type, alias)
-{
-    switch(type) {
-    case kTypeChar:
-    case kTypeUint8:
-        m_signed = false;
-    case kTypeInt8:
-        m_size = sizeof(int8_t);
-        break;
-    case kTypeUint16:
-        m_signed = false;
-    case kTypeInt16:
-        m_size = sizeof(int16_t);
-        break;
-    case kTypeUint32:
-        m_signed = false;
-    case kTypeInt32:
-        m_size = sizeof(int32_t);
-        break;
-    case kTypeUint64:
-        m_signed = false;
-    case kTypeInt64:
-        m_size = sizeof(int64_t);
-        break;
-    case kTypeFloat32:
-        m_size = sizeof(float);
-        break;
-    case kTypeFloat64:
-        m_size = sizeof(double);
-        break;
-    default:
-        m_subtype = kTypeNone;
-    }
-}
-
 Numeric *Numeric::as_numeric()
 {
     return this;

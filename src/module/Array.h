@@ -31,9 +31,6 @@ class Array : public Type
     inline bool has_range() const { return !m_array_range.is_nan(); }
     inline NumericRange range() const { return m_array_range; }
 
-    // Primitive array constructor
-    Array(Type *element_type, const std::string& alias);
-
   private:
     bool m_element_owned = false;
     Type *m_element_type = nullptr;

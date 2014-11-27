@@ -9,4 +9,5 @@
 #include "Parameter.h"
 #include "Struct.h"
 #include "Type.h"
+#include "TypeAlias.h"
 #include "Value.h"

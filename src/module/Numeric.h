@@ -16,7 +16,6 @@ class Numeric : public Type
 {
   public:
     explicit Numeric(Subtype type);
-    Numeric(Subtype type, const std::string& alias);
     Numeric(const Numeric&) = delete;
     Numeric& operator=(const Numeric&) = delete;
     virtual ~Numeric() {};

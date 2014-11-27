@@ -22,10 +22,12 @@ Array::Array(Type *element_type, bool transfer_ownership, const NumericRange& si
         m_array_size = 0;
     }
 
-    // Set subtype
-    if(m_element_type->subtype() == kTypeChar) {
+    // Use special types for single-byte unmodified primitive types
+    // These types can be serialized and deserialized faster because they don't have endianness
+    // and they don't need to be specially packed unlike types with divisors/ranges/etc
+    if(m_element_type == Type::Char) {
         m_subtype = kTypeString;
-    } else if(m_element_type->subtype() == kTypeUint8) {
+    } else if(m_element_type == Type::Byte) {
         m_subtype = kTypeBlob;
     }
 
@@ -34,24 +36,6 @@ Array::Array(Type *element_type, bool transfer_ownership, const NumericRange& si
         m_size = m_array_size * m_element_type->fixed_size();
     } else {
         m_size = 0;
-    }
-}
-
-Array::Array(Type *element_type, const string& alias) :
-    Type(kTypeArray, alias),
-    m_element_type(element_type)
-{
-    if(m_element_type == nullptr) {
-        m_element_type = Type::None;
-    }
-
-    // Set subtype
-    if(m_element_type->subtype() == kTypeChar) {
-        m_subtype = kTypeString;
-    } else if(m_element_type->subtype() == kTypeUint8) {
-        m_subtype = kTypeBlob;
-    } else {
-        m_subtype = kTypeArray;
     }
 }
 

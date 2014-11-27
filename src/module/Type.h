@@ -6,6 +6,7 @@ namespace bamboo
 {
 
 
+class TypeAlias;
 class Array;
 class Method;
 class Numeric;
@@ -15,6 +16,7 @@ class Struct;
 enum Subtype {
     /* Numeric Types */
     kTypeChar, // equivalent to uint8, except that it should be printed as a string
+    // @TODO(Kevin): Add kTypeByte without breaking legacy_hash
     kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
     kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
     kTypeFloat32, kTypeFloat64,
@@ -49,6 +51,7 @@ class Type
 
     // Unbounded primitive data types
     static Type *None;
+    static Type *Byte;
     static Type *Char;
     static Type *Int8;
     static Type *Int16;
@@ -68,10 +71,8 @@ class Type
     inline bool has_fixed_size() const { return m_size != 0; }
     inline size_t fixed_size() const { return m_size; }
 
-    inline bool has_alias() const { return !m_alias.empty(); }
-    inline const std::string& alias() const { return m_alias; }
-    inline void set_alias(const std::string& alias) { m_alias = alias; }
-
+    virtual TypeAlias *as_aliased();
+    virtual const TypeAlias *as_aliased() const;
     virtual Numeric *as_numeric();
     virtual const Numeric *as_numeric() const;
     virtual Array *as_array();
@@ -81,15 +82,13 @@ class Type
     virtual Method *as_method();
     virtual const Method *as_method() const;
 
-    virtual std::string to_string() const; // representation for debug/development output
+    virtual std::string to_string() const;
 
   protected:
     explicit Type(Subtype subtype) : m_subtype(subtype) {}
-    Type(Subtype subtype, const std::string& alias) : m_subtype(subtype), m_alias(alias) {}
 
     Subtype m_subtype = kTypeNone;
     size_t m_size = 0; // a value of 0 indicates the size is variable
-    std::string m_alias;
 };
 
 

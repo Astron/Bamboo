@@ -712,8 +712,8 @@ bool Parser::parse_typedef_into_module(Module *module)
         return false;
     }
 
-    if(!type->has_alias()) { type->set_alias(name); }
-    module->add_typedef(name, type, caller_owns_return);
+    Type *type_alias = new TypeAlias(name, type, caller_owns_return);
+    module->add_typedef(name, type_alias, true);
     return true;
 }
 
@@ -1356,7 +1356,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                         add_error(this, curr_token.line,
                                   "Unexpected numeric range for array type",
                                   "Numeric range must be declared before array specifier");
-                    } else if(type->has_alias()) {
+                    } else if(type->as_aliased()) {
                         add_error(this, curr_token.line,
                                   "Unexpected numeric range for array type",
                                   "Typedef was declared as an array");
@@ -1380,8 +1380,10 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                                   "Range for string-like type must be unsigned integer");
                     }
 
+                    // @FIXME(Kevin): We should be able to tell the difference
+                    // between a `string(0,20)` and a `char[0,20]`
+                    // but this doesn't make that distinction yet
                     type = new Array(Type::Char, false, range);
-                    type->set_alias("string");
                     caller_owns_return = true;
                 } else if(type->subtype() == kTypeBlob) {
                     if(range.type != Number::kUint) {
@@ -1389,8 +1391,10 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                                   "Range for blob-like type must be unsigned integer");
                     }
 
-                    type = new Array(Type::Uint8, false, range);
-                    type->set_alias("blob");
+                    // @FIXME(Kevin): We should be able to tell the difference
+                    // between a `blob(0,20)` and a `byte[0,20]`
+                    // but this doesn't make that distinction yet
+                    type = new Array(Type::Byte, false, range);
                     caller_owns_return = true;
                 } else if(type->as_numeric()) {
                     Numeric *num = type->as_numeric();
