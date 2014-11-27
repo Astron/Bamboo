@@ -11,10 +11,10 @@ namespace bamboo
 {
 
 
-const array<Type *, 13> token_to_primitive = {
-    Type::Char, Type::Int8, Type::Int16, Type::Int32, Type::Int64,
-    Type::Uint8, Type::Uint16, Type::Uint32, Type::Uint64,
-    Type::Float32, Type::Float64, Type::String, Type::Blob
+const array<Type **, 13> token_to_primitive = {
+    &Type::Char, &Type::Int8, &Type::Int16, &Type::Int32, &Type::Int64,
+    &Type::Uint8, &Type::Uint16, &Type::Uint32, &Type::Uint64,
+    &Type::Float32, &Type::Float64, &Type::String, &Type::Blob
 };
 
 const array<Subtype, 13> token_to_subtype = {
@@ -23,7 +23,7 @@ const array<Subtype, 13> token_to_subtype = {
     kTypeFloat32, kTypeFloat64, kTypeString, kTypeBlob
 };
 
-static Type *to_primitive(TokenType type) { return token_to_primitive[type - Token_Char]; }
+static Type *to_primitive(TokenType type) { return *token_to_primitive[type - Token_Char]; }
 static Subtype to_subtype(TokenType type) { return token_to_subtype[type - Token_Char]; }
 
 static void unexpected_token(Parser *parser, const char *expected);
@@ -1011,6 +1011,7 @@ Field *Parser::parse_class_field(Class *class_)
                 param = method->add_param(param_name, type, param_owns_type);
                 if(value != nullptr) { param->set_default_value(value); }
             }
+            eat_token(this); // Eat right-paren ')'
 
             // @NOTE(Kevin): I want to remove support for assigning a default value to methods
             // Parameters already support having a default value, so we should rely on that tool
@@ -1179,12 +1180,12 @@ bool Parser::parse_keywords_for_field(Field *field)
             stringstream error;
             error << "Duplicate keyword \"" << keyword << " for field \"" << field->name() << '"';
             add_error(this, curr_token.line, error.str().c_str());
-            error_occured = false;
+            error_occured = true;
         }
         eat_token(this);
     }
 
-    return error_occured;
+    return !error_occured;
 }
 
 Type *Parser::parse_type_expr(bool& caller_owns_return)
@@ -1312,7 +1313,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                 bool is_negative = prev_token.type == (TokenType)'-';
                 if(curr_token.type == Token_Real) {
                     modulus = curr_token.value.real;
-                } else if(curr_token.type != Token_Integer) {
+                } else if(curr_token.type == Token_Integer) {
                     modulus = (double)curr_token.value.integer;
                 } else {
                     unexpected_token(this, "number", "Attempting to parse modulus for type");
@@ -1700,7 +1701,7 @@ NumericRange Parser::parse_array_expr()
 
 Value *Parser::parse_value_expr(const Type *type)
 {
-    // TODO: Implement
+    // @TODO(Kevin): Implement
 }
 
 static void add_warning(Parser *parser, const LineInfo& where, const char *what)

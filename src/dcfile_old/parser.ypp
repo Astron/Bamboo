@@ -1577,7 +1577,7 @@ array_expansion
 			}
 			$$ = buf;
 
-			// TODO: Check for range limits
+			// @TODO(Kevin): Check for range limits
 
 		} else {
 			dcerror("Cannot use string value for non-string type '"
@@ -1623,7 +1623,7 @@ array_expansion
 			}
 			$$ = buf;
 
-			// TODO: Check for range limits
+			// @TODO(Kevin): Check for range limits
 
 		} else {
 			dcerror("Cannot use hex value for non-blob type '"

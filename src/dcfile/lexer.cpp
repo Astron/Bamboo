@@ -16,7 +16,7 @@ const array<string, 20> keywords = {
     "uint8", "uint16", "uint32", "uint64",
     "float32", "float64", "string", "blob",
 
-    "dclass" // NOTE(Kevin): I want to deprecate "dclass" in favor of "class"
+    "dclass" // @NOTE(Kevin): I want to deprecate "dclass" in favor of "class"
 };
 
 const array<TokenType, 20> keyword_types = {
@@ -143,7 +143,7 @@ Token Lexer::scan_token()
 
         for(unsigned int i = 0; i < keywords.size(); ++i) {
             if(name == "dclass") {
-                // NOTE(Kevin): If Bamboo works for everything, this change can be made
+                // @NOTE(Kevin): If Bamboo works for everything, this change can be made
                 /* print_warning(here, "\"dclass\" is deprecated, use \"class\" instead"); */
             }
             if(name == keywords[i]) {
@@ -392,7 +392,7 @@ Token Lexer::scan_token()
             token.type = (TokenType)'/';
             return token;
         }
-    } else if(c == EOF) {
+    } else if(c == EOF || c == '\0') {
         Token token;
         token.line = here;
         token.type = Token_Eof;

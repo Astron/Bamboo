@@ -37,7 +37,7 @@ void print_type(Type *typ, int indent) {
 }
 
 
-// NOTE(Kevin): Temporarily read the file and run the parser manually until
+// @NOTE(Kevin): Temporarily read the file and run the parser manually until
 // the load_module method has been implemented in dcfile/parser.cpp
 #include <stdio.h>
 #include <bamboo/dcfile/lexer.h>
@@ -59,7 +59,7 @@ int main(void) {
     auto lexer = Lexer(buffer, read + 1);
     auto parser = Parser(&lexer);
     parser.start();
-    mod = parser.parse_module(mod);
+    parser.parse_module(mod);
 
     cout << '\n'; // Newline after prompt
 

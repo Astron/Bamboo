@@ -43,7 +43,20 @@ const Class *Struct::as_class() const
 
 Field *Struct::add_field(const string& name, Type *type, bool field_owns_type)
 {
-    // TODO: Implement
+    // Structs can't have methods
+    if(type->subtype() == kTypeMethod) { return nullptr; }
+
+    // Struct fields must have unique names
+    if(m_fields_by_name.find(name) != m_fields_by_name.end()) { return nullptr; }
+
+    // Actually add field to struct
+    Field *field = new Field(name, type, field_owns_type);
+    if(!name.empty()) {
+        m_fields_by_name.emplace(name, field);
+        m_indices_by_name.emplace(name, (unsigned int)m_fields.size());
+    }
+
+    return field;
 }
 
 bool Struct::add_field(Field *field)
@@ -63,13 +76,21 @@ bool Struct::add_field(Field *field)
         return false;
     }
 
+    // Struct fields must have unique names
+    if(m_fields_by_name.find(field->name()) != m_fields_by_name.end()) { return false; }
+
+    // Actually add field to struct
     if(!field->name().empty()) {
-        // Struct fields must have unique names
-        bool inserted = m_fields_by_name.emplace(field->name(), field).second;
-        if(!inserted) { return false; }
-        m_indices_by_name[field->name()] = (unsigned int)m_fields.size();
+        m_fields_by_name.emplace(field->name(), field);
+        m_indices_by_name.emplace(field->name(), (unsigned int)m_fields.size());
     }
 
+
+    return true;
+}
+
+void Struct::add_declared_field(Field *field)
+{
     m_fields.push_back(field);
     if(m_module != nullptr) {
         // Get a module-wide id
@@ -77,6 +98,7 @@ bool Struct::add_field(Field *field)
         m_fields_by_id.emplace(field->id(), field);
     }
 
+    // Update struct size
     if(has_fixed_size() || m_fields.size() == 1) {
         if(field->type()->has_fixed_size()) {
             m_size += field->type()->fixed_size();
@@ -88,8 +110,6 @@ bool Struct::add_field(Field *field)
     // Transfer ownership of the Field to the Struct
     field->m_struct = this;
     m_declared_fields.push_back(unique_ptr<Field>(field));
-
-    return true;
 }
 
 void Struct::update_field_id(Field *field, int id)

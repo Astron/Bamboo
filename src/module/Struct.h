@@ -54,6 +54,8 @@ class Struct : public Type
 
     Struct(Module *module, const std::string& name, int id);
 
+    void add_declared_field(Field *field);
+
     // update_field_id registers the id for a field if it isn't shadowed
     void update_field_id(Field *field, int id);
     void update_field_type(Field *field, Type *new_type, Type *old_type = nullptr);
@@ -62,7 +64,7 @@ class Struct : public Type
     Module *m_module = nullptr;
     std::string m_name;
 
-    std::vector<Field *> m_fields; // TODO: Deal with keeping this vector ordered
+    std::vector<Field *> m_fields; // Fields ordered by id
     std::vector<std::unique_ptr<Field>> m_declared_fields;
     std::unordered_map<std::string, unsigned int> m_indices_by_name;
     std::unordered_map<std::string, Field *> m_fields_by_name;

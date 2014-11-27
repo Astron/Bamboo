@@ -42,34 +42,48 @@ void Class::add_child(Class *child)
 
 Field *Class::add_field(const string& name, Type *type, bool field_owns_type)
 {
-    // TODO: Implement
+    // Class fields must have names
+    if(name.empty()) { return nullptr; }
+
+    // Declared fields must have unique names
+    if(m_declared_names.find(name) != m_declared_names.end()) { return nullptr; }
+    m_declared_names.emplace(name);
+
+    // Actually add Field to Class
+    Field *field = new Field(name, type, field_owns_type);
+    add_declared_field(field);
+    return field;
 }
 
 bool Class::add_field(Field *field)
 {
     // Classes can't share fields, and can't re-add field to this
-    if(field->container() != nullptr) {
-        return false;
-    }
+    if(field->container() != nullptr) { return false; }
 
     // Class fields must have names
-    if(field->name().empty()) {
-        return false;
-    }
+    if(field->name().empty()) { return false; }
 
     // Declared fields must have unique names
     bool inserted = m_declared_names.insert(field->name()).second;
     if(!inserted) { return false; }
 
+    // Actually add field to class
+    add_declared_field(field);
+    return true;
+}
+
+// add_declared_field is called by the add_field overloads to actually add the field to the class.
+void Class::add_declared_field(Field *field)
+{
     // If a parent has a field with the same name, shadow it
     auto prev_field = m_fields_by_name.find(field->name());
     if(prev_field != m_fields_by_name.end()) {
         shadow_field(prev_field->second);
     }
 
-    m_fields.push_back(field); // Don't have to try to sort; id will always be the latest
+    // Keep m_fields is sorted, a new field will always be last
+    m_fields.push_back(field);
     if(m_module != nullptr) {
-        // Get a module-wide id
         m_module->register_field(field);
         m_fields_by_id[field->id()] = field;
     }
@@ -94,8 +108,6 @@ bool Class::add_field(Field *field)
     // Transfer ownership of the Field to the Class
     field->m_struct = this;
     m_declared_fields.push_back(unique_ptr<Field>(field));
-
-    return true;
 }
 
 // add_inherited_field updates a classes's fields after a parent adds a new field.

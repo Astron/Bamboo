@@ -39,7 +39,7 @@ class Class : public Struct
     bool add_parent(Class *parent);
 
     Field *add_field(const std::string& name, Type *type, bool field_owns_type) override;
-    bool add_field(Field *) override;  // If true, Class owns field
+    bool add_field(Field *field) override;  // If true, Class owns field
 
   private:
     friend class Module;
@@ -47,12 +47,8 @@ class Class : public Struct
     Class(Module *module, const std::string& name, int id) : Struct(module, name, id) {}
 
     void add_child(Class *child);
-
-    // add_inherited_field updates this Class's fields after a parent adds a new field.
+    void add_declared_field(Field *field);
     void add_inherited_field(Class *parent, Field *field);
-
-    // shadow_field removes the field from all of this Class's field accessors,
-    //     so that another field with the same name can be inserted.
     void shadow_field(Field *field);
 
     std::unordered_set<std::string> m_declared_names;

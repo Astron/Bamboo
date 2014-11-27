@@ -176,7 +176,7 @@ bool Numeric::set_modulus(double modulus)
 
 bool Numeric::set_range(const NumericRange& range)
 {
-    // TODO: Accept integer ranges
+    // @TODO(Kevin): Accept integer ranges
     if(range.type != Number::kFloat) { return false; }
 
     m_orig_range = range;
@@ -186,7 +186,7 @@ bool Numeric::set_range(const NumericRange& range)
     case kTypeInt32:
     case kTypeInt64:
         {
-            // TODO: Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
+            // @TODO(Kevin): Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
             int64_t min = (int64_t)floor(range.min.floating * m_divisor + 0.5);
             int64_t max = (int64_t)floor(range.max.floating * m_divisor + 0.5);
             m_range = NumericRange(min, max);
@@ -198,7 +198,7 @@ bool Numeric::set_range(const NumericRange& range)
     case kTypeUint32:
     case kTypeUint64:
         {
-            // TODO: Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
+            // @TODO(Kevin): Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
             uint64_t min = (uint64_t)floor(range.min.floating * m_divisor + 0.5);
             uint64_t max = (uint64_t)floor(range.max.floating * m_divisor + 0.5);
             m_range = NumericRange(min, max);

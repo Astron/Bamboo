@@ -186,7 +186,7 @@ void SimpleParameter::output_instance(ostream &out, bool brief, const string &pr
             out << "/" << m_divisor;
         }
 
-        // TODO: Replace
+        // @TODO(Kevin): Replace
         switch(m_datatype)
         {
             case DT_int8:
@@ -282,7 +282,7 @@ void ArrayParameter::output_instance(ostream &out, bool brief, const string &pre
         ostringstream strm;
 
         strm << "[";
-        // TODO: fix
+        // @TODO(Kevin): fix
         //m_array_size_range.output(strm);
         strm << "]";
 
@@ -337,7 +337,7 @@ void Struct::write(ostream &out, bool brief, int indent_level) const
         out << " " << m_name;
     }
 
-    // TODO: Move and update class write
+    // @TODO(Kevin): Move and update class write
     if(!m_parents.empty())
     {
         auto it = m_parents.begin();
@@ -358,7 +358,7 @@ void Struct::write(ostream &out, bool brief, int indent_level) const
     }
     out << "\n";
 
-    // TODO: Move and update class writing
+    // @TODO(Kevin): Move and update class writing
     if(m_constructor != nullptr)
     {
         m_constructor->write(out, brief, indent_level + 2);

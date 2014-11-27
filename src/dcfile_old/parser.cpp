@@ -3147,7 +3147,7 @@ yyreduce:
 			}
 			(yyval.value) = buf;
 
-			// TODO: Check for range limits
+			// @TODO(Kevin): Check for range limits
 
 		} else {
 			dcerror("Cannot use string value for non-string type '"
@@ -3197,7 +3197,7 @@ yyreduce:
 			}
 			(yyval.value) = buf;
 
-			// TODO: Check for range limits
+			// @TODO(Kevin): Check for range limits
 
 		} else {
 			dcerror("Cannot use hex value for non-blob type '"

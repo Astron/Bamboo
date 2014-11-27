@@ -55,8 +55,10 @@ class Module
     inline size_t num_imports() const { return m_imports.size(); }
     inline Import *nth_import(unsigned int n) { return m_imports[n].get(); }
     inline const Import *nth_import(unsigned int n) const { return m_imports[n].get(); }
+/*
     inline Import *import_by_module(const std::string& pymodule);
     inline const Import *import_by_module(const std::string& pymodule) const;
+*/
 
     inline bool has_keyword(const std::string& name);
     inline size_t num_keywords() const { return m_keywords.size(); }
@@ -81,6 +83,8 @@ class Module
     friend class Class;
     friend class Struct;
 
+    void add_declared_class(Class *class_);
+    void add_declared_struct(Struct *struct_);
     void register_field(Field *field); // sets the field's id
 
     std::vector<Struct *> m_structs;
@@ -90,7 +94,6 @@ class Module
     std::vector<std::unique_ptr<Type>> m_owned_types; // Builtin-types are statically allocated
     std::vector<Type *> m_types_by_id;
     std::unordered_map<std::string, Type *> m_types_by_name;
-    std::unordered_map<std::string, Import *> m_imports_by_module;
 
     std::vector<Field *> m_fields_by_id;
 

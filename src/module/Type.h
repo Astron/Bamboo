@@ -19,7 +19,7 @@ enum Subtype {
     kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
     kTypeFloat32, kTypeFloat64,
 
-    // TODO: Merge all numeric types into single subtype kTypeNumeric,
+    // @TODO(Kevin): Merge all numeric types into single subtype kTypeNumeric,
     //       use separate numeric typedef in Numeric.h
 
     kTypeFixed, // FIXME: Need a better model for loading and storing bounded numeric types

@@ -72,7 +72,7 @@ struct Number {
 
 };
 
-// TODO: Implement other comparison operators
+// @TODO(Kevin): Implement other comparison operators
 // FIXME: Allow operator== to perform conversions and compare numerically
 inline bool operator==(const Number& a, const Number& b)
 {

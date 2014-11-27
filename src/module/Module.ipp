@@ -47,16 +47,19 @@ inline const Type *Module::type_by_name(const std::string& name) const
     return it == m_types_by_name.end() ? nullptr : it->second;
 }
 
+/*
 inline Import *Module::import_by_module(const std::string& pymodule)
 {
     auto it = m_imports_by_module.find(pymodule);
     return it == m_imports_by_module.end() ? nullptr : it->second;
 }
+
 inline const Import *Module::import_by_module(const std::string& pymodule) const
 {
     auto it = m_imports_by_module.find(pymodule);
     return it == m_imports_by_module.end() ? nullptr : it->second;
 }
+*/
 
 inline bool Module::has_keyword(const std::string& name)
 {

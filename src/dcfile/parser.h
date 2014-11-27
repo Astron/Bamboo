@@ -70,7 +70,7 @@ struct Parser
     Token next_token;
     Token prev_token;
 
-    // TODO(Kevin): Maybe have the individual parse methods return a parser result with
+    // @TODO(Kevin): Maybe have the individual parse methods return a parser result with
     // results for "success", "error but finished expression", "error and could not recover"
     // so that we can avoid masking valid errors and produce fewer meaningless errors.
     bool mask_next_error = false;
