@@ -90,9 +90,31 @@ bool Method::add_param(Parameter *param)
     return true;
 }
 
-void Method::update_param_type(Parameter *param, Type *new_type, Type *old_type)
+void Method::update_param_type(Parameter *, Type *new_type, Type *old_type)
 {
-    // @TODO(Kevin): Implement
+    if(new_type->has_fixed_size()) {
+        if(old_type != nullptr && old_type->has_fixed_size()) {
+            m_size -= old_type->fixed_size();
+            m_size += old_type->fixed_size();
+        } else {
+            size_t fixed_size = 0;
+            bool is_fixed_size = true;
+            for(unique_ptr<Parameter>& param_ptr : m_params) {
+                if(!param_ptr->type()->has_fixed_size()) {
+                    is_fixed_size = false;
+                    break;
+                } else {
+                    fixed_size += param_ptr->type()->fixed_size();
+                }
+            }
+
+            if(is_fixed_size) {
+                m_size = fixed_size;
+            }
+        }
+    } else {
+        m_size = 0;
+    }
 }
 
 

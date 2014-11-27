@@ -51,6 +51,9 @@ class Class : public Struct
     void add_inherited_field(Class *parent, Field *field);
     void shadow_field(Field *field);
 
+    void update_field_id(Field *field, int id) override;
+    void update_field_type(Field *field, Type *new_type, Type *old_type = nullptr) override;
+
     std::unordered_set<std::string> m_declared_names;
     std::vector<Class *> m_parents;
     std::vector<Class *> m_children;

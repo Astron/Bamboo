@@ -114,12 +114,34 @@ void Struct::add_declared_field(Field *field)
 
 void Struct::update_field_id(Field *field, int id)
 {
-    // TODO: Implement
+    m_fields_by_id.emplace(id, field);
 }
 
-void Struct::update_field_type(Field *field, Type *new_type, Type *old_type)
+void Struct::update_field_type(Field *, Type *new_type, Type *old_type)
 {
-    // TODO: Implement
+    if(new_type->has_fixed_size()) {
+        if(old_type != nullptr && old_type->has_fixed_size()) {
+            m_size -= old_type->fixed_size();
+            m_size += old_type->fixed_size();
+        } else {
+            size_t fixed_size = 0;
+            bool is_fixed_size = true;
+            for(Field *field_ptr : m_fields) {
+                if(!field_ptr->type()->has_fixed_size()) {
+                    is_fixed_size = false;
+                    break;
+                } else {
+                    fixed_size += field_ptr->type()->fixed_size();
+                }
+            }
+
+            if(is_fixed_size) {
+                m_size = fixed_size;
+            }
+        }
+    } else {
+        m_size = 0;
+    }
 }
 
 

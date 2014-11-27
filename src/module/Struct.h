@@ -18,8 +18,6 @@ class Class;
 // Struct's constructor throws null_error if module is null.
 class Struct : public Type
 {
-    friend class Module;
-
   public:
     explicit Struct(const std::string& name);
     Struct(const Struct&) = delete;
@@ -50,15 +48,15 @@ class Struct : public Type
     virtual bool add_field(Field *field); // If true, Struct owns field
 
   protected:
+    friend class Module;
     friend class Field;
 
     Struct(Module *module, const std::string& name, int id);
 
     void add_declared_field(Field *field);
 
-    // update_field_id registers the id for a field if it isn't shadowed
-    void update_field_id(Field *field, int id);
-    void update_field_type(Field *field, Type *new_type, Type *old_type = nullptr);
+    virtual void update_field_id(Field *field, int id);
+    virtual void update_field_type(Field *field, Type *new_type, Type *old_type = nullptr);
 
     int m_id = -1;
     Module *m_module = nullptr;

@@ -204,5 +204,53 @@ void Class::shadow_field(Field *field)
     }
 }
 
+void Class::update_field_id(Field *field, int id)
+{
+    if(m_fields_by_name.find(field->name()) != m_fields_by_name.end()) {
+        // Update this class
+        m_fields_by_id.erase(id);
+        m_fields_by_id.emplace(id, field);
+
+        // Update derived classes
+        for(Class *child : m_children) {
+            child->update_field_id(field, id);
+        }
+    }
+}
+
+void Class::update_field_type(Field *field, Type *new_type, Type *old_type)
+{
+    if(m_fields_by_name.find(field->name()) != m_fields_by_name.end()) {
+        // Update this class
+        if(new_type->has_fixed_size()) {
+            if(old_type != nullptr && old_type->has_fixed_size()) {
+                m_size -= old_type->fixed_size();
+                m_size += old_type->fixed_size();
+            } else {
+                size_t fixed_size = 0;
+                bool is_fixed_size = true;
+                for(Field *field_ptr : m_fields) {
+                    if(!field_ptr->type()->has_fixed_size()) {
+                        is_fixed_size = false;
+                        break;
+                    } else {
+                        fixed_size += field_ptr->type()->fixed_size();
+                    }
+                }
+
+                if(is_fixed_size) {
+                    m_size = fixed_size;
+                }
+            }
+        } else {
+            m_size = 0;
+        }
+
+        // Update derived classes
+        for(Class *child : m_children) {
+            child->update_field_type(field, new_type, old_type);
+        }
+    }
+}
 
 } // close namespace bamboo

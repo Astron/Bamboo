@@ -43,10 +43,16 @@ bool Module::add_class(Class *class_)
     // A Class can't share a name with any other type.
     if(m_types_by_name.find(class_->name()) != m_types_by_name.end()) { return nullptr; }
 
+    // Set ids for the class and fields
     class_->m_id = m_types_by_id.size();
-
-    // @TODO(Kevin): Set the id of each field declared in the struct
-    // Deal with problem of reordering class fields by id
+    // @FIXME(Kevin): If we were to add fields to a class, then add parents that
+    // weren't in a module, then add both this and its parents to the module,
+    // the fields would be out of order and need to be reordered.
+    // In our current use case (parsing from a dcfile) this shouldn't happen.
+    for(Field *field : class_->m_fields) {
+        this->register_field(field);
+        class_->update_field_id(field, field->id());
+    }
 
     add_declared_class(class_);
     return true;
@@ -77,9 +83,12 @@ bool Module::add_struct(Struct *struct_)
     // A Class can't share a name with any other type.
     if(m_types_by_name.find(struct_->name()) != m_types_by_name.end()) { return false; }
 
+    // Set ids for the struct and fields
     struct_->m_id = m_types_by_id.size();
-
-    // @TODO(Kevin): Set the id of each field declared in the struct
+    for(Field *field : struct_->m_fields) {
+        this->register_field(field);
+        struct_->update_field_id(field, field->id());
+    }
 
     add_declared_struct(struct_);
     return true;
