@@ -11,7 +11,7 @@ class ParseValueTests : public CxxTest::TestSuite
     void testParseChar()
     {
       bool had_error = false;
-      Numeric *type = new Numeric(kTypeChar);
+      Numeric *type = new Numeric(Subtype_Char);
       Value value = Value::parse(type, "'k'", had_error);
 
       assert(not had_error);
@@ -21,7 +21,7 @@ class ParseValueTests : public CxxTest::TestSuite
     void testParseCharArray()
     {
       bool had_error = false;
-      Array *type = new Array(new Numeric(kTypeChar));
+      Array *type = new Array(new Numeric(Subtype_Char));
       Value value = Value::parse(type, "['T','e','s','t']", had_error);
       vector<char> expected = {'T', 'e', 's', 't'};
 

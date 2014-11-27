@@ -2,32 +2,34 @@
 #pragma once
 #include <cstdint>
 #include <limits>
+#include <ostream>
 namespace bamboo   // open namespace bamboo
 {
 
 
-// A Number represents any C++ numeric type.
-struct Number {
-    enum Type {
-        kNaN = 0,
-        kInt,
-        kUint,
-        kFloat
-    };
+enum NumberType {
+    Number_NotANumber = 0,
+    Number_Signed,
+    Number_Unsigned,
+    Number_Floating
+};
 
-    Type type;
+// A Number represents any C++ numeric type.
+struct Number
+{
+    NumberType type;
     union {
-        int64_t integer;
+        int64_t sinteger;
         uint64_t uinteger;
         double floating;
     };
 
-    Number()           : type(kNaN),   integer(0)  {}
-    Number(int32_t n)  : type(kInt),   integer(n)  {}
-    Number(int64_t n)  : type(kInt),   integer(n)  {}
-    Number(uint32_t n) : type(kUint),  uinteger(n) {}
-    Number(uint64_t n) : type(kUint),  uinteger(n) {}
-    Number(double n)   : type(kFloat), floating(n) {}
+    Number()           : type(Number_NotANumber), sinteger(0)  {}
+    Number(int32_t n)  : type(Number_Signed),     sinteger(n)  {}
+    Number(int64_t n)  : type(Number_Signed),     sinteger(n)  {}
+    Number(uint32_t n) : type(Number_Unsigned),   uinteger(n) {}
+    Number(uint64_t n) : type(Number_Unsigned),   uinteger(n) {}
+    Number(double n)   : type(Number_Floating),   floating(n) {}
     Number operator=(int64_t n)
     {
         return Number(n);
@@ -45,18 +47,19 @@ struct Number {
     operator numtype() const \
     { \
         switch(type) { \
-        case kInt: \
-            return (numtype)integer; \
-        case kUint: \
+        case Number_Signed: \
+            return (numtype)sinteger; \
+        case Number_Unsigned: \
             return (numtype)uinteger; \
-        case kFloat: \
+        case Number_Floating: \
             return (numtype)floating; \
-        case kNaN: \
+        case Number_NotANumber: \
         default: \
             return 0; \
         } \
     }
 
+    explicit CONVERSION(char);
     explicit CONVERSION(int8_t);
     explicit CONVERSION(int16_t);
     explicit CONVERSION(int32_t);
@@ -73,7 +76,7 @@ struct Number {
 };
 
 // @TODO(Kevin): Implement other comparison operators
-// FIXME: Allow operator== to perform conversions and compare numerically
+// @FIXME(Kevin): Allow operator== to perform conversions and compare numerically
 inline bool operator==(const Number& a, const Number& b)
 {
     return a.type == b.type && a.uinteger == b.uinteger;
@@ -82,40 +85,40 @@ inline bool operator==(const Number& a, const Number& b)
 // A NumericRange represents a range of integer or floating-point values.
 //     This is used to limit numeric types; or array, string, or blob sizes.
 struct NumericRange {
-    Number::Type type;
+    NumberType type;
     Number min;
     Number max;
 
-    inline NumericRange() : type(Number::kNaN)
+    inline NumericRange() : type(Number_NotANumber)
     {
-        min.type = max.type = Number::kNaN;
+        min.type = max.type = Number_NotANumber;
         // lowest is the most negative float (min is smallest positive)
         min.floating = std::numeric_limits<double>::lowest();
         max.floating = std::numeric_limits<double>::max();
     }
-    inline NumericRange(Number size)                : type(size.type),      min(size), max(size) {}
-    inline NumericRange(int32_t min, int32_t max)   : type(Number::kInt),   min(min), max(max) {}
-    inline NumericRange(int64_t min, int64_t max)   : type(Number::kInt),   min(min), max(max) {}
-    inline NumericRange(uint32_t min, uint32_t max) : type(Number::kUint),  min(min), max(max) {}
-    inline NumericRange(uint64_t min, uint64_t max) : type(Number::kUint),  min(min), max(max) {}
-    inline NumericRange(double min, double max)     : type(Number::kFloat), min(min), max(max) {}
+    inline NumericRange(Number size)                : type(size.type),       min(size), max(size) {}
+    inline NumericRange(int32_t min, int32_t max)   : type(Number_Signed),   min(min), max(max) {}
+    inline NumericRange(int64_t min, int64_t max)   : type(Number_Signed),   min(min), max(max) {}
+    inline NumericRange(uint32_t min, uint32_t max) : type(Number_Unsigned), min(min), max(max) {}
+    inline NumericRange(uint64_t min, uint64_t max) : type(Number_Unsigned), min(min), max(max) {}
+    inline NumericRange(double min, double max)     : type(Number_Floating), min(min), max(max) {}
 
     inline bool contains(Number num) const
     {
         switch(min.type) {
-        case Number::kNaN:
+        case Number_NotANumber:
             return true;
-        case Number::kInt:
+        case Number_Signed:
             {
                 int64_t val = int64_t(num);
-                return (min.integer <= val && val <= max.integer);
+                return (min.sinteger <= val && val <= max.sinteger);
             }
-        case Number::kUint:
+        case Number_Unsigned:
             {
                 uint64_t val = uint64_t(num);
                 return (min.uinteger <= val && val <= max.uinteger);
             }
-        case Number::kFloat:
+        case Number_Floating:
             {
                 double val = double(num);
                 return (min.floating <= val && val <= max.floating);
@@ -125,9 +128,37 @@ struct NumericRange {
 
     inline bool is_nan() const
     {
-        return (type == Number::kNaN);
+        return (type == Number_NotANumber);
     }
 };
 
 
 } // close namespace bamboo
+
+// Compatibility with namespace std primitives
+namespace std
+{
+
+
+inline std::ostream& operator<<(std::ostream& lhs, const bamboo::Number& rhs)
+{
+    switch(rhs.type) {
+    case bamboo::Number_NotANumber:
+        lhs << "nan";
+        break;
+    case bamboo::Number_Signed:
+        lhs << (int64_t)rhs;
+        break;
+    case bamboo::Number_Unsigned:
+        lhs << (uint64_t)rhs;
+        break;
+    case bamboo::Number_Floating:
+        lhs << (double)rhs;
+        break;
+    }
+
+    return lhs;
+}
+
+
+} // close namespace std

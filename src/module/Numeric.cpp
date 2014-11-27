@@ -1,44 +1,71 @@
 // Filename: Numeric.cpp
 #include "Numeric.h"
-#include <cmath>  // std::floor
-#include <limits> // std::numeric_limits
+#include <cmath>   // std::floor
+#include <limits>  // std::numeric_limits
+#include <sstream> // std::stringstream
 using namespace std;
 namespace bamboo
 {
 
 
-Numeric::Numeric(Subtype type) : Type(type)
+const char *format_numeric_type(NumericType numeric_type)
 {
-    switch(type) {
-    case kTypeChar:
-    case kTypeUint8:
-        m_signed = false;
-    case kTypeInt8:
+    switch(numeric_type) {
+    case Numeric_Invalid:
+        return "invalid";
+    case Numeric_Int8:
+        return "int8";
+    case Numeric_Int16:
+        return "int16";
+    case Numeric_Int32:
+        return "int32";
+    case Numeric_Int64:
+        return "int64";
+    case Numeric_Uint8:
+        return "uint8";
+    case Numeric_Uint16:
+        return "uint16";
+    case Numeric_Uint32:
+        return "uint32";
+    case Numeric_Uint64:
+        return "uint64";
+    case Numeric_Float32:
+        return "float32";
+    case Numeric_Float64:
+        return "float64";
+    }
+
+    return "unknown";
+}
+
+Numeric::Numeric(NumericType packtype) : Type(Subtype_Numeric), m_packtype(packtype)
+{
+    switch(packtype) {
+    case Numeric_Uint8:
+    case Numeric_Int8:
         m_size = sizeof(int8_t);
         break;
-    case kTypeUint16:
-        m_signed = false;
-    case kTypeInt16:
+    case Numeric_Uint16:
+    case Numeric_Int16:
         m_size = sizeof(int16_t);
         break;
-    case kTypeUint32:
-        m_signed = false;
-    case kTypeInt32:
+    case Numeric_Uint32:
+    case Numeric_Int32:
         m_size = sizeof(int32_t);
         break;
-    case kTypeUint64:
-        m_signed = false;
-    case kTypeInt64:
+    case Numeric_Uint64:
+    case Numeric_Int64:
         m_size = sizeof(int64_t);
         break;
-    case kTypeFloat32:
+    case Numeric_Float32:
         m_size = sizeof(float);
         break;
-    case kTypeFloat64:
+    case Numeric_Float64:
         m_size = sizeof(double);
         break;
-    default:
-        m_subtype = kTypeNone;
+    case Numeric_Invalid:
+        m_size = 0;
+        break;
     }
 }
 
@@ -54,18 +81,11 @@ const Numeric *Numeric::as_numeric() const
 
 bool Numeric::set_divisor(unsigned int divisor)
 {
-    if(divisor == 0) {
-        return false;
-    }
+    if(divisor == 0) { return false; }
 
     m_divisor = divisor;
-
-    if(has_range()) {
-        set_range(m_orig_range);
-    }
-    if(has_modulus()) {
-        set_modulus(m_orig_modulus);
-    }
+    if(has_range()) { set_range(m_orig_range); }
+    if(has_modulus()) { set_modulus(m_orig_modulus); }
 
     return true;
 }
@@ -77,61 +97,60 @@ bool Numeric::set_modulus(double modulus)
     uint64_t uint_modulus = uint64_t(floor(float_modulus + 0.5));
 
     // Check the range.  A valid range for the modulus is 1 to (maximum_value + 1) after scaling.
-    switch(m_subtype) {
-    case kTypeChar:
-    case kTypeUint8:
+    switch(m_packtype) {
+    case Numeric_Uint8:
         if(uint_modulus < 1 || uint16_t(numeric_limits<uint8_t>::max()) + 1u < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeUint16:
+    case Numeric_Uint16:
         if(uint_modulus < 1 || uint32_t(numeric_limits<uint16_t>::max()) + 1u < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeUint32:
+    case Numeric_Uint32:
         if(uint_modulus < 1 || uint64_t(numeric_limits<uint32_t>::max()) + 1ull < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeUint64:
+    case Numeric_Uint64:
         if(uint_modulus < 1) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeInt8:
+    case Numeric_Int8:
         if(uint_modulus < 1 || uint16_t(numeric_limits<int8_t>::max()) + 1u < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeInt16:
+    case Numeric_Int16:
         if(uint_modulus < 1 || uint32_t(numeric_limits<int16_t>::max()) + 1u < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeInt32:
+    case Numeric_Int32:
         if(uint_modulus < 1 || uint64_t(numeric_limits<int32_t>::max()) + 1ull < uint_modulus) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeInt64:
+    case Numeric_Int64:
         if(uint_modulus < 1) {
             return false;
         }
         m_modulus = uint_modulus;
         break;
-    case kTypeFloat32:
-    case kTypeFloat64:
+    case Numeric_Float32:
+    case Numeric_Float64:
         m_modulus = float_modulus;
         break;
-    default:
+    case Numeric_Invalid:
         return false;
     }
 
@@ -142,14 +161,14 @@ bool Numeric::set_modulus(double modulus)
 bool Numeric::set_range(const NumericRange& range)
 {
     // @TODO(Kevin): Accept integer ranges
-    if(range.type != Number::kFloat) { return false; }
+    if(range.type != Number_Floating) { return false; }
 
     m_orig_range = range;
-    switch(m_subtype) {
-    case kTypeInt8:
-    case kTypeInt16:
-    case kTypeInt32:
-    case kTypeInt64:
+    switch(m_packtype) {
+    case Numeric_Int8:
+    case Numeric_Int16:
+    case Numeric_Int32:
+    case Numeric_Int64:
         {
             // @TODO(Kevin): Validate range, i.e. => min and max within (INT[N]_MIN - INT[N]MAX)
             int64_t min = (int64_t)floor(range.min.floating * m_divisor + 0.5);
@@ -157,11 +176,10 @@ bool Numeric::set_range(const NumericRange& range)
             m_range = NumericRange(min, max);
         }
         break;
-    case kTypeChar:
-    case kTypeUint8:
-    case kTypeUint16:
-    case kTypeUint32:
-    case kTypeUint64:
+    case Numeric_Uint8:
+    case Numeric_Uint16:
+    case Numeric_Uint32:
+    case Numeric_Uint64:
         {
             // @TODO(Kevin): Validate range, i.e. => min and max within (UINT[N]_MIN - UINT[N]MAX)
             uint64_t min = (uint64_t)floor(range.min.floating * m_divisor + 0.5);
@@ -169,19 +187,32 @@ bool Numeric::set_range(const NumericRange& range)
             m_range = NumericRange(min, max);
         }
         break;
-    case kTypeFloat32:
-    case kTypeFloat64:
+    case Numeric_Float32:
+    case Numeric_Float64:
         {
             double min = range.min.floating * m_divisor;
             double max = range.max.floating * m_divisor;
             m_range = NumericRange(min, max);
         }
         break;
-    default:
+    case Numeric_Invalid:
         return false;
     }
 
     return true;
+}
+
+string Numeric::to_string() const
+{
+    stringstream repr;
+    repr << format_numeric_type(m_packtype);
+    if(has_range()) {
+        if(m_range.min == m_range.max) { repr << "(" << m_range.min << ")"; }
+        else { repr << "(" << m_range.min << ", " << m_range.max << ")"; }
+    }
+    if(has_modulus()) { repr << " % " << m_orig_modulus; }
+    if(has_divisor()) { repr << " / " << m_divisor; }
+    return repr.str();
 }
 
 

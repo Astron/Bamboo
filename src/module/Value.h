@@ -6,6 +6,7 @@
 #include "../module/Type.h"
 #include "../module/Field.h"
 #include "../module/Parameter.h"
+#include "../module/NumericRange.h"
 namespace bamboo
 {
 
@@ -67,18 +68,7 @@ class Value {
     inline const Type *type() const;
 
     // as_<T> performs a dynamic cast of the value to the given type; throws InvalidCast
-    inline char as_char() const;
-    inline int8_t as_int8() const;
-    inline int16_t as_int16() const;
-    inline int32_t as_int32() const;
-    inline int64_t as_int64() const;
-    inline uint8_t as_uint8() const;
-    inline uint16_t as_uint16() const;
-    inline uint32_t as_uint32() const;
-    inline uint64_t as_uint64() const;
-    inline float as_float32() const;
-    inline double as_float64() const;
-    inline double as_fixed() const;
+    inline Number as_numeric() const;
     inline const std::string& as_string() const;
     inline const std::vector<uint8_t>& as_blob() const;
     inline const array_t& as_array() const;
@@ -87,17 +77,8 @@ class Value {
 
     // Value member variables can be accessed directly to access the value without type-checking
     union {
-        char m_char;
-        int8_t m_int8;
-        int16_t m_int16;
-        int32_t m_int32;
-        int64_t m_int64;
-        uint8_t m_uint8;
-        uint16_t m_uint16;
-        uint32_t m_uint32;
-        uint64_t m_uint64;
-        float m_float32;
-        double m_float64;
+        Number m_numeric;
+
 #ifndef _MSC_VER
         // Use C++11 relaxed union for compliant compilers
         std::string m_string;

@@ -5,14 +5,7 @@
 #include <iostream> // std::cerr
 #include <set>
 #include "../traits/HashGenerator.h"
-#include "../module/Module.h"
-#include "../module/Class.h"
-#include "../module/Method.h"
-#include "../module/Parameter.h"
-#include "../module/MolecularField.h"
-#include "../module/NumericRange.h"
-#include "../module/Array.h"
-#include "../module/Numeric.h"
+#include "../module/module"
 
 using namespace std;
 namespace bamboo
@@ -27,6 +20,7 @@ static void hash_parameter(HashGenerator& hashgen, const Parameter *param);
 static void hash_keywords(HashGenerator& hashgen, const KeywordList *list);
 static void hash_legacy_type(HashGenerator& hashgen, const Type *type);
 static void hash_int_type(HashGenerator& hashgen, const Numeric *type);
+static void hash_num_type(HashGenerator& hashgen, const Numeric *type);
 
 // legacy_hash produces a hash which matches that of the old dcparser.
 uint32_t legacy_hash(const Module *file)
@@ -129,7 +123,7 @@ void hash_field(HashGenerator& hashgen, const Field *field)
 
 
     /* Handle DCAtomicField */
-    if(field->type()->subtype() == kTypeMethod) {
+    if(field->type()->subtype() == Subtype_Method) {
         // DCField::generate_hash()
         hashgen.add_string(field->name());
         hashgen.add_int(field->id());
@@ -220,8 +214,20 @@ void hash_keywords(HashGenerator& hashgen, const KeywordList *list)
 
 void hash_legacy_type(HashGenerator& hashgen, const Type *type)
 {
+    const TypeAlias *aliased = type->as_aliased();
+    if(aliased != nullptr) {
+        if(aliased->alias() == "char") {
+            hashgen.add_int(L_CHAR);
+            hash_int_type(hashgen, type->as_numeric());
+            return;
+        } else if(aliased->alias() == "byte") {
+            cerr << "Warning: byte ignored in legacy_hash.\n";
+            return;
+        }
+    }
+
     switch(type->subtype()) {
-    case kTypeStruct:
+    case Subtype_Struct:
         {
             // get_class()->generate_hash()
             const Struct *strct = type->as_struct();
@@ -232,7 +238,7 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
             }
         }
         break;
-    case kTypeArray:
+    case Subtype_Array:
         {
             const Array *arr = type->as_array();
 
@@ -248,7 +254,7 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
             }
         }
         break;
-    case kTypeBlob:
+    case Subtype_Blob:
         {
             hashgen.add_int(L_BLOB); // _type
             hashgen.add_int(1); // _divisor
@@ -263,7 +269,7 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
             }
         }
         break;
-    case kTypeString:
+    case Subtype_String:
         {
             hashgen.add_int(L_STRING); // _type
             hashgen.add_int(1); // _divisor
@@ -278,47 +284,56 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
             }
         }
         break;
-    case kTypeInt8:
+    case Subtype_Numeric:
+        hash_num_type(hashgen, type->as_numeric());
+        break;
+    case Subtype_None:
+        cerr << "Warning: none type ignored in legacy_hash.\n";
+        break;
+    case Subtype_Method:
+        cerr << "Warning: unbound method ignored in legacy_hash.\n";
+        break;
+    }
+}
+
+void hash_num_type(HashGenerator& hashgen, const Numeric *numeric)
+{
+    switch(numeric->packtype()) {
+    case Numeric_Int8:
         hashgen.add_int(L_INT8);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeInt16:
+    case Numeric_Int16:
         hashgen.add_int(L_INT16);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeInt32:
+    case Numeric_Int32:
         hashgen.add_int(L_INT32);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeInt64:
+    case Numeric_Int64:
         hashgen.add_int(L_INT64);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeUint8:
+    case Numeric_Uint8:
         hashgen.add_int(L_UINT8);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeUint16:
+    case Numeric_Uint16:
         hashgen.add_int(L_UINT16);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeUint32:
+    case Numeric_Uint32:
         hashgen.add_int(L_UINT32);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeUint64:
+    case Numeric_Uint64:
         hashgen.add_int(L_UINT64);
-        hash_int_type(hashgen, type->as_numeric());
+        hash_int_type(hashgen, numeric);
         break;
-    case kTypeChar:
-        hashgen.add_int(L_CHAR);
-        hash_int_type(hashgen, type->as_numeric());
-        break;
-    case kTypeFloat64:
+    case Numeric_Float64:
         {
             hashgen.add_int(L_FLOAT64); // _type
-
-            const Numeric *numeric = type->as_numeric();
             hashgen.add_int(numeric->divisor()); // _divisor
             if(numeric->has_modulus()) {
                 hashgen.add_int(int(numeric->modulus() * numeric->divisor())); // _modulus
@@ -332,17 +347,14 @@ void hash_legacy_type(HashGenerator& hashgen, const Type *type)
             }
         }
         break;
-    case kTypeFloat32:
+    case Numeric_Float32:
         cerr << "Warning: float32 ignored in legacy_hash.\n";
         break;
-    case kTypeNone:
-        cerr << "Warning: none type ignored in legacy_hash.\n";
+    case Numeric_Invalid:
+        cerr << "Warning: invalid numeric ignored in legacy_hash.\n";
         break;
-    default:
-        cerr << "Error: Unexpected type in hash_legacy_type while generating legacy_hash.\n";
     }
 }
-
 
 void hash_int_type(HashGenerator& hashgen, const Numeric *numeric)
 {

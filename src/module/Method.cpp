@@ -9,7 +9,7 @@ namespace bamboo
 
 Method::Method()
 {
-    m_subtype = kTypeMethod;
+    m_subtype = Subtype_Method;
 }
 
 Method *Method::as_method()
@@ -25,12 +25,12 @@ const Method *Method::as_method() const
 Parameter *Method::add_param(const std::string& name, Type *type, bool param_owns_type)
 {
     // Parameters can't have method types for now
-    if(type->subtype() == kTypeMethod) {
+    if(type->subtype() == Subtype_Method) {
         return nullptr;
     }
 
     // Parameters can't have class types for now
-    if(type->subtype() == kTypeStruct && type->as_struct()->as_class()) {
+    if(type->subtype() == Subtype_Struct && type->as_struct()->as_class()) {
         return nullptr;
     }
 

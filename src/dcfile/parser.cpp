@@ -11,20 +11,22 @@ namespace bamboo
 {
 
 
-const array<Type **, 13> token_to_primitive = {
-    &Type::Char, &Type::Int8, &Type::Int16, &Type::Int32, &Type::Int64,
+const array<Type **, 14> token_to_primitive = {
+    &Type::Byte, &Type::Char,
+    &Type::Int8, &Type::Int16, &Type::Int32, &Type::Int64,
     &Type::Uint8, &Type::Uint16, &Type::Uint32, &Type::Uint64,
-    &Type::Float32, &Type::Float64, &Type::String, &Type::Blob
+    &Type::Float32, &Type::Float64,
+    &Type::String, &Type::Blob
 };
 
-const array<Subtype, 13> token_to_subtype = {
-    kTypeChar, kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
-    kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
-    kTypeFloat32, kTypeFloat64, kTypeString, kTypeBlob
+const array<NumericType, 10> token_to_numtype = {
+    Numeric_Int8, Numeric_Int16, Numeric_Int32, Numeric_Int64,
+    Numeric_Uint8, Numeric_Uint16, Numeric_Uint32, Numeric_Uint64,
+    Numeric_Float32, Numeric_Float64
 };
 
-static Type *to_primitive(TokenType type) { return *token_to_primitive[type - Token_Char]; }
-static Subtype to_subtype(TokenType type) { return token_to_subtype[type - Token_Char]; }
+static Type *to_primitive(TokenType type) { return *token_to_primitive[type - Token_Byte]; }
+static NumericType to_numeric_type(TokenType type) { return token_to_numtype[type - Token_Int8]; }
 
 static void unexpected_token(Parser *parser, const char *expected);
 static void unexpected_token(Parser *parser, const char *expected, const char *info);
@@ -971,7 +973,7 @@ Field *Parser::parse_class_field(Class *class_)
                 if(type == nullptr) {
                     delete method;
                     return nullptr;
-                } else if(type->subtype() == kTypeStruct && type->as_struct()->as_class()) {
+                } else if(type->subtype() == Subtype_Struct && type->as_struct()->as_class()) {
                     add_error(this, param_start, "Parameter type cannot be a class");
                     if(param_owns_type) { delete type; }
                     delete method;
@@ -1212,13 +1214,21 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
             type = to_primitive(curr_token.type);
             caller_owns_return = false;
         } else if(curr_token.type == Token_String) {
+            // NOTE(Kevin): Types with Subtype string shouldn't need to be modified below
             type = Type::String;
             caller_owns_return = false;
         } else if(curr_token.type == Token_Blob) {
+            // NOTE(Kevin): Types with Subtype blob shouldn't need to be modified below
             type = Type::Blob;
             caller_owns_return = false;
+        } else if(curr_token.type == Token_Byte) {
+            type = new TypeAlias("byte", new Numeric(Numeric_Uint8), true);
+            caller_owns_return = true;
+        } else if(curr_token.type == Token_Char) {
+            type = new TypeAlias("char", new Numeric(Numeric_Uint8), true);
+            caller_owns_return = true;
         } else {
-            type = new Numeric(to_subtype(curr_token.type));
+            type = new Numeric(to_numeric_type(curr_token.type));
             caller_owns_return = true;
         }
     } else {
@@ -1337,7 +1347,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
             break;
         case '(':
             {
-                if(type->subtype() == kTypeString || type->subtype() == kTypeBlob) {
+                if(type->subtype() == Subtype_String || type->subtype() == Subtype_Blob) {
                     Array *ary = type->as_array();
                     if(ary->has_range()) {
                         stringstream error;
@@ -1374,8 +1384,8 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                     // Pass the error upstream
                     if(caller_owns_return) { delete type; }
                     return nullptr;
-                } else if(type->subtype() == kTypeString) {
-                    if(range.type != Number::kUint) {
+                } else if(type->subtype() == Subtype_String) {
+                    if(range.type != Number_Unsigned) {
                         add_error(this, curr_token.line,
                                   "Range for string-like type must be unsigned integer");
                     }
@@ -1385,8 +1395,8 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                     // but this doesn't make that distinction yet
                     type = new Array(Type::Char, false, range);
                     caller_owns_return = true;
-                } else if(type->subtype() == kTypeBlob) {
-                    if(range.type != Number::kUint) {
+                } else if(type->subtype() == Subtype_Blob) {
+                    if(range.type != Number_Unsigned) {
                         add_error(this, curr_token.line,
                                   "Range for blob-like type must be unsigned integer");
                     }
@@ -1556,15 +1566,15 @@ NumericRange Parser::parse_range_expr()
     eat_token(this);;
 
     // Actually build the numeric range
-    if(lhs.type == Number::kFloat || rhs.type == Number::kFloat) {
+    if(lhs.type == Number_Floating || rhs.type == Number_Floating) {
         if((double)lhs > (double)rhs) {
             add_error(this, start, "Min value of range greater than max");
         } else {
             return NumericRange((double)lhs, (double)rhs);
         }
-    } else if(lhs.type == Number::kInt || rhs.type == Number::kInt) {
+    } else if(lhs.type == Number_Signed || rhs.type == Number_Signed) {
         // Check left integer overflow
-        if(lhs.type != Number::kInt) {
+        if(lhs.type != Number_Signed) {
             int64_t lhs_s64 = (int64_t)lhs;
             if(lhs.uinteger > 0 && !(lhs_s64 > 0)) {
                 add_warning(this, lhs_line,
@@ -1573,7 +1583,7 @@ NumericRange Parser::parse_range_expr()
         }
 
         // Check right integer overflow
-        if(rhs.type != Number::kInt) {
+        if(rhs.type != Number_Signed) {
             int64_t rhs_s64 = (int64_t)rhs;
             if(rhs.uinteger > 0 && !(rhs_s64 > 0)) {
                 add_warning(this, rhs_line,
@@ -1693,7 +1703,7 @@ NumericRange Parser::parse_array_expr()
     eat_token(this);;
 
     // Actually build the array range
-    if(lhs.type == Number::kNaN || rhs.type == Number::kNaN) {
+    if(lhs.type == Number_NotANumber || rhs.type == Number_NotANumber) {
         return NumericRange();
     } else if(lhs.uinteger > rhs.uinteger) {
         add_error(this, start, "Min size of array range greater than max");

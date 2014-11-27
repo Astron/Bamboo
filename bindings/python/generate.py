@@ -78,9 +78,9 @@ def generate(file_):
     # Declare enums
     enumSubtype = module.add_enum('Subtype', [
         'kTypeInt8', 'kTypeInt16', 'kTypeInt32', 'kTypeInt64', 'kTypeUint8', 'kTypeUint16',
-        'kTypeUint32', 'kTypeUint64', 'kTypeChar', 'kTypeFloat32', 'kTypeFloat64', 'kTypeString',
-        'kTypeBlob', 'kTypeArray', 'kTypeStruct', 'kTypeMethod', 'kTypeNone'])
-    enumNumtype = structNumber.add_enum('Type', ['kNaN', 'kInt', 'kUint', 'kFloat'])
+        'kTypeUint32', 'kTypeUint64', 'Subtype_Char', 'kTypeFloat32', 'kTypeFloat64', 'Subtype_String',
+        'Subtype_Blob', 'Subtype_Array', 'Subtype_Struct', 'Subtype_Method', 'Subtype_None'])
+    enumNumtype = structNumber.add_enum('Type', ['Number_NotANumber', 'Number_Signed', 'Number_Unsigned', 'Number_Floating'])
 
     # Wrap STL containers
     bits.add_container('std::vector<std::string>', 'std::string', 'vector', custom_name = 'StringCollection')
@@ -91,12 +91,12 @@ def generate(file_):
     structImport.add_instance_attribute('module', 'std::string')
     structImport.add_instance_attribute('symbols', 'std::vector<std::string>')
     structNumber.add_copy_constructor()
-    structNumber.add_instance_attribute('type', 'bamboo::Number::Type')
+    structNumber.add_instance_attribute('type', 'bamboo::NumberType')
     structNumber.add_instance_attribute('integer', 'int64_t')
     structNumber.add_instance_attribute('uinteger', 'uint64_t')
     structNumber.add_instance_attribute('floating', 'double')
     structNumericRange.add_copy_constructor()
-    structNumericRange.add_instance_attribute('type', 'bamboo::Number::Type')
+    structNumericRange.add_instance_attribute('type', 'bamboo::NumberType')
     structNumericRange.add_instance_attribute('min', 'Number')
     structNumericRange.add_instance_attribute('max', 'Number')
 

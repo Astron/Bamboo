@@ -7,6 +7,21 @@
 namespace bamboo   // open namespace bamboo
 {
 
+enum NumericType {
+    Numeric_Invalid = 0,
+    Numeric_Int8,
+    Numeric_Int16,
+    Numeric_Int32,
+    Numeric_Int64,
+    Numeric_Uint8,
+    Numeric_Uint16,
+    Numeric_Uint32,
+    Numeric_Uint64,
+    Numeric_Float32,
+    Numeric_Float64,
+};
+
+const char *format_numeric_type(NumericType numeric_type);
 
 // A Numeric can represent any of the basic number types (ie. integers, floats, etc).
 //     A Numeric may also have a range and/or modulus to limit its possible values,
@@ -15,7 +30,7 @@ namespace bamboo   // open namespace bamboo
 class Numeric : public Type
 {
   public:
-    explicit Numeric(Subtype type);
+    explicit Numeric(NumericType packtype);
     Numeric(const Numeric&) = delete;
     Numeric& operator=(const Numeric&) = delete;
     virtual ~Numeric() {};
@@ -23,40 +38,54 @@ class Numeric : public Type
     Numeric *as_numeric() override;
     const Numeric *as_numeric() const override;
 
+    inline bool is_unsigned() const;
     inline bool is_signed() const;
+    inline bool is_floating() const;
+
+    inline bool has_divisor() const;
     inline unsigned int divisor() const;
     inline bool has_modulus() const;
     inline double modulus() const;
     inline bool has_range() const;
     inline NumericRange range() const;
 
-    inline double clamp(double value) const;
-    inline double clamp_fixed(double value) const; // clamp using range scaled by divisor
+#define TRANSFORMS(from, to) \
+    inline to scale(from value) const; \
+    inline to descale(from value) const; \
+    inline to wrap(from value) const; \
+    inline to wrap_scaled(from value) const; \
+    inline to clamp(from value) const; \
+    inline to clamp_scaled(from value) const;
 
-    inline int8_t to_fixed_s8(double floating) const;
-    inline int16_t to_fixed_s16(double floating) const;
-    inline int32_t to_fixed_s32(double floating) const;
-    inline int64_t to_fixed_s64(double floating) const;
-    inline uint8_t to_fixed_u8(double floating) const;
-    inline uint16_t to_fixed_u16(double floating) const;
-    inline uint32_t to_fixed_u32(double floating) const;
-    inline uint64_t to_fixed_u64(double floating) const;
+    TRANSFORMS(int8_t,  int64_t);
+    TRANSFORMS(int16_t, int64_t);
+    TRANSFORMS(int32_t, int64_t);
+    TRANSFORMS(int64_t, int64_t);
+    TRANSFORMS(uint8_t,  uint64_t);
+    TRANSFORMS(uint16_t, uint64_t);
+    TRANSFORMS(uint32_t, uint64_t);
+    TRANSFORMS(uint64_t, uint64_t);
+    TRANSFORMS(float,  double);
+    TRANSFORMS(double, double);
+#undef TRANSFORMS
 
-    inline double to_floating(int8_t fixed) const;
-    inline double to_floating(int16_t fixed) const;
-    inline double to_floating(int32_t fixed) const;
-    inline double to_floating(int64_t fixed) const;
-    inline double to_floating(uint8_t fixed) const;
-    inline double to_floating(uint16_t fixed) const;
-    inline double to_floating(uint32_t fixed) const;
-    inline double to_floating(uint64_t fixed) const;
+    inline NumericType packtype() const;
+    inline std::vector<uint8_t> pack(int64_t value) const;
+    inline std::vector<uint8_t> pack(uint64_t value) const;
+    inline std::vector<uint8_t> pack(double value) const;
+    inline size_t pack(int64_t value, uint8_t *buffer) const;
+    inline size_t pack(uint64_t value, uint8_t *buffer) const;
+    inline size_t pack(double value, uint8_t *buffer) const;
+    inline Number unpack(const uint8_t *buffer) const;
 
     bool set_divisor(unsigned int divisor); // typically to represent fixed-point
     bool set_modulus(double modulus); // typically for degrees/radians
     bool set_range(const NumericRange& range);
 
+    std::string to_string() const override;
+
   private:
-    bool m_signed = true;
+    NumericType m_packtype;
     unsigned int m_divisor = 1;
 
     // Original range and modulus values from the file, unscaled by the divisor.

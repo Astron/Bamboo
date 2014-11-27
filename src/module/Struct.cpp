@@ -8,13 +8,13 @@ namespace bamboo
 
 
 Struct::Struct(const std::string& name) :
-    Type(kTypeStruct),
+    Type(Subtype_Struct),
     m_name(name)
 {
 }
 
 Struct::Struct(Module *module, const std::string& name, int id) :
-    Type(kTypeStruct),
+    Type(Subtype_Struct),
     m_id(id),
     m_module(module),
     m_name(name)
@@ -44,7 +44,7 @@ const Class *Struct::as_class() const
 Field *Struct::add_field(const string& name, Type *type, bool field_owns_type)
 {
     // Structs can't have methods
-    if(type->subtype() == kTypeMethod) { return nullptr; }
+    if(type->subtype() == Subtype_Method) { return nullptr; }
 
     // Struct fields must have unique names
     if(m_fields_by_name.find(name) != m_fields_by_name.end()) { return nullptr; }
@@ -72,7 +72,7 @@ bool Struct::add_field(Field *field)
     }
 
     // Structs can't have methods
-    if(field->type()->subtype() == kTypeMethod) {
+    if(field->type()->subtype() == Subtype_Method) {
         return false;
     }
 

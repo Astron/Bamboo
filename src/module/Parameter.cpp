@@ -37,12 +37,12 @@ bool Parameter::set_name(const string& name)
 bool Parameter::set_type(Type *type, bool transfer_ownership)
 {
     // Parameters can't have method types for now
-    if(type->subtype() == kTypeMethod) {
+    if(type->subtype() == Subtype_Method) {
         return false;
     }
 
     // Parameters can't have class types for now
-    if(type->subtype() == kTypeStruct && type->as_struct()->as_class()) {
+    if(type->subtype() == Subtype_Struct && type->as_struct()->as_class()) {
         return false;
     }
 

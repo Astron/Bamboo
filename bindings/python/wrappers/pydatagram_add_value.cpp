@@ -20,7 +20,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
 #define PY_PACK_ERROR msgbuf
 
     switch(type->subtype()) {
-    case bamboo::kTypeChar:
+    case bamboo::Subtype_Char:
         if(!PyBytes_Check(py_value) && PyBytes_Size(py_value) == 1) {
             return _custom_py_pack_typerr("a byte string of length 1", py_value, msgbuf, bufsize);
         }
@@ -197,8 +197,8 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             }
         }
         break;
-    case bamboo::kTypeString:
-    case bamboo::kTypeBlob:
+    case bamboo::Subtype_String:
+    case bamboo::Subtype_Blob:
         {
             const char *value_ptr;
             Py_ssize_t value_length;
@@ -228,7 +228,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             }
         }
         break;
-    case bamboo::kTypeArray:
+    case bamboo::Subtype_Array:
         if(PyList_Check(py_value)) {
             const bamboo::Array *arr = type->as_array();
             const bamboo::Type *element_type = arr->element_type();
@@ -268,7 +268,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("list", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeStruct:
+    case bamboo::Subtype_Struct:
         if(PyTuple_Check(py_value)) {
             const bamboo::Struct *struct_ = type->as_struct();
             size_t num_fields = struct_->num_fields();
@@ -292,7 +292,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("tuple", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeMethod:
+    case bamboo::Subtype_Method:
         if(PyTuple_Check(py_value)) {
             const bamboo::Method *method = type->as_method();
             size_t num_params = method->num_params();
@@ -316,7 +316,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("tuple", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeNone:
+    case bamboo::Subtype_None:
         return (char *)"Can't pack value for type with subtype 'none'";
     }
 

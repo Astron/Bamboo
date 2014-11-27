@@ -12,33 +12,17 @@ class Method;
 class Numeric;
 class Struct;
 
-// Subtypes are numeric constants representing the layout of a Type.
 enum Subtype {
-    /* Numeric Types */
-    kTypeChar, // equivalent to uint8, except that it should be printed as a string
-    // @TODO(Kevin): Add kTypeByte without breaking legacy_hash
-    kTypeInt8, kTypeInt16, kTypeInt32, kTypeInt64,
-    kTypeUint8, kTypeUint16, kTypeUint32, kTypeUint64,
-    kTypeFloat32, kTypeFloat64,
-
-    // @TODO(Kevin): Merge all numeric types into single subtype kTypeNumeric,
-    //       use separate numeric typedef in Numeric.h
-
-    kTypeFixed, // FIXME: Need a better model for loading and storing bounded numeric types
-
-    /* Array Types */
-    kTypeString, // a human-readable string
-    kTypeBlob,   // any binary data
-    kTypeArray,  // any array with fixed byte-length (fixed array-size and element-length)
-
-    /* User-defined types */
-    kTypeStruct, // user-defined structure
-    kTypeMethod, // user-defined function prototype
-
-    kTypeNone
+    Subtype_None = 0,
+    Subtype_Numeric, // any number
+    Subtype_String,  // a human-readable string
+    Subtype_Blob,    // any binary data
+    Subtype_Array,   // any array with fixed byte-length (fixed array-size and element-length)
+    Subtype_Struct,  // user-defined structure
+    Subtype_Method,  // user-defined function prototype
 };
 
-std::string format_subtype(Subtype subtype);
+const char *format_subtype(Subtype subtype);
 
 // A Type defines the storage and wire format of a variable in the Bamboo type system
 class Type
@@ -87,7 +71,7 @@ class Type
   protected:
     explicit Type(Subtype subtype) : m_subtype(subtype) {}
 
-    Subtype m_subtype = kTypeNone;
+    Subtype m_subtype = Subtype_None;
     size_t m_size = 0; // a value of 0 indicates the size is variable
 };
 

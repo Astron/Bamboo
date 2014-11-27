@@ -15,7 +15,7 @@ string astron_keywords[] = {"clsend", "ownsend", "clrecv", "ownrecv",
 /* Helper function for printing complex types */
 void print_type(Type *typ, int indent) {
     string tab(2 * indent, ' ');
-    if(typ->subtype() == kTypeMethod) {
+    if(typ->subtype() == Subtype_Method) {
         Method *method = typ->as_method();
         for(unsigned int i = 0; i < method->num_params(); ++i) {
             Parameter *param = method->nth_param(i);
@@ -24,7 +24,7 @@ void print_type(Type *typ, int indent) {
             cout << param->type()->to_string() << '\n';
             print_type(param->type(), indent + 1);
         }
-    } else if(typ->subtype() == kTypeStruct) {
+    } else if(typ->subtype() == Subtype_Struct) {
         Struct *cls = typ->as_struct();
         for(unsigned int i = 0; i < cls->num_fields(); ++i) {
             Field *field = cls->nth_field(i);

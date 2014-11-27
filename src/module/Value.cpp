@@ -1,7 +1,7 @@
 // Filename: Value.cpp
 #include "Value.h"
-#include <cctype>  // std::isprint
-#include <sstream> // std::ostringstream
+#include <cctype>  // isprint
+#include <sstream> // ostringstream
 #include "../bits/buffers.h"
 #include "../module/Array.h"
 #include "../module/Struct.h"
@@ -18,101 +18,74 @@ using namespace std;
 namespace bamboo   // open namespace bamboo
 {
 
-
-static std::string format_value(const Value& value);
-static void format_value(const Value& value, std::ostream& out);
-static void format_hex(const std::vector<uint8_t>& blob, std::ostream& out);
-// format_quoted outputs a string enclosed in quotes after escaping the string.
-//     Any instances of backslash (\) or the quoute character in the string are escaped.
-//     Non-printable characters are replaced with an escaped hexidecimal constant.
-static void format_quoted(char quote_mark, const std::string& str, std::ostream& out);
+static string format_value(const Value& value);
+static void format_value(const Value& value, ostream& out);
+static void format_hex(uint8_t byte, ostream& out);
+static void format_hex(const vector<uint8_t>& bytes, ostream& out);
+static void format_quoted(char chr, ostream& out);
+static void format_quoted(const string& str, ostream& out);
 
 Value::Value(const Type *type) : m_type(type)
 {
     if(m_type == nullptr) { m_type = Type::None; }
     switch(m_type->subtype()) {
-    case kTypeChar:
-        m_char = '\0';
+    case Subtype_Numeric:
+        if(m_type->as_numeric()->is_unsigned()) { m_numeric = (uint64_t)0; }
+        else if(m_type->as_numeric()->is_signed()) { m_numeric = (int64_t)0; }
+        else if(m_type->as_numeric()->is_floating()) { m_numeric = (double)0; }
+        else { m_numeric = Number(); }
         break;
-    case kTypeInt8:
-        m_int8 = 0;
-        break;
-    case kTypeInt16:
-        m_int16 = 0;
-        break;
-    case kTypeInt32:
-        m_int32 = 0;
-        break;
-    case kTypeInt64:
-        m_int64 = 0;
-        break;
-    case kTypeUint8:
-        m_uint8 = 0;
-        break;
-    case kTypeUint16:
-        m_uint16 = 0;
-        break;
-    case kTypeUint32:
-        m_uint32 = 0;
-        break;
-    case kTypeUint64:
-        m_uint64 = 0;
-        break;
-    case kTypeFloat32:
-        m_float32 = 0;
-        break;
-    case kTypeFloat64:
-    case kTypeFixed:
-        m_float64 = 0;
-        break;
-    case kTypeString:
+    case Subtype_String:
         new (&m_string) string(size_t(m_type->as_array()->range().min.uinteger), '\0');
         break;
-    case kTypeBlob:
+    case Subtype_Blob:
         new (&m_blob) vector<uint8_t>(size_t(m_type->as_array()->range().min.uinteger), uint8_t(0));
         break;
-    case kTypeArray: {
-        const Array *array = m_type->as_array();
-        new (&m_array) vector<Value>(size_t(array->range().min.uinteger), Value(array->element_type()));
+    case Subtype_Array:
+        {
+            const Array *array = m_type->as_array();
+            new (&m_array) vector<Value>(size_t(array->range().min.uinteger), Value(array->element_type()));
+        }
         break;
-    }
-    case kTypeStruct: {
-        new (&m_struct) struct_t();
+    case Subtype_Struct:
+        {
+            new (&m_struct) struct_t();
 
-        // Construct the struct from default values for its fields
-        const Struct *container = m_type->as_struct();
-        size_t num_fields = container->num_fields();
-        for(size_t i = 0; i < num_fields; ++i) {
-            const Field *field = container->nth_field((unsigned int)i);
-            if(field->has_default_value()) {
-                // Get default value for field
-                m_struct.emplace(field, *field->default_value());
-            } else {
-                // Otherwise, use the implicit default (0, empty, etc...)
-                m_struct.emplace(field, Value(field->type()));
+            // Construct the struct from default values for its fields
+            const Struct *struct_ = m_type->as_struct();
+            size_t num_fields = struct_->num_fields();
+            for(size_t i = 0; i < num_fields; ++i) {
+                const Field *field = struct_->nth_field((unsigned int)i);
+                if(field->has_default_value()) {
+                    // Get default value for field
+                    m_struct.emplace(field, *field->default_value());
+                } else {
+                    // Otherwise, use the implicit default (0, empty, etc...)
+                    m_struct.emplace(field, Value(field->type()));
+                }
             }
         }
         break;
-    }
-    case kTypeMethod: {
-        new (&m_method) method_t();
+    case Subtype_Method:
+        {
+            new (&m_method) method_t();
 
-        // Construct the method-call from default values for its parameters
-        const Method *method = m_type->as_method();
-        size_t num_params = method->num_params();
-        for(unsigned int i = 0; i < num_params; ++i) {
-            const Parameter *param = method->nth_param(i);
-            if(param->has_default_value()) {
-                // Get default value for field
-                m_method.emplace(param, *param->default_value());
-            } else {
-                // Otherwise, use the implicit default (0, empty, etc...)
-                m_method.emplace(param, Value(param->type()));
+            // Construct the method-call from default values for its parameters
+            const Method *method = m_type->as_method();
+            size_t num_params = method->num_params();
+            for(unsigned int i = 0; i < num_params; ++i) {
+                const Parameter *param = method->nth_param(i);
+                if(param->has_default_value()) {
+                    // Get default value for field
+                    m_method.emplace(param, *param->default_value());
+                } else {
+                    // Otherwise, use the implicit default (0, empty, etc...)
+                    m_method.emplace(param, Value(param->type()));
+                }
             }
         }
         break;
-    }
-    case kTypeNone:
+    case Subtype_None:
         break;
     }
 }
@@ -120,56 +93,25 @@ Value::Value(const Type *type) : m_type(type)
 Value::Value(const Value& other) : m_type(other.m_type)
 {
     switch(m_type->subtype()) {
-    case kTypeChar:
-        m_char = other.m_char;
+    case Subtype_Numeric:
+        m_numeric = other.m_numeric;
         break;
-    case kTypeInt8:
-        m_int8 = other.m_int8;
-        break;
-    case kTypeInt16:
-        m_int16 = other.m_int16;
-        break;
-    case kTypeInt32:
-        m_int32 = other.m_int32;
-        break;
-    case kTypeInt64:
-        m_int64 = other.m_int64;
-        break;
-    case kTypeUint8:
-        m_uint8 = other.m_uint8;
-        break;
-    case kTypeUint16:
-        m_uint16 = other.m_uint16;
-        break;
-    case kTypeUint32:
-        m_uint32 = other.m_uint32;
-        break;
-    case kTypeUint64:
-        m_uint64 = other.m_uint64;
-        break;
-    case kTypeFloat32:
-        m_float32 = other.m_float32;
-        break;
-    case kTypeFloat64:
-    case kTypeFixed:
-        m_float64 = other.m_float64;
-        break;
-    case kTypeString:
+    case Subtype_String:
         m_string = other.m_string;
         break;
-    case kTypeBlob:
+    case Subtype_Blob:
         m_blob = other.m_blob;
         break;
-    case kTypeArray:
+    case Subtype_Array:
         m_array = other.m_array;
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         m_struct = other.m_struct;
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         m_method = other.m_method;
         break;
-    case kTypeNone:
+    case Subtype_None:
         break;
     }
 }
@@ -183,19 +125,19 @@ Value& Value::operator=(Value rhs)
 Value::~Value()
 {
     switch(m_type->subtype()) {
-    case kTypeString:
+    case Subtype_String:
         m_string.~string();
         break;
-    case kTypeBlob:
+    case Subtype_Blob:
         m_blob.~vector<uint8_t>();
         break;
-    case kTypeArray:
+    case Subtype_Array:
         m_array.~vector<Value>();
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         m_struct.~struct_t();
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         m_method.~method_t();
         break;
     default:
@@ -203,7 +145,7 @@ Value::~Value()
     }
 }
 
-Value Value::parse(const Type *type, const std::string& formatted)
+Value Value::parse(const Type *type, const string& formatted)
 {
     auto lexer = Lexer(formatted.c_str(), formatted.length());
     auto parser = Parser(&lexer);
@@ -219,71 +161,14 @@ Value Value::unpack(const Type *type, const vector<uint8_t>& packed, size_t offs
     Value value;
     value.m_type = type;
     switch(type->subtype()) {
-    case kTypeChar:
-        value.m_char = safe_read_char(packed, offset);
-        break;
-    case kTypeInt8:
-        value.m_int8 = safe_read_int8(packed, offset);
-        break;
-    case kTypeInt16:
-        value.m_int16 = safe_read_int16(packed, offset);
-        break;
-    case kTypeInt32:
-        value.m_int32 = safe_read_int32(packed, offset);
-        break;
-    case kTypeInt64:
-        value.m_int64 = safe_read_int64(packed, offset);
-        break;
-    case kTypeUint8:
-        value.m_uint8 = safe_read_uint8(packed, offset);
-        break;
-    case kTypeUint16:
-        value.m_uint16 = safe_read_uint16(packed, offset);
-        break;
-    case kTypeUint32:
-        value.m_uint32 = safe_read_uint32(packed, offset);
-        break;
-    case kTypeUint64:
-        value.m_uint64 = safe_read_uint64(packed, offset);
-        break;
-    case kTypeFloat32:
-        value.m_float32 = safe_read_float32(packed, offset);
-        break;
-    case kTypeFloat64:
-        value.m_float64 = safe_read_float64(packed, offset);
-        break;
-    case kTypeFixed: {
-        const Numeric *numeric = type->as_numeric();
-        if(numeric->is_signed()) {
-            switch(numeric->fixed_size()) {
-            case 1:
-                value.m_float64 = numeric->to_floating(safe_read_int8(packed, offset));
-            case 2:
-                value.m_float64 = numeric->to_floating(safe_read_int16(packed, offset));
-            case 4:
-                value.m_float64 = numeric->to_floating(safe_read_int32(packed, offset));
-            case 8:
-                value.m_float64 = numeric->to_floating(safe_read_int64(packed, offset));
-            default:
-                throw InvalidValue("type had unexpected bytesize");
-            }
-        } else {
-            switch(numeric->fixed_size()) {
-            case 1:
-                value.m_float64 = numeric->to_floating(safe_read_uint8(packed, offset));
-            case 2:
-                value.m_float64 = numeric->to_floating(safe_read_uint16(packed, offset));
-            case 4:
-                value.m_float64 = numeric->to_floating(safe_read_uint32(packed, offset));
-            case 8:
-                value.m_float64 = numeric->to_floating(safe_read_uint64(packed, offset));
-            default:
-                throw InvalidValue("type had unexpected bytesize");
-            }
-
+    case Subtype_Numeric:
+        {
+            const Numeric *numeric = type->as_numeric();
+            value.m_numeric = numeric->unpack(&packed[offset]);
+            offset += numeric->fixed_size();
         }
-    }
-    case kTypeString: {
+        break;
+    case Subtype_String:
         new (&value.m_string) string();
         if(type->has_fixed_size()) {
             value.m_string = safe_read_string(packed, type->fixed_size(), offset);
@@ -292,8 +177,7 @@ Value Value::unpack(const Type *type, const vector<uint8_t>& packed, size_t offs
             value.m_string = safe_read_string(packed, size, offset);
         }
         break;
-    }
-    case kTypeBlob: {
+    case Subtype_Blob:
         new (&value.m_blob) vector<uint8_t>();
         if(type->has_fixed_size()) {
             value.m_blob = safe_read_data(packed, type->fixed_size(), offset);
@@ -302,47 +186,50 @@ Value Value::unpack(const Type *type, const vector<uint8_t>& packed, size_t offs
             value.m_blob = safe_read_data(packed, size, offset);
         }
         break;
-    }
-    case kTypeArray: {
-        new (&value.m_array) array_t();
+    case Subtype_Array:
+        {
+            new (&value.m_array) array_t();
 
-        uint16_t size = 0;
-        if(type->has_fixed_size()) {
-            size = type->fixed_size();
-        } else {
-            size = safe_read_int16(packed, offset);
-        }
+            uint16_t size = 0;
+            if(type->has_fixed_size()) {
+                size = type->fixed_size();
+            } else {
+                size = safe_read_int16(packed, offset);
+            }
 
-        size_t array_end = offset + size;
-        const Array *array = type->as_array();
-        while(offset < array_end) {
-            value.m_array.push_back(unpack(array->element_type(), packed, offset));
-        }
-        if(offset > array_end) { throw InvalidValue("array values exceeded array size"); }
-    }
-    case kTypeStruct: {
-        new (&value.m_struct) struct_t();
-
-        const Struct *struct_ = type->as_struct();
-        size_t num_fields = struct_->num_fields();
-        for(unsigned int i = 0; i < num_fields; ++i) {
-            const Field *field = struct_->nth_field(i);
-            value.m_struct.emplace(field, unpack(field->type(), packed, offset));
+            size_t array_end = offset + size;
+            const Array *array = type->as_array();
+            while(offset < array_end) {
+                value.m_array.push_back(unpack(array->element_type(), packed, offset));
+            }
+            if(offset > array_end) { throw InvalidValue("array values exceeded array size"); }
         }
         break;
-    }
-    case kTypeMethod: {
-        new (&value.m_method) method_t();
+    case Subtype_Struct:
+        {
+            new (&value.m_struct) struct_t();
 
-        const Method *method = type->as_method();
-        size_t num_params = method->num_params();
-        for(unsigned int i = 0; i < num_params; ++i) {
-            const Parameter *param = method->nth_param(i);
-            value.m_method.emplace(param, unpack(param->type(), packed, offset));
+            const Struct *struct_ = type->as_struct();
+            size_t num_fields = struct_->num_fields();
+            for(unsigned int i = 0; i < num_fields; ++i) {
+                const Field *field = struct_->nth_field(i);
+                value.m_struct.emplace(field, unpack(field->type(), packed, offset));
+            }
         }
         break;
-    }
-    case kTypeNone:
+    case Subtype_Method:
+        {
+            new (&value.m_method) method_t();
+
+            const Method *method = type->as_method();
+            size_t num_params = method->num_params();
+            for(unsigned int i = 0; i < num_params; ++i) {
+                const Parameter *param = method->nth_param(i);
+                value.m_method.emplace(param, unpack(param->type(), packed, offset));
+            }
+        }
+        break;
+    case Subtype_None:
         break;
     }
 
@@ -355,7 +242,7 @@ Value Value::unpack32(const Type *type, const vector<uint8_t>& packed, size_t of
     Value value;
     value.m_type = type;
     switch(type->subtype()) {
-    case kTypeString: {
+    case Subtype_String:
         new (&value.m_string) string();
         if(type->has_fixed_size()) {
             value.m_string = safe_read_string(packed, type->fixed_size(), offset);
@@ -364,8 +251,7 @@ Value Value::unpack32(const Type *type, const vector<uint8_t>& packed, size_t of
             value.m_string = safe_read_string(packed, size, offset);
         }
         break;
-    }
-    case kTypeBlob: {
+    case Subtype_Blob:
         new (&value.m_blob) vector<uint8_t>();
         if(type->has_fixed_size()) {
             value.m_blob = safe_read_data(packed, type->fixed_size(), offset);
@@ -374,46 +260,49 @@ Value Value::unpack32(const Type *type, const vector<uint8_t>& packed, size_t of
             value.m_blob = safe_read_data(packed, size, offset);
         }
         break;
-    }
-    case kTypeArray: {
-        new (&value.m_array) array_t();
+    case Subtype_Array:
+        {
+            new (&value.m_array) array_t();
 
-        uint32_t size = 0;
-        if(type->has_fixed_size()) {
-            size = type->fixed_size();
-        } else {
-            size = safe_read_int32(packed, offset);
-        }
+            uint32_t size = 0;
+            if(type->has_fixed_size()) {
+                size = type->fixed_size();
+            } else {
+                size = safe_read_int32(packed, offset);
+            }
 
-        size_t array_end = offset + size;
-        const Array *array = type->as_array();
-        while(offset < array_end) {
-            value.m_array.push_back(unpack32(array->element_type(), packed, offset));
-        }
-        if(offset > array_end) { throw InvalidValue("array values exceeded array size"); }
-    }
-    case kTypeStruct: {
-        new (&value.m_struct) struct_t();
-
-        const Struct *struct_ = type->as_struct();
-        size_t num_fields = struct_->num_fields();
-        for(unsigned int i = 0; i < num_fields; ++i) {
-            const Field *field = struct_->nth_field(i);
-            value.m_struct.emplace(field, unpack32(field->type(), packed, offset));
+            size_t array_end = offset + size;
+            const Array *array = type->as_array();
+            while(offset < array_end) {
+                value.m_array.push_back(unpack32(array->element_type(), packed, offset));
+            }
+            if(offset > array_end) { throw InvalidValue("array values exceeded array size"); }
         }
         break;
-    }
-    case kTypeMethod: {
-        new (&value.m_method) method_t();
+    case Subtype_Struct:
+        {
+            new (&value.m_struct) struct_t();
 
-        const Method *method = type->as_method();
-        size_t num_params = method->num_params();
-        for(unsigned int i = 0; i < num_params; ++i) {
-            const Parameter *param = method->nth_param(i);
-            value.m_method.emplace(param, unpack32(param->type(), packed, offset));
+            const Struct *struct_ = type->as_struct();
+            size_t num_fields = struct_->num_fields();
+            for(unsigned int i = 0; i < num_fields; ++i) {
+                const Field *field = struct_->nth_field(i);
+                value.m_struct.emplace(field, unpack32(field->type(), packed, offset));
+            }
         }
         break;
-    }
+    case Subtype_Method:
+        {
+            new (&value.m_method) method_t();
+
+            const Method *method = type->as_method();
+            size_t num_params = method->num_params();
+            for(unsigned int i = 0; i < num_params; ++i) {
+                const Parameter *param = method->nth_param(i);
+                value.m_method.emplace(param, unpack32(param->type(), packed, offset));
+            }
+        }
+        break;
     default:
         return unpack(type, packed, offset);
     }
@@ -422,7 +311,7 @@ Value Value::unpack32(const Type *type, const vector<uint8_t>& packed, size_t of
     return value;
 }
 
-std::string Value::format() const
+string Value::format() const
 {
     return format_value(*this);
 }
@@ -430,60 +319,22 @@ std::string Value::format() const
 vector<uint8_t> Value::pack() const
 {
     switch(m_type->subtype()) {
-    case kTypeChar:
-        return as_buffer(m_char);
-    case kTypeInt8:
-        return as_buffer(m_int8);
-    case kTypeInt16:
-        return as_buffer(m_int16);
-    case kTypeInt32:
-        return as_buffer(m_int32);
-    case kTypeInt64:
-        return as_buffer(m_int64);
-    case kTypeUint8:
-        return as_buffer(m_uint8);
-    case kTypeUint16:
-        return as_buffer(m_uint16);
-    case kTypeUint32:
-        return as_buffer(m_uint32);
-    case kTypeUint64:
-        return as_buffer(m_uint64);
-    case kTypeFloat32:
-        return as_buffer(m_float32);
-    case kTypeFloat64:
-        return as_buffer(m_float64);
-    case kTypeFixed:
+    case Subtype_Numeric:
         {
             const Numeric *numeric = m_type->as_numeric();
-            if(numeric->is_signed()) {
-                switch(numeric->fixed_size()) {
-                case 1:
-                    return as_buffer(numeric->to_fixed_s8(m_float64));
-                case 2:
-                    return as_buffer(numeric->to_fixed_s16(m_float64));
-                case 4:
-                    return as_buffer(numeric->to_fixed_s32(m_float64));
-                case 8:
-                    return as_buffer(numeric->to_fixed_s64(m_float64));
-                default:
-                    return vector<uint8_t>();
-                }
-            } else {
-                switch(numeric->fixed_size()) {
-                case 1:
-                    return as_buffer(numeric->to_fixed_u8(m_float64));
-                case 2:
-                    return as_buffer(numeric->to_fixed_u16(m_float64));
-                case 4:
-                    return as_buffer(numeric->to_fixed_u32(m_float64));
-                case 8:
-                    return as_buffer(numeric->to_fixed_u64(m_float64));
-                default:
-                    return vector<uint8_t>();
-                }
+            switch(m_numeric.type) {
+            case Number_Signed:
+                return numeric->pack(m_numeric.sinteger);
+            case Number_Unsigned:
+                return numeric->pack(m_numeric.uinteger);
+            case Number_Floating:
+                return numeric->pack(m_numeric.floating);
+            case Number_NotANumber:
+                return vector<uint8_t>();
             }
         }
-    case kTypeString:
+        break;
+    case Subtype_String:
         {
             if(m_type->has_fixed_size()) { return as_buffer(m_string); }
 
@@ -491,7 +342,8 @@ vector<uint8_t> Value::pack() const
             pack_value(as_buffer(m_string), packed);
             return packed;
         }
-    case kTypeBlob:
+        break;
+    case Subtype_Blob:
         {
             if(m_type->has_fixed_size()) { return m_blob; }
 
@@ -499,7 +351,8 @@ vector<uint8_t> Value::pack() const
             pack_value(m_blob, packed);
             return packed;
         }
-    case kTypeArray:
+        break;
+    case Subtype_Array:
         {
             if(m_type->has_fixed_size()) {
                 vector<uint8_t> packed;
@@ -519,7 +372,8 @@ vector<uint8_t> Value::pack() const
                 return packed;
             }
         }
-    case kTypeStruct:
+        break;
+    case Subtype_Struct:
         {
             const Struct *container = m_type->as_struct();
             size_t num_fields = container->num_fields();
@@ -529,7 +383,8 @@ vector<uint8_t> Value::pack() const
             }
             return packed;
         }
-    case kTypeMethod:
+        break;
+    case Subtype_Method:
         {
             const Method *method = m_type->as_method();
             size_t num_params = method->num_params();
@@ -539,7 +394,8 @@ vector<uint8_t> Value::pack() const
             }
             return packed;
         }
-    case kTypeNone:
+        break;
+    case Subtype_None:
         break;
     }
 
@@ -549,7 +405,7 @@ vector<uint8_t> Value::pack() const
 vector<uint8_t> Value::pack32() const
 {
     switch(m_type->subtype()) {
-    case kTypeString:
+    case Subtype_String:
         {
             if(m_type->has_fixed_size()) { return pack(); }
 
@@ -557,7 +413,7 @@ vector<uint8_t> Value::pack32() const
             pack_value(as_buffer(m_string), packed);
             return packed;
         }
-    case kTypeBlob:
+    case Subtype_Blob:
         {
             if(m_type->has_fixed_size()) { return pack(); }
 
@@ -565,7 +421,7 @@ vector<uint8_t> Value::pack32() const
             pack_value(m_blob, packed);
             return packed;
         }
-    case kTypeArray:
+    case Subtype_Array:
         {
             if(m_type->has_fixed_size()) { return pack(); }
 
@@ -579,7 +435,7 @@ vector<uint8_t> Value::pack32() const
             *size_ptr = uint32_t(packed.size() - sizeof(uint32_t));
             return packed;
         }
-    case kTypeStruct:
+    case Subtype_Struct:
         {
             const Struct *container = m_type->as_struct();
             size_t num_fields = container->num_fields();
@@ -589,7 +445,7 @@ vector<uint8_t> Value::pack32() const
             }
             return packed;
         }
-    case kTypeMethod:
+    case Subtype_Method:
         {
             const Method *method = m_type->as_method();
             size_t num_params = method->num_params();
@@ -610,56 +466,25 @@ void swap(Value& lhs, Value& rhs)
 
     swap(lhs.m_type, rhs.m_type);
     switch(lhs.m_type->subtype()) {
-    case kTypeChar:
-        swap(lhs.m_char, rhs.m_char);
+    case Subtype_Numeric:
+        swap(lhs.m_numeric, rhs.m_numeric);
         break;
-    case kTypeInt8:
-        swap(lhs.m_int8, rhs.m_int8);
-        break;
-    case kTypeInt16:
-        swap(lhs.m_int16, rhs.m_int16);
-        break;
-    case kTypeInt32:
-        swap(lhs.m_int32, rhs.m_int32);
-        break;
-    case kTypeInt64:
-        swap(lhs.m_int64, rhs.m_int64);
-        break;
-    case kTypeUint8:
-        swap(lhs.m_uint8, rhs.m_uint8);
-        break;
-    case kTypeUint16:
-        swap(lhs.m_uint16, rhs.m_uint16);
-        break;
-    case kTypeUint32:
-        swap(lhs.m_uint32, rhs.m_uint32);
-        break;
-    case kTypeUint64:
-        swap(lhs.m_uint64, rhs.m_uint64);
-        break;
-    case kTypeFloat32:
-        swap(lhs.m_float32, rhs.m_float32);
-        break;
-    case kTypeFloat64:
-    case kTypeFixed:
-        swap(lhs.m_float64, rhs.m_float64);
-        break;
-    case kTypeString:
+    case Subtype_String:
         swap(lhs.m_string, rhs.m_string);
         break;
-    case kTypeBlob:
+    case Subtype_Blob:
         swap(lhs.m_blob, rhs.m_blob);
         break;
-    case kTypeArray:
+    case Subtype_Array:
         swap(lhs.m_array, rhs.m_array);
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         swap(lhs.m_struct, rhs.m_struct);
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         swap(lhs.m_method, rhs.m_method);
         break;
-    case kTypeNone:
+    case Subtype_None:
         break;
     }
 }
@@ -676,51 +501,20 @@ static void format_value(const Value& value, ostream& out)
     const Type *type = value.type();
     Subtype subtype = type->subtype();
     switch(subtype) {
-    case kTypeNone:
-        out << "<None>";
+    case Subtype_Numeric:
+        if(type == Type::Char) { format_quoted((char)value.m_numeric, out); }
+        else if(type == Type::Byte) { format_hex((uint8_t)value.m_numeric, out); }
+        out << value.m_numeric;
         break;
-    case kTypeInt8:
-        out << int(value.m_int8);
+    case Subtype_String:
+        // Only arrays using the built-in char-type (Type::Char) have Subtype_String
+        format_quoted(value.m_string, out);
         break;
-    case kTypeInt16:
-        out << int(value.m_int16);
-        break;
-    case kTypeInt32:
-        out << int(value.m_int32);
-        break;
-    case kTypeInt64:
-        out << int64_t(value.m_int64);
-        break;
-    case kTypeUint8:
-        out << uint32_t(value.m_uint8);
-        break;
-    case kTypeUint16:
-        out << uint32_t(value.m_uint16);
-        break;
-    case kTypeUint32:
-        out << uint32_t(value.m_uint32);
-        break;
-    case kTypeUint64:
-        out << uint64_t(value.m_uint64);
-        break;
-    case kTypeFloat32:
-        out << value.m_float32;
-        break;
-    case kTypeFloat64:
-        out << value.m_float64;
-        break;
-    case kTypeChar:
-        format_quoted('\'', string(1, value.m_char), out);
-        break;
-    case kTypeString:
-        // Only arrays using the built-in char-type (Type::Char) have kTypeString
-        format_quoted('"', value.m_string, out);
-        break;
-    case kTypeBlob:
+    case Subtype_Blob:
         // Format blob as a hex constant then output
         format_hex(value.m_blob, out);
         break;
-    case kTypeArray:
+    case Subtype_Array:
         {
             out << '[';
             if(value.m_array.size() > 0) {
@@ -733,7 +527,7 @@ static void format_value(const Value& value, ostream& out)
             out << ']';
         }
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         {
             out << '{';
             const Struct *struct_ = type->as_struct();
@@ -754,7 +548,7 @@ static void format_value(const Value& value, ostream& out)
             out << '}';
         }
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         {
             out << '(';
             const Method *method_ = type->as_method();
@@ -770,41 +564,67 @@ static void format_value(const Value& value, ostream& out)
             out << ')';
         }
         break;
-    default:
-        out << "<error>";
+    case Subtype_None:
+        out << "None";
+        break;
     }
+}
+
+static void format_hex(uint8_t byte, ostream& out)
+{
+    char buffer[10];
+    snprintf(buffer, 10, "%02x", byte);
+
+    out << '<' << buffer << '>';
 }
 
 static void format_hex(const vector<uint8_t>& bytes, ostream& out)
 {
     out << '<';
     for(auto it = bytes.begin(); it != bytes.end(); ++it) {
-        char infer[10];
-        snprintf(infer, 10, "%02x", (uint8_t)(*it));
-        out << infer;
+        uint8_t byte = *it;
+        char buffer[10];
+        snprintf(buffer, 10, "%02x", (uint8_t)(byte));
+        out << buffer;
     }
     out << '>';
 }
 
-static void format_quoted(char quote_mark, const string& str, ostream& out)
+static void format_quoted(char chr, ostream& out)
 {
-    out << quote_mark;
-    for(auto it = str.begin(); it != str.end(); ++it) {
-        char c = *it;
-        if(c == quote_mark || c == '\\') {
-            // escape the character
-            out << '\\' << c;
+    out << '\'';
+    if(chr == '"' || chr == '\\') {
+        // Escape the character
+        out << '\\' << chr;
+    } else if(!isprint(chr)) { // Character is not a printable ascii character
+        // Print the character as an escaped hexidecimal character constant
+        char buffer[10];
+        snprintf(buffer, 10, "%02x", (unsigned char)chr);
+        out << "\\x" << buffer;
+    } else {
+        out << chr;
+    }
+    out << '\'';
+}
 
-        } else if(!isprint(c)) { // character is not a printable ascii character
-            // print the character as an escaped hexidecimal character constant
-            char infer[10];
-            snprintf(infer, 10, "%02x", (unsigned char)c);
-            out << "\\x" << infer;
+static void format_quoted(const string& str, ostream& out)
+{
+    out << '"';
+    for(auto it = str.begin(); it != str.end(); ++it) {
+        char chr = *it;
+        if(chr == '"' || chr == '\\') {
+            // Escape the character
+            out << '\\' << chr;
+        } else if(!isprint(chr)) { // Character is not a printable ascii character
+            // Print the character as an escaped hexidecimal character constant
+            char buffer[10];
+            snprintf(buffer, 10, "%02x", (unsigned char)chr);
+            out << "\\x" << buffer;
         } else {
-            out << c;
+            out << chr;
         }
     }
-    out << quote_mark;
+    out << '"';
 }
 
 

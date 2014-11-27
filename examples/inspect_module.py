@@ -39,7 +39,7 @@ print() # Newline after keywords
 def print_type(typ, indent):
     tab = '  ' * indent
     subtype = typ.subtype()
-    if subtype == module.kTypeMethod:
+    if subtype == module.Subtype_Method:
         method = typ.as_method()
         for param_num in range(0, method.num_params()):
             param = method.nth_param(param_num)
@@ -49,7 +49,7 @@ def print_type(typ, indent):
                 print(tab + param.name() + ' : ' + param.type().to_string())
             print_type(param.type(), indent + 1)
 
-    elif subtype == module.kTypeStruct:
+    elif subtype == module.Subtype_Struct:
         struct = typ.as_struct()
         for field_num in range(0, struct.num_fields()):
             field = struct.nth_field(field_num)

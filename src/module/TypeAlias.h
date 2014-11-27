@@ -21,6 +21,8 @@ class TypeAlias : public Type
 
     inline const std::string& alias() const { return m_alias; }
 
+    TypeAlias *as_aliased() override { return this; }
+    const TypeAlias *as_aliased() const override { return this; }
     Numeric *as_numeric() override { return m_type->as_numeric(); }
     const Numeric *as_numeric() const override { return m_type->as_numeric(); }
     Array *as_array() override { return m_type->as_array(); }

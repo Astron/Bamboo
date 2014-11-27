@@ -50,81 +50,26 @@ void DatagramIterator::read_packed(const Type *type, vector<uint8_t>& buffer)
 
     // For the unlucky types/machines, we have to figure out their size manually
     switch(type->subtype()) {
-    case kTypeChar:
-        pack_value(read_char(), buffer);
-        break;
-    case kTypeInt8:
-        pack_value(read_int8(), buffer);
-        break;
-    case kTypeInt16:
-        pack_value(read_int16(), buffer);
-        break;
-    case kTypeInt32:
-        pack_value(read_int32(), buffer);
-        break;
-    case kTypeInt64:
-        pack_value(read_int64(), buffer);
-        break;
-    case kTypeUint8:
-        pack_value(read_uint8(), buffer);
-        break;
-    case kTypeUint16:
-        pack_value(read_uint16(), buffer);
-        break;
-    case kTypeUint32:
-        pack_value(read_uint32(), buffer);
-        break;
-    case kTypeUint64:
-        pack_value(read_uint64(), buffer);
-        break;
-    case kTypeFloat32:
-        pack_value(read_float32(), buffer);
-        break;
-    case kTypeFloat64:
-        pack_value(read_float64(), buffer);
-        break;
-    case kTypeFixed:
-        {
-            const Numeric *numeric = type->as_numeric();
-            if(numeric->is_signed()) {
-                switch(numeric->fixed_size()) {
-                case 1:
-                    pack_value(read_int8(), buffer);
-                    break;
-                case 2:
-                    pack_value(read_int16(), buffer);
-                    break;
-                case 4:
-                    pack_value(read_int32(), buffer);
-                    break;
-                case 8:
-                    pack_value(read_int64(), buffer);
-                    break;
-                default:
-                    break;
-                }
-            } else {
-                switch(numeric->fixed_size()) {
-                case 1:
-                    pack_value(read_uint8(), buffer);
-                    break;
-                case 2:
-                    pack_value(read_uint16(), buffer);
-                    break;
-                case 4:
-                    pack_value(read_uint32(), buffer);
-                    break;
-                case 8:
-                    pack_value(read_uint64(), buffer);
-                    break;
-                default:
-                    break;
-                }
-            }
+    case Subtype_Numeric:
+        switch(type->fixed_size()) {
+        case 1:
+            pack_value(read_uint8(), buffer);
+            break;
+        case 2:
+            pack_value(read_uint16(), buffer);
+            break;
+        case 4:
+            pack_value(read_uint32(), buffer);
+            break;
+        case 8:
+            pack_value(read_uint64(), buffer);
+            break;
+        default:
+            break;
         }
         break;
-    case kTypeString:
-    case kTypeBlob:
+    case Subtype_String:
+    case Subtype_Blob:
         if(type->has_fixed_size()) {
             pack_value(read_data(type->fixed_size()), buffer);
         } else {
@@ -133,7 +78,7 @@ void DatagramIterator::read_packed(const Type *type, vector<uint8_t>& buffer)
             pack_value(read_data(len), buffer);
         }
         break;
-    case kTypeArray:
+    case Subtype_Array:
         {
             sizetag_t len;
             const Array *arr = type->as_array();
@@ -164,7 +109,7 @@ void DatagramIterator::read_packed(const Type *type, vector<uint8_t>& buffer)
             }
         }
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         {
             const Struct *dstruct = type->as_struct();
             size_t num_fields = dstruct->num_fields();
@@ -173,7 +118,7 @@ void DatagramIterator::read_packed(const Type *type, vector<uint8_t>& buffer)
             }
         }
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         {
             const Method *dmethod = type->as_method();
             size_t num_params = dmethod->num_params();
@@ -182,7 +127,7 @@ void DatagramIterator::read_packed(const Type *type, vector<uint8_t>& buffer)
             }
         }
         break;
-    case kTypeNone:
+    case Subtype_None:
         break;
     }
 }
@@ -199,16 +144,16 @@ void DatagramIterator::skip_type(const Type *type)
     }
 
     switch(type->subtype()) {
-    case kTypeString:
-    case kTypeBlob:
-    case kTypeArray:
+    case Subtype_String:
+    case Subtype_Blob:
+    case Subtype_Array:
         {
             sizetag_t length = read_size();
             check_read_length(length);
             m_offset += length;
         }
         break;
-    case kTypeStruct:
+    case Subtype_Struct:
         {
             const Struct *dstruct = type->as_struct();
             size_t num_fields = dstruct->num_fields();
@@ -217,7 +162,7 @@ void DatagramIterator::skip_type(const Type *type)
             }
         }
         break;
-    case kTypeMethod:
+    case Subtype_Method:
         {
             const Method *dmethod = type->as_method();
             size_t num_params = dmethod->num_params();
@@ -226,7 +171,7 @@ void DatagramIterator::skip_type(const Type *type)
             }
         }
         break;
-    case kTypeNone:
+    case Subtype_None:
         break;
     default:
         break;

@@ -6,7 +6,7 @@ namespace bamboo
 
 
 Array::Array(Type *element_type, bool transfer_ownership, const NumericRange& size) :
-    Type(kTypeArray),
+    Type(Subtype_Array),
     m_element_owned(transfer_ownership),
     m_element_type(element_type),
     m_array_range(size)
@@ -26,9 +26,9 @@ Array::Array(Type *element_type, bool transfer_ownership, const NumericRange& si
     // These types can be serialized and deserialized faster because they don't have endianness
     // and they don't need to be specially packed unlike types with divisors/ranges/etc
     if(m_element_type == Type::Char) {
-        m_subtype = kTypeString;
+        m_subtype = Subtype_String;
     } else if(m_element_type == Type::Byte) {
-        m_subtype = kTypeBlob;
+        m_subtype = Subtype_Blob;
     }
 
     // Set bytesize

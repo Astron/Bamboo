@@ -8,64 +8,42 @@ namespace bamboo   // open namespace bamboo
 {
 
 
-string format_subtype(Subtype subtype)
+const char *format_subtype(Subtype subtype)
 {
     switch(subtype) {
-    case kTypeChar:
-        return "char";
-    case kTypeInt8:
-        return "int8";
-    case kTypeInt16:
-        return "int16";
-    case kTypeInt32:
-        return "int32";
-    case kTypeInt64:
-        return "int64";
-    case kTypeUint8:
-        return "uint8";
-    case kTypeUint16:
-        return "uint16";
-    case kTypeUint32:
-        return "uint32";
-    case kTypeUint64:
-        return "uint64";
-    case kTypeFloat32:
-        return "float32";
-    case kTypeFloat64:
-        return "float64";
-    case kTypeFixed:
-        return "fixed";
-    case kTypeString:
+    case Subtype_Numeric:
+        return "numeric";
+    case Subtype_String:
         return "string";
-    case kTypeBlob:
+    case Subtype_Blob:
         return "blob";
-    case kTypeArray:
+    case Subtype_Array:
         return "array";
-    case kTypeStruct:
+    case Subtype_Struct:
         return "struct";
-    case kTypeMethod:
+    case Subtype_Method:
         return "method";
-    case kTypeNone:
+    case Subtype_None:
         return "none";
-    default:
-        return "<invalid>";
     }
+
+    return "unknown";
 }
 
 
 Type *Type::None = new Type();
-Type *Type::Char = new Numeric(kTypeChar);
-Type *Type::Int8 = new Numeric(kTypeInt8);
-Type *Type::Int16 = new Numeric(kTypeInt16);
-Type *Type::Int32 = new Numeric(kTypeInt32);
-Type *Type::Int64 = new Numeric(kTypeInt64);
-Type *Type::Uint8 = new Numeric(kTypeUint8);
-Type *Type::Uint16 = new Numeric(kTypeUint16);
-Type *Type::Uint32 = new Numeric(kTypeUint32);
-Type *Type::Uint64 = new Numeric(kTypeUint64);
-Type *Type::Float32 = new Numeric(kTypeFloat32);
-Type *Type::Float64 = new Numeric(kTypeFloat64);
+Type *Type::Int8 = new Numeric(Numeric_Int8);
+Type *Type::Int16 = new Numeric(Numeric_Int16);
+Type *Type::Int32 = new Numeric(Numeric_Int32);
+Type *Type::Int64 = new Numeric(Numeric_Int64);
+Type *Type::Uint8 = new Numeric(Numeric_Uint8);
+Type *Type::Uint16 = new Numeric(Numeric_Uint16);
+Type *Type::Uint32 = new Numeric(Numeric_Uint32);
+Type *Type::Uint64 = new Numeric(Numeric_Uint64);
+Type *Type::Float32 = new Numeric(Numeric_Float32);
+Type *Type::Float64 = new Numeric(Numeric_Float64);
 
+Type *Type::Char = new TypeAlias("char", Type::Uint8, false);
 Type *Type::Byte = new TypeAlias("byte", Type::Uint8, false);
 Type *Type::String = new TypeAlias("string", new Array(Type::Char, false), true);
 Type *Type::Blob = new TypeAlias("blob", new Array(Type::Byte, false), true);

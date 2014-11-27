@@ -6833,32 +6833,32 @@ initbamboo_module(void)
     PyModule_AddIntConstant(m, (char *) "kTypeUint16", bamboo::kTypeUint16);
     PyModule_AddIntConstant(m, (char *) "kTypeUint32", bamboo::kTypeUint32);
     PyModule_AddIntConstant(m, (char *) "kTypeUint64", bamboo::kTypeUint64);
-    PyModule_AddIntConstant(m, (char *) "kTypeChar", bamboo::kTypeChar);
+    PyModule_AddIntConstant(m, (char *) "Subtype_Char", bamboo::Subtype_Char);
     PyModule_AddIntConstant(m, (char *) "kTypeFloat32", bamboo::kTypeFloat32);
     PyModule_AddIntConstant(m, (char *) "kTypeFloat64", bamboo::kTypeFloat64);
-    PyModule_AddIntConstant(m, (char *) "kTypeString", bamboo::kTypeString);
-    PyModule_AddIntConstant(m, (char *) "kTypeBlob", bamboo::kTypeBlob);
-    PyModule_AddIntConstant(m, (char *) "kTypeArray", bamboo::kTypeArray);
-    PyModule_AddIntConstant(m, (char *) "kTypeStruct", bamboo::kTypeStruct);
-    PyModule_AddIntConstant(m, (char *) "kTypeMethod", bamboo::kTypeMethod);
-    PyModule_AddIntConstant(m, (char *) "kTypeNone", bamboo::kTypeNone);
+    PyModule_AddIntConstant(m, (char *) "Subtype_String", bamboo::Subtype_String);
+    PyModule_AddIntConstant(m, (char *) "Subtype_Blob", bamboo::Subtype_Blob);
+    PyModule_AddIntConstant(m, (char *) "Subtype_Array", bamboo::Subtype_Array);
+    PyModule_AddIntConstant(m, (char *) "Subtype_Struct", bamboo::Subtype_Struct);
+    PyModule_AddIntConstant(m, (char *) "Subtype_Method", bamboo::Subtype_Method);
+    PyModule_AddIntConstant(m, (char *) "Subtype_None", bamboo::Subtype_None);
     {
         PyObject *tmp_value;
-         // bamboo::Number::kNaN
-        tmp_value = PyLong_FromLong(bamboo::Number::kNaN);
-        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "kNaN", tmp_value);
+         // bamboo::Number_NotANumber
+        tmp_value = PyLong_FromLong(bamboo::Number_NotANumber);
+        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "Number_NotANumber", tmp_value);
         Py_DECREF(tmp_value);
-         // bamboo::Number::kInt
-        tmp_value = PyLong_FromLong(bamboo::Number::kInt);
-        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "kInt", tmp_value);
+         // bamboo::Number_Signed
+        tmp_value = PyLong_FromLong(bamboo::Number_Signed);
+        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "Number_Signed", tmp_value);
         Py_DECREF(tmp_value);
-         // bamboo::Number::kUint
-        tmp_value = PyLong_FromLong(bamboo::Number::kUint);
-        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "kUint", tmp_value);
+         // bamboo::Number_Unsigned
+        tmp_value = PyLong_FromLong(bamboo::Number_Unsigned);
+        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "Number_Unsigned", tmp_value);
         Py_DECREF(tmp_value);
-         // bamboo::Number::kFloat
-        tmp_value = PyLong_FromLong(bamboo::Number::kFloat);
-        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "kFloat", tmp_value);
+         // bamboo::Number_Floating
+        tmp_value = PyLong_FromLong(bamboo::Number_Floating);
+        PyDict_SetItemString((PyObject*) PyBambooNumber_Type.tp_dict, "Number_Floating", tmp_value);
         Py_DECREF(tmp_value);
     }
     return m;
@@ -7680,7 +7680,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
 #define PY_PACK_ERROR msgbuf
 
     switch(type->subtype()) {
-    case bamboo::kTypeChar:
+    case bamboo::Subtype_Char:
         if(!PyBytes_Check(py_value) && PyBytes_Size(py_value) == 1) {
             return _custom_py_pack_typerr("a byte string of length 1", py_value, msgbuf, bufsize);
         }
@@ -7814,8 +7814,8 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             dg->add_float64((double)value);
         }
         break;
-    case bamboo::kTypeString:
-    case bamboo::kTypeBlob:
+    case bamboo::Subtype_String:
+    case bamboo::Subtype_Blob:
         {
             const char *value_ptr;
             Py_ssize_t value_length;
@@ -7845,7 +7845,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             }
         }
         break;
-    case bamboo::kTypeArray:
+    case bamboo::Subtype_Array:
         if(PyList_Check(py_value)) {
             const bamboo::Array *arr = type->as_array();
             const bamboo::Type *element_type = arr->element_type();
@@ -7885,7 +7885,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("list", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeStruct:
+    case bamboo::Subtype_Struct:
         if(PyTuple_Check(py_value)) {
             const bamboo::Struct *struct_ = type->as_struct();
             size_t num_fields = struct_->num_fields();
@@ -7909,7 +7909,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("tuple", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeMethod:
+    case bamboo::Subtype_Method:
         if(PyTuple_Check(py_value)) {
             const bamboo::Method *method = type->as_method();
             size_t num_params = method->num_params();
@@ -7933,7 +7933,7 @@ static char *_custom_PyBambooDatagram_py_pack(bamboo::Datagram *dg, const bamboo
             return _custom_py_pack_typerr("tuple", py_value, msgbuf, bufsize);
         }
         break;
-    case bamboo::kTypeNone:
+    case bamboo::Subtype_None:
         return (char *)"Can't pack value for type with subtype 'none'";
     }
 
@@ -8667,7 +8667,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
                                                      PyObject **return_exception)
 {
     switch(type->subtype()) {
-    case bamboo::kTypeChar:
+    case bamboo::Subtype_Char:
         return Py_BuildValue("c", dgi->read_char()); // Py_BuildValue simplifies Py2/3 support
     case bamboo::kTypeInt8:
         return PyLong_FromLong(dgi->read_int8());
@@ -8689,7 +8689,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
         return PyFloat_FromDouble(dgi->read_float32());
     case bamboo::kTypeFloat64:
         return PyFloat_FromDouble(dgi->read_float64());
-    case bamboo::kTypeString:
+    case bamboo::Subtype_String:
         if(type->has_fixed_size()) {
             std::string value = dgi->read_string(type->fixed_size());
             return PyUnicode_FromStringAndSize(value.c_str(), value.length());
@@ -8697,7 +8697,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
             std::string value = dgi->read_string();
             return PyUnicode_FromStringAndSize(value.c_str(), value.length());
         }
-    case bamboo::kTypeBlob:
+    case bamboo::Subtype_Blob:
         if(type->has_fixed_size()) {
             std::string value = dgi->read_string(type->fixed_size());
             return PyBytes_FromStringAndSize(value.c_str(), value.length());
@@ -8705,7 +8705,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
             std::string value = dgi->read_string();
             return PyBytes_FromStringAndSize(value.c_str(), value.length());
         }
-    case bamboo::kTypeArray:
+    case bamboo::Subtype_Array:
         {
             const bamboo::Array *arr = type->as_array();
             const bamboo::Type *element_type = arr->element_type();
@@ -8751,7 +8751,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
                 return value;
             }
         }
-    case bamboo::kTypeStruct:
+    case bamboo::Subtype_Struct:
         {
             const bamboo::Struct *struct_ = type->as_struct();
             size_t num_fields = struct_->num_fields();
@@ -8767,7 +8767,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
 
             return value;
         }
-    case bamboo::kTypeMethod:
+    case bamboo::Subtype_Method:
         {
             const bamboo::Method *method = type->as_method();
             size_t num_params = method->num_params();
@@ -8783,7 +8783,7 @@ static PyObject *_custom_PyBambooDatagramIterator_py_unpack(bamboo::DatagramIter
 
             return value;
         }
-    case bamboo::kTypeNone:
+    case bamboo::Subtype_None:
         PyErr_SetString((PyObject *) PyExc_RuntimeError, "Can't unpack value for type with subtype 'none'");
         return nullptr;
     }
