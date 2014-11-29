@@ -43,27 +43,27 @@ class Value {
     Value() {}
     Value(const Value&);
     Value& operator=(Value rhs);
-    explicit Value(const Type *);
     friend void swap(Value&, Value&);
     ~Value();
+
+    explicit Value(const Type *);
+    static Value Default(const Type *);
 
     typedef std::vector<Value> array_t;
     typedef std::map<const Field *, Value, Field::SortById> struct_t;
     typedef std::map<const Parameter *, Value, Parameter::SortByPosition> method_t;
 
-    // parse reads a Value from a formatted string; throws InvalidValue
+    // parse and unpack variants that don't return an error throw InvalidValue
     static Value parse(const Type *, const std::string& formatted);
-    // unpack reads a Value from a packed buffer; throws InvalidValue
+    static Value parse(const Type *, const std::string& formatted, bool& error);
     static Value unpack(const Type *, const std::vector<uint8_t>& packed, size_t offset = 0);
-    // unpack32 reads a Value (with 32-bit size tags) from a packed buffer; throws InvalidValue
+    static Value unpack(const Type *, const std::vector<uint8_t>& packed, size_t offset, bool &error);
     static Value unpack32(const Type *, const std::vector<uint8_t>& packed, size_t offset = 0);
+    static Value unpack32(const Type *, const std::vector<uint8_t>& packed, size_t offset, bool &error);
 
-    // format serializes the Value as a formatted string with human-readable values
     std::string format() const;
-    // pack serializes the Value to a buffer with native-endian data
-    std::vector<uint8_t> pack() const;
-    // pack32 serializes the Value (with 32-bit size tags) to a buffer with native-endian data
-    std::vector<uint8_t> pack32() const;
+    std::vector<uint8_t> pack() const; // native-endiannes
+    std::vector<uint8_t> pack32() const; // uses 32-bit max value bytesize
 
     inline const Type *type() const;
 
@@ -77,7 +77,7 @@ class Value {
 
     // Value member variables can be accessed directly to access the value without type-checking
     union {
-        Number m_numeric;
+        Number m_numeric = Number();
 
 #ifndef _MSC_VER
         // Use C++11 relaxed union for compliant compilers

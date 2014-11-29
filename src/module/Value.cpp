@@ -29,63 +29,23 @@ Value::Value(const Type *type) : m_type(type)
 {
     if(m_type == nullptr) { m_type = Type::None; }
     switch(m_type->subtype()) {
-    case Subtype_Numeric:
-        if(m_type->as_numeric()->is_unsigned()) { m_numeric = (uint64_t)0; }
-        else if(m_type->as_numeric()->is_signed()) { m_numeric = (int64_t)0; }
-        else if(m_type->as_numeric()->is_floating()) { m_numeric = (double)0; }
-        else { m_numeric = Number(); }
-        break;
     case Subtype_String:
-        new (&m_string) string(size_t(m_type->as_array()->range().min.uinteger), '\0');
+        new (&m_string) string();
         break;
     case Subtype_Blob:
-        new (&m_blob) vector<uint8_t>(size_t(m_type->as_array()->range().min.uinteger), uint8_t(0));
+        new (&m_blob) vector<uint8_t>();
         break;
     case Subtype_Array:
-        {
-            const Array *array = m_type->as_array();
-            new (&m_array) vector<Value>(size_t(array->range().min.uinteger), Value(array->element_type()));
-        }
+        new (&m_array) vector<Value>();
         break;
     case Subtype_Struct:
-        {
-            new (&m_struct) struct_t();
-
-            // Construct the struct from default values for its fields
-            const Struct *struct_ = m_type->as_struct();
-            size_t num_fields = struct_->num_fields();
-            for(size_t i = 0; i < num_fields; ++i) {
-                const Field *field = struct_->nth_field((unsigned int)i);
-                if(field->has_default_value()) {
-                    // Get default value for field
-                    m_struct.emplace(field, *field->default_value());
-                } else {
-                    // Otherwise, use the implicit default (0, empty, etc...)
-                    m_struct.emplace(field, Value(field->type()));
-                }
-            }
-        }
+        new (&m_struct) struct_t();
         break;
     case Subtype_Method:
-        {
-            new (&m_method) method_t();
-
-            // Construct the method-call from default values for its parameters
-            const Method *method = m_type->as_method();
-            size_t num_params = method->num_params();
-            for(unsigned int i = 0; i < num_params; ++i) {
-                const Parameter *param = method->nth_param(i);
-                if(param->has_default_value()) {
-                    // Get default value for field
-                    m_method.emplace(param, *param->default_value());
-                } else {
-                    // Otherwise, use the implicit default (0, empty, etc...)
-                    m_method.emplace(param, Value(param->type()));
-                }
-            }
-        }
+        new (&m_method) method_t();
         break;
     case Subtype_None:
+    case Subtype_Numeric:
         break;
     }
 }
@@ -140,9 +100,77 @@ Value::~Value()
     case Subtype_Method:
         m_method.~method_t();
         break;
-    default:
+    case Subtype_Numeric:
+    case Subtype_None:
         break;
     }
+}
+
+Value Value::Default(const Type *type)
+{
+    Value value(type);
+    switch(type->subtype()) {
+    case Subtype_Numeric:
+        {
+            const Numeric *numeric = type->as_numeric();
+            if(numeric->is_unsigned()) { value.m_numeric = (uint64_t)0; }
+            else if(numeric->is_signed()) { value.m_numeric = (int64_t)0; }
+            else if(numeric->is_floating()) { value.m_numeric = (double)0; }
+            else { value.m_numeric = Number(); }   
+        }
+        break;
+    case Subtype_String:
+        value.m_string.assign((size_t)type->as_array()->range().min.uinteger, '\0');
+        break;
+    case Subtype_Blob:
+        value.m_blob.assign((size_t)type->as_array()->range().min.uinteger, (uint8_t)0);
+        break;
+    case Subtype_Array:
+        {
+            const Array *array = type->as_array();
+            value.m_array.assign((size_t)array->range().min.uinteger,
+                                 Default(array->element_type()));
+        }
+        break;
+    case Subtype_Struct:
+        {
+            // Construct the struct from default values for its fields
+            const Struct *struct_ = type->as_struct();
+            size_t num_fields = struct_->num_fields();
+            for(size_t i = 0; i < num_fields; ++i) {
+                const Field *field = struct_->nth_field((unsigned int)i);
+                if(field->has_default_value()) {
+                    // Get default value for field
+                    value.m_struct.emplace(field, *field->default_value());
+                } else {
+                    // Otherwise, use the implicit default (0, empty, etc...)
+                    value.m_struct.emplace(field, Default(field->type()));
+                }
+            }
+        }
+        break;
+    case Subtype_Method:
+        {
+            // Construct the method-call from default values for its parameters
+            const Method *method = type->as_method();
+            size_t num_params = method->num_params();
+            for(unsigned int i = 0; i < num_params; ++i) {
+                const Parameter *param = method->nth_param(i);
+                if(param->has_default_value()) {
+                    // Get default value for field
+                    value.m_method.emplace(param, *param->default_value());
+                } else {
+                    // Otherwise, use the implicit default (0, empty, etc...)
+                    value.m_method.emplace(param, Default(param->type()));
+                }
+            }
+        }
+        break;
+    case Subtype_None:
+        break;
+    }
+
+    return value;
 }
 
 Value Value::parse(const Type *type, const string& formatted)

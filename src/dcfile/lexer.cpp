@@ -36,10 +36,9 @@ static void set_token_data(Token& token, const vector<uint8_t>& data);
 static void set_token_text(Token& token, const string& text);
 static string scan_quoted_text(Lexer *lexer, const LineInfo& start);
 
-
-static char format_buf[8];
 const char *format_tokentype(TokenType type)
 {
+    char format_buf[8];
     switch(type) {
     case Token_NotAToken:
         return "uninitialized-token";

@@ -55,23 +55,23 @@ inline NumericType Numeric::packtype() const
 inline std::vector<uint8_t> Numeric::pack(int64_t value) const
 {
     uint8_t buf[8];
-    pack(value, &buf[0]);
-    return std::vector<uint8_t>(&buf[0], &buf[m_size]);
+    pack(value, buf);
+    return std::vector<uint8_t>(buf, &buf[m_size]);
 }
 
 inline std::vector<uint8_t> Numeric::pack(uint64_t value) const
 {
     uint8_t buf[8];
-    pack(value, &buf[0]);
-    return std::vector<uint8_t>(&buf[0], &buf[m_size]);
+    pack(value, buf);
+    return std::vector<uint8_t>(buf, &buf[m_size]);
 }
 
 
 inline std::vector<uint8_t> Numeric::pack(double value) const
 {
     uint8_t buf[8];
-    pack(value, &buf[0]);
-    return std::vector<uint8_t>(&buf[0], &buf[m_size]);
+    pack(value, buf);
+    return std::vector<uint8_t>(buf, &buf[m_size]);
 }
 
 
