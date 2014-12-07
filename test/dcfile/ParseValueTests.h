@@ -10,7 +10,6 @@ class ParseValueTests : public CxxTest::TestSuite
   public:
     void testParseChar()
     {
-      bool had_error = false;
       Numeric *type = new Numeric(Subtype_Char);
       Value value = Value::parse(type, "'k'", had_error);
 
@@ -21,9 +20,13 @@ class ParseValueTests : public CxxTest::TestSuite
     void testParseCharArray()
     {
       bool had_error = false;
-      Array *type = new Array(new Numeric(Subtype_Char));
+
+      // Parser for String array
+
+
+      // Parse for custom Char Array
+      Array *type = new Array(Type::Char, NumericRange(0u, 32u));
       Value value = Value::parse(type, "['T','e','s','t']", had_error);
-      vector<char> expected = {'T', 'e', 's', 't'};
 
       assert(not had_error);
       expect_equals(value.string_, "Test");

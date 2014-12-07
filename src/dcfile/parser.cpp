@@ -44,6 +44,13 @@ struct MoleculeDefn
     unordered_map<string, LineInfo> fields;
 };
 static MoleculeDefn *parse_molecule(Parser *parser);
+static Value *parse_numeric_value(Parser *parser, const Numeric *numeric);
+static Value *parse_string_value(Parser *parser, const Array *array);
+static Value *parse_blob_value(Parser *parser, const Array *array);
+static Value *parse_array_value(Parser *parser, const Array *array);
+static Value *parse_struct_value(Parser *parser, const Struct *struct_);
+static Value *parse_method_value(Parser *parser, const Method *method);
+
 
 Parser::Parser(Lexer *lex) : lexer(lex) {}
 Parser::~Parser()
@@ -189,7 +196,7 @@ Struct *Parser::parse_struct()
     eat_token(this);
 
     string struct_name;
-    if(curr_token.type == (TokenType)'{') {
+    if(curr_token.type == '{') {
         add_error(this, curr_token.line, "Missing struct name before '{'");
         error_occured = true;
     } else if(curr_token.type != Token_Identifier) {
@@ -202,14 +209,14 @@ Struct *Parser::parse_struct()
     }
 
     // As a special case, lets check to see if a list of base classes follows the identifier
-    if(curr_token.type == (TokenType)':') {
+    if(curr_token.type == ':') {
         add_error(this, curr_token.line,
                   "Unexpected ':', expecting '{'",
                   "Structs cannot inherit from other types");
         error_occured = true;
         eat_token(this);
         while(true) {
-            if(curr_token.type == (TokenType)';' ||
+            if(curr_token.type == ';' ||
                curr_token.type == Token_Identifier) {
                 eat_token(this);
             } else {
@@ -219,7 +226,7 @@ Struct *Parser::parse_struct()
     }
 
     // Parse struct body
-    if(curr_token.type != (TokenType)'{') {
+    if(curr_token.type != '{') {
         stringstream info;
         info << "Missing struct body for \"struct " << struct_name << '"';
         unexpected_token(this, "'{'", info.str().c_str());
@@ -236,7 +243,7 @@ Struct *Parser::parse_struct()
         if(field == nullptr) {
             error_occured = true;
             if(curr_token.type == Token_Eof) { break; }
-            if(curr_token.type == (TokenType)'}') { break; }
+            if(curr_token.type == '}') { break; }
 
             eat_until_end_of_statement_or_line(this, field_start);
             mask_next_error = true;
@@ -261,7 +268,7 @@ Struct *Parser::parse_struct()
         }
 
         // Consume any extra semi-colons before the next field
-        while(curr_token.type == (TokenType)';') { eat_token(this); }
+        while(curr_token.type == ';') { eat_token(this); }
     }
     if(curr_token.type == Token_Eof) {
         add_error(this, start, "Missing closing brace '}' at end of struct definition");
@@ -272,7 +279,7 @@ Struct *Parser::parse_struct()
     }
     eat_token(this);
 
-    if(curr_token.type == (TokenType)';') {
+    if(curr_token.type == ';') {
         eat_token(this);
     } else {
         add_error(this, start, "Missing ';' after struct definition");
@@ -305,12 +312,12 @@ Class *Parser::parse_class()
     eat_token(this);
 
     string class_name;
-    if(curr_token.type == (TokenType)':') {
+    if(curr_token.type == ':') {
         add_error(this, curr_token.line,
                   "Unexpected ':', expecting identifier",
                   "Missing class name before list of base classes");
         error_occured = true;
-    } else if(curr_token.type == (TokenType)'{') {
+    } else if(curr_token.type == '{') {
         add_error(this, curr_token.line, "Missing class name before '{'");
         error_occured = true;
     } else if(curr_token.type != Token_Identifier) {
@@ -330,19 +337,19 @@ Class *Parser::parse_class()
                   "Must use ':' before listing base classes");
         mask_next_error = true;
         return nullptr;
-    } else if(curr_token.type == (TokenType)':') {
+    } else if(curr_token.type == ':') {
         eat_token(this);
-        if(curr_token.type == (TokenType)'{') {
+        if(curr_token.type == '{') {
             add_error(this, curr_token.line, "No base classes listed after ':'");
             error_occured = true;
         } else {
             while(true) {
-                if(curr_token.type == (TokenType)',') {
+                if(curr_token.type == ',') {
                     add_error(this, curr_token.line, "Missing base class name before ','");
                     error_occured = true;
                     eat_token(this);
                     continue;
-                } else if(curr_token.type == (TokenType)'{') {
+                } else if(curr_token.type == '{') {
                     add_error(this, curr_token.line, "Missing base class name before '{'");
                     error_occured = true;
                     break;
@@ -400,7 +407,7 @@ Class *Parser::parse_class()
 
             next_parent:
                 eat_token(this); // Eat the identifier
-                if(curr_token.type == (TokenType)',') {
+                if(curr_token.type == ',') {
                     eat_token(this); // Eat the comma
                 } else {
                     break;
@@ -410,7 +417,7 @@ Class *Parser::parse_class()
     }
 
     // Parse Class Body
-    if(curr_token.type != (TokenType)'{') {
+    if(curr_token.type != '{') {
         stringstream info;
         info << "Missing class body for \"class " << class_name << "\"";
         unexpected_token(this, "'{'", info.str().c_str());
@@ -428,16 +435,16 @@ Class *Parser::parse_class()
     unordered_map<string, LineInfo> field_definitions;
     unordered_map<string, Field *> atomics;
     unordered_map<string, MoleculeDefn *> molecules;
-    while(curr_token.type != (TokenType)'}' && curr_token.type != Token_Eof) {
+    while(curr_token.type != '}' && curr_token.type != Token_Eof) {
         LineInfo field_start = curr_token.line;
 
         // Try parsing as molecular
-        if(curr_token.type == Token_Identifier && next_token.type == (TokenType)':') {
+        if(curr_token.type == Token_Identifier && next_token.type == ':') {
             MoleculeDefn *molecule = parse_molecule(this);
             if(molecule == nullptr) {
                 error_occured = true;
                 if(curr_token.type == Token_Eof) { break; }
-                if(curr_token.type == (TokenType)'}') { break; }
+                if(curr_token.type == '}') { break; }
 
                 eat_until_end_of_statement_or_line(this, field_start);
                 mask_next_error = true;
@@ -470,7 +477,7 @@ Class *Parser::parse_class()
         if(field == nullptr) {
             error_occured = true;
             if(curr_token.type == Token_Eof) { break; }
-            if(curr_token.type == (TokenType)'}') { break; }
+            if(curr_token.type == '}') { break; }
 
             eat_until_end_of_statement_or_line(this, field_start);
             mask_next_error = true;
@@ -495,7 +502,7 @@ Class *Parser::parse_class()
         }
 
         // Consume any extra semi-colons before the next field
-        while(curr_token.type == (TokenType)';') { eat_token(this); }
+        while(curr_token.type == ';') { eat_token(this); }
     }
 
     if(curr_token.type == Token_Eof) {
@@ -506,7 +513,7 @@ Class *Parser::parse_class()
     }
     eat_token(this);
 
-    if(curr_token.type == (TokenType)';') {
+    if(curr_token.type == ';') {
         eat_token(this);
         // Semicolons are a good point to begin unmasking errors, and this
         // one is likely to cbe ours because it is after a closing brace
@@ -583,7 +590,7 @@ Import *Parser::parse_import()
     }
     eat_token(this);
 
-    if(curr_token.type != Token_Identifier && curr_token.type != (TokenType)'.') {
+    if(curr_token.type != Token_Identifier && curr_token.type != '.') {
         if(has_symbols) {
             add_error(this, start, "Missing module name after \"from\"");
         } else {
@@ -626,9 +633,9 @@ Import *Parser::parse_import()
     while(true) {
         if(curr_token.type == Token_Identifier) {
             curr_symbol += curr_token.value.text;
-        } else if(curr_token.type == (TokenType)'/') {
+        } else if(curr_token.type == '/') {
             curr_symbol += '/';
-        } else if(curr_token.type == (TokenType)',') {
+        } else if(curr_token.type == ',') {
             if(curr_symbol.empty()) {
                 error_occured = true;
                 add_error(this, curr_token.line, "Missing symbol name before ','");
@@ -636,7 +643,7 @@ Import *Parser::parse_import()
                 import->symbols.push_back(curr_symbol);
                 curr_symbol.clear();
             }
-        } else if(curr_token.type == (TokenType)';') {
+        } else if(curr_token.type == ';') {
             if(curr_symbol.empty()) {
                 error_occured = true;
                 add_error(this, curr_token.line, "Missing symbol name before ';'");
@@ -688,7 +695,7 @@ bool Parser::parse_typedef_into_module(Module *module)
     if(type == nullptr) { return false; }
 
     // Look for the new type name as an identifier
-    if(curr_token.type == (TokenType)';') {
+    if(curr_token.type == ';') {
         add_error(this, curr_token.line, "Missing new type name before ';' in typedef");
         if(caller_owns_return) { delete type; }
         return false;
@@ -708,7 +715,7 @@ bool Parser::parse_typedef_into_module(Module *module)
     }
     eat_token(this);
 
-    if(curr_token.type != (TokenType)';') {
+    if(curr_token.type != ';') {
         add_error(this, prev_token.line, "Missing ';' after typedef declaration");
         if(caller_owns_return) { delete type; }
         return false;
@@ -785,14 +792,14 @@ Field *Parser::parse_struct_field()
 {
     if(curr_token.type == Token_Identifier) {
         if(module == nullptr || module->type_by_name(curr_token.value.text) == nullptr) {
-            if(next_token.type == (TokenType)'(') {
+            if(next_token.type == '(') {
                 // We think this is supposed to look like a method
                 stringstream error;
                 error << "Cannot find type \"" << curr_token.value.text << "\"";
                 add_error(this, curr_token.line, error.str().c_str(),
                           "Field looks like a method, but methods cannot be defined in a struct");
                 return nullptr;
-            } else if(next_token.type == (TokenType)':') {
+            } else if(next_token.type == ':') {
                 // We think this is supposed to look like a molecular field
                 stringstream error;
                 error << "Cannot find type \"" << curr_token.value.text << "\"";
@@ -820,7 +827,7 @@ Field *Parser::parse_struct_field()
 
     // A struct field can have a default value
     Value *value = nullptr;
-    if(curr_token.type == (TokenType)'=') {
+    if(curr_token.type == '=') {
         eat_token(this);
         value = parse_value_expr(type);
         if(value == nullptr) {
@@ -849,7 +856,7 @@ Field *Parser::parse_struct_field()
     }
 
 
-    if(curr_token.type != (TokenType)';') {
+    if(curr_token.type != ';') {
         stringstream error;
         error << "Unexpected " << format_tokentype(curr_token.type) << ", expecting ';'";
         if(value != nullptr) {
@@ -897,9 +904,9 @@ Field *Parser::parse_class_field(Class *class_)
     if(curr_token.type == Token_Identifier) {
         if(module != nullptr && module->type_by_name(curr_token.value.text) != nullptr) {
             parse_mode = ClassParseMode_Field;
-        } else if(next_token.type == (TokenType)'(') {
+        } else if(next_token.type == '(') {
             parse_mode = ClassParseMode_Method;
-        } else if(next_token.type == (TokenType)':') {
+        } else if(next_token.type == ':') {
             parse_mode = ClassParseMode_Molecular;
         } else {
             stringstream error;
@@ -933,7 +940,7 @@ Field *Parser::parse_class_field(Class *class_)
 
             // Class fields can have default values
             Value *value = nullptr;
-            if(curr_token.type == (TokenType)'=') {
+            if(curr_token.type == '=') {
                 eat_token(this);
                 value = parse_value_expr(type);
                 if(value == nullptr) {
@@ -965,7 +972,7 @@ Field *Parser::parse_class_field(Class *class_)
 
             // Parse function
             Method *method = new Method();
-            while(curr_token.type != (TokenType)')') {
+            while(curr_token.type != ')') {
                 LineInfo param_start = curr_token.line;
 
                 bool param_owns_type;
@@ -995,7 +1002,7 @@ Field *Parser::parse_class_field(Class *class_)
                 }
 
                 Value *value = nullptr;
-                if(curr_token.type == (TokenType)'=') {
+                if(curr_token.type == '=') {
                     value = parse_value_expr(type);
                     if(value == nullptr) {
                         if(param_owns_type) { delete type; }
@@ -1003,9 +1010,9 @@ Field *Parser::parse_class_field(Class *class_)
                     }
                 }
 
-                if(curr_token.type == (TokenType)',') {
+                if(curr_token.type == ',') {
                     eat_token(this);
-                } else if(curr_token.type != (TokenType)')') {
+                } else if(curr_token.type != ')') {
                     unexpected_token(this, "',' or ')'", "Attempting to parse method parameters");
                 }
 
@@ -1018,7 +1025,7 @@ Field *Parser::parse_class_field(Class *class_)
             // @NOTE(Kevin): I want to remove support for assigning a default value to methods
             // Parameters already support having a default value, so we should rely on that tool
             Value *value = nullptr;
-            if(curr_token.type == (TokenType)'=') {
+            if(curr_token.type == '=') {
                 value = parse_value_expr(method);
                 if(value == nullptr) {
                     delete method;
@@ -1055,8 +1062,8 @@ Field *Parser::parse_class_field(Class *class_)
             eat_token(this); // Eat ':'
 
             bool error_occured = true;
-            while(curr_token.type != (TokenType)';') {
-                if(curr_token.type == (TokenType)',') {
+            while(curr_token.type != ';') {
+                if(curr_token.type == ',') {
                     add_error(this, curr_token.line,
                               "Missing atomic field before ',' in molecular field definition");
                     error_occured = true;
@@ -1093,7 +1100,7 @@ Field *Parser::parse_class_field(Class *class_)
                 }
                 eat_token(this);
 
-                if(curr_token.type == (TokenType)',') {
+                if(curr_token.type == ',') {
                     eat_token(this);
                 }
             }
@@ -1130,8 +1137,8 @@ MoleculeDefn *parse_molecule(Parser *parser)
     eat_token(parser); // Eat ':'
 
     bool error_occured = false;
-    while(parser->curr_token.type != (TokenType)';') {
-        if(parser->curr_token.type == (TokenType)',') {
+    while(parser->curr_token.type != ';') {
+        if(parser->curr_token.type == ',') {
             error_occured = true;
             add_error(parser, parser->curr_token.line,
                       "Missing atomic field before ',' in molecular field definition");
@@ -1148,7 +1155,7 @@ MoleculeDefn *parse_molecule(Parser *parser)
         molecule->fields.emplace(parser->curr_token.value.text, parser->curr_token.line);
         eat_token(parser);
 
-        if(parser->curr_token.type == (TokenType)',') {
+        if(parser->curr_token.type == ',') {
             eat_token(parser);
         }
     }
@@ -1207,9 +1214,9 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
 
         caller_owns_return = false;
     } else if(curr_token.is_type()) {
-        bool is_primitive = (next_token.type != (TokenType)'(' &&
-                             next_token.type != (TokenType)'/' &&
-                             next_token.type != (TokenType)'%');
+        bool is_primitive = (next_token.type != '(' &&
+                             next_token.type != '/' &&
+                             next_token.type != '%');
         if(is_primitive) {
             type = to_primitive(curr_token.type);
             caller_owns_return = false;
@@ -1257,12 +1264,12 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
                 declared_divisor = true;
                 eat_token(this);
 
-                if(curr_token.type == (TokenType)'-') {
+                if(curr_token.type == '-') {
                     add_error(this, curr_token.line,
                               "Unexpected unary operator '-' before divisor",
                               "Divisor must be unsigned integer");
                     eat_token(this);
-                } else if(curr_token.type == (TokenType)'+') {
+                } else if(curr_token.type == '+') {
                     add_warning(this, curr_token.line,
                                 "'+' ignored before divisor (divisor is treated as unsigned)");
                     eat_token(this);
@@ -1320,7 +1327,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
 
                 eat_unary(this);
                 double modulus = 0.0;
-                bool is_negative = prev_token.type == (TokenType)'-';
+                bool is_negative = prev_token.type == '-';
                 if(curr_token.type == Token_Real) {
                     modulus = curr_token.value.real;
                 } else if(curr_token.type == Token_Integer) {
@@ -1419,7 +1426,7 @@ Type *Parser::parse_type_expr(bool& caller_owns_return)
         case '[':
             {
                 declared_array = true;
-                if(next_token.type == (TokenType)']') {
+                if(next_token.type == ']') {
                     type = new Array(type, caller_owns_return);
                     caller_owns_return = true;
 
@@ -1460,22 +1467,22 @@ NumericRange Parser::parse_range_expr()
     Number lhs;
     eat_unary(this);
     if(curr_token.type == Token_Integer) {
-        if(prev_token.type == (TokenType)'-') {
+        if(prev_token.type == '-') {
             lhs = -(int64_t)curr_token.value.integer;
-        } else if(prev_token.type == (TokenType)'+') {
+        } else if(prev_token.type == '+') {
             lhs = (int64_t)curr_token.value.integer;
         } else {
             lhs = (uint64_t)curr_token.value.integer;
         }
     } else if(curr_token.type == Token_Real) {
-        if(prev_token.type == (TokenType)'-') {
+        if(prev_token.type == '-') {
             lhs = -curr_token.value.real;
-        } else if(prev_token.type == (TokenType)'+') {
+        } else if(prev_token.type == '+') {
             lhs = (int64_t)curr_token.value.real;
         } else {
             lhs = curr_token.value.real;
         }
-    } else if(curr_token.type == (TokenType)')') {
+    } else if(curr_token.type == ')') {
         add_error(this, curr_token.line, "Missing size before ')' in range");
         mask_next_error = true;
         return NumericRange();
@@ -1489,7 +1496,7 @@ NumericRange Parser::parse_range_expr()
     eat_token(this);
 
     // Range can be ( A ) or ( A , B )
-    if(curr_token.type == (TokenType)')') {
+    if(curr_token.type == ')') {
         eat_token(this);
         return NumericRange(lhs);
     } else if(curr_token.type == '+' || curr_token.type == '-') {
@@ -1529,22 +1536,22 @@ NumericRange Parser::parse_range_expr()
     Number rhs;
     eat_unary(this);
     if(curr_token.type == Token_Integer) {
-        if(prev_token.type == (TokenType)'-') {
+        if(prev_token.type == '-') {
             rhs = -(int64_t)curr_token.value.integer;
-        } else if(prev_token.type == (TokenType)'+') {
+        } else if(prev_token.type == '+') {
             rhs = (int64_t)curr_token.value.integer;
         } else {
             rhs = (uint64_t)curr_token.value.integer;
         }
     } else if(curr_token.type == Token_Real) {
-        if(prev_token.type == (TokenType)'-') {
+        if(prev_token.type == '-') {
             rhs = -curr_token.value.real;
-        } else if(prev_token.type == (TokenType)'+') {
+        } else if(prev_token.type == '+') {
             rhs = (int64_t)curr_token.value.real;
         } else {
             rhs = curr_token.value.real;
         }
-    } else if(curr_token.type == (TokenType)')') {
+    } else if(curr_token.type == ')') {
         add_error(this, curr_token.line, "Missing max value before ')' in range");
         eat_token(this);
         return NumericRange();
@@ -1569,6 +1576,7 @@ NumericRange Parser::parse_range_expr()
     if(lhs.type == Number_Floating || rhs.type == Number_Floating) {
         if((double)lhs > (double)rhs) {
             add_error(this, start, "Min value of range greater than max");
+            return NumericRange();
         } else {
             return NumericRange((double)lhs, (double)rhs);
         }
@@ -1593,12 +1601,14 @@ NumericRange Parser::parse_range_expr()
 
         if((int64_t)lhs > (int64_t)rhs) {
             add_error(this, start, "Min value of range greater than max");
+            return NumericRange();
         } else {
             return NumericRange((int64_t)lhs, (int64_t)rhs);
         }
     } else {
         if(lhs.uinteger > rhs.uinteger) {
             add_error(this, start, "Min value of range greater than max");
+            return NumericRange();
         } else {
             return NumericRange(lhs.uinteger, rhs.uinteger);
         }
@@ -1619,13 +1629,13 @@ NumericRange Parser::parse_array_expr()
     if(curr_token.type == Token_Integer) {
         lhs = (uint64_t)curr_token.value.integer;
     } else if(curr_token.type == Token_Real) {
-        if(next_token.type == (TokenType)']') {
+        if(next_token.type == ']') {
             add_error(this, curr_token.line, "Array size must be integer");
         } else {
             add_error(this, curr_token.line, "Array min must be integer");
         }
         lhs = Number(); // NaN signals error
-    } else if(curr_token.type == (TokenType)']') {
+    } else if(curr_token.type == ']') {
         add_error(this, curr_token.line, "Missing size before closing ']' in sized array");
         mask_next_error = true;
         return NumericRange();
@@ -1635,10 +1645,10 @@ NumericRange Parser::parse_array_expr()
         return NumericRange();
     }
 
-    if(prev_token.type == (TokenType)'-' ||
-       prev_token.type == (TokenType)'+')
+    if(prev_token.type == '-' ||
+       prev_token.type == '+')
     {
-        if(next_token.type == (TokenType)']') {
+        if(next_token.type == ']') {
             add_error(this, curr_token.line, "Array size must be unsigned");
         } else {
             add_error(this, curr_token.line, "Array min must be unsigned");
@@ -1648,7 +1658,7 @@ NumericRange Parser::parse_array_expr()
     eat_token(this);
 
     // Array expression can be [ A ] or [ A , B ]
-    if(curr_token.type == (TokenType)']') {
+    if(curr_token.type == ']') {
         eat_token(this);
         return NumericRange(lhs);
     } else if(curr_token.type == Token_Integer || curr_token.type == Token_Real) {
@@ -1677,7 +1687,7 @@ NumericRange Parser::parse_array_expr()
     } else if(curr_token.type == Token_Real) {
         add_error(this, curr_token.line, "Array max must be integer");
         rhs = Number(); // NaN signals error
-    } else if(curr_token.type == (TokenType)']') {
+    } else if(curr_token.type == ']') {
         add_error(this, curr_token.line, "Missing max value before ']' in array range");
         eat_token(this);
         return NumericRange();
@@ -1687,8 +1697,8 @@ NumericRange Parser::parse_array_expr()
         return NumericRange();
     }
 
-    if(prev_token.type == (TokenType)'-' ||
-       prev_token.type == (TokenType)'+')
+    if(prev_token.type == '-' ||
+       prev_token.type == '+')
     {
         add_error(this, curr_token.line, "Array max must be unsigned");
         rhs = Number(); // NaN signals error
@@ -1715,8 +1725,258 @@ NumericRange Parser::parse_array_expr()
 
 Value *Parser::parse_value_expr(const Type *type)
 {
-    // @TODO(Kevin): Implement
+    Value *value = nullptr;
+    switch(type->subtype()) {
+    case Subtype_Numeric:
+        value = parse_numeric_value(this, type->as_numeric());
+        break;
+    case Subtype_String:
+        value = parse_string_value(this, type->as_array());
+        break;
+    case Subtype_Blob:
+        value = parse_blob_value(this, type->as_array());
+        break;
+    case Subtype_Array:
+        value = parse_array_value(this, type->as_array());
+        break;
+    case Subtype_Struct:
+        value = parse_struct_value(this, type->as_struct());
+        break;
+    case Subtype_Method:
+        value = parse_method_value(this, type->as_method());
+        break;
+    case Subtype_None:
+        break;
+    }
+
+    return value;
 }
+
+Value *parse_numeric_value(Parser *parser, const Numeric *numeric)
+{
+    bool is_negative = false;
+    Value *value = nullptr;
+
+    // @TODO(Kevin): Add warnings for overflow/underflow/etc
+
+    if(parser->curr_token.type == '-') {
+        if(numeric->is_unsigned()) {
+            add_error(parser, parser->curr_token.line, "Unexpected '-' for unsigned integer");
+            return nullptr;
+        }
+
+        is_negative = true;
+        eat_token(parser);
+    } else if(parser->curr_token.type == '+') {
+        if(numeric->is_unsigned()) {
+            add_warning(parser, parser->curr_token.line, "'+'' ignored for unsigned integer");
+        }
+
+        eat_token(parser);
+    }
+
+    Token token = parser->curr_token;
+    switch(token.type) {
+    case Token_Character:
+        if(parser->prev_token.type == '-' || parser->prev_token.type == '+') {
+            add_warning(parser, parser->prev_token.line, "Unary +/- ignored before character literal");
+        }
+
+        value = new Value(numeric);
+        if(numeric->is_floating()) {
+            value->m_numeric = (double)token.value.character;
+        } else if(numeric->is_signed()) {
+            value->m_numeric = (int64_t)token.value.character;
+        } else {
+            value->m_numeric = (uint64_t)token.value.character;
+        }
+        break;
+    case Token_Integer:
+        {
+            value = new Value(numeric);
+            if(numeric->is_floating()) {
+                if(is_negative) {
+                    value->m_numeric = -(double)token.value.integer;
+                } else {
+                    value->m_numeric = (double)token.value.integer;
+                }
+            } else if(numeric->is_signed()) {
+                if(is_negative) {
+                    value->m_numeric = -(int64_t)token.value.integer;
+                } else {
+                    value->m_numeric = (int64_t)token.value.integer;
+                }
+            } else  {
+                value->m_numeric = token.value.integer;
+            }
+        }
+        break;
+    case Token_Real:
+        {
+            value = new Value(numeric);
+            if(numeric->is_floating()) {
+
+                if(is_negative) {
+                    value->m_numeric = -token.value.real;
+                } else {
+                    value->m_numeric = token.value.real;
+                }
+            } else if(numeric->is_signed()) {
+                if(is_negative) {
+                    value->m_numeric = -(int64_t)token.value.real;
+                } else {
+                    value->m_numeric = (int64_t)token.value.real;
+                }
+            } else  {
+                value->m_numeric = (uint64_t)token.value.real;
+            }
+        }
+        break;
+    default:
+        {
+            stringstream error;
+            error << "Attempting to parse value for numeric \"" << numeric->to_string() << "\"";
+            unexpected_token(parser, "number", error.str().c_str());
+            mask_next_error = true;
+            return nullptr;
+        }
+    }
+    eat_token(parser); // Eat numeric literal
+
+    return value;
+}
+
+static Value *parse_string_value(Parser *parser, const Array *array)
+{
+    if(parser->curr_token.type == '[') {
+        return parse_chararray_value(parser, array);
+    } else if(parser->curr_token.type != Token_Text) {
+        unexpected_token(parser, "string literal", "Attempting to parse value for string");
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    // @TODO(Kevin): Maybe assert this `assert(array->subtype() == Subtype_String)`
+    // @TODO(Kevin): Check string bounds
+
+    eat_token(parser);
+
+    Value *value = new Value(array);
+    value.m_string = parser->curr_token.value.text;
+    return value;
+}
+
+static Value *parse_blob_value(Parser *parser, const Array *array)
+{
+    if(parser->curr_token.type == '[') {
+        return parser_bytearray_value(array);
+    } else if(parser->curr_token.type != Token_Hexstring) {
+        unexpected_token(parser, "hexstring literal", "Attempting to parse value for blob");
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    // @TODO(Kevin): Maybe assert this `assert(array->subtype() == Subtype_Blob)`
+    // @TODO(Kevin): Check blob bounds
+
+    Value *value = new Value(array);
+    value.m_blob = parser->curr_token.value.data;
+
+    eat_token(parser);
+
+    return value;
+}
+
+static Value *parse_array_value(Parser *parser, const Array *array)
+{
+    if(parser->curr_token.type != '[') {
+        unexpected_token(parser, "'['", "Attempting to parse value for array");
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    // @TODO(Kevin): Maybe assert this `assert(array->subtype() == Subtype_Array)`
+    // @TODO(Kevin): Check array bounds
+
+    Value *value = new Value(array);
+    while(true) {
+        Value *element = parser->parse_value_expr(array->element_type());
+        if(element == nullptr) {
+            delete value;
+            return nullptr;
+        }
+
+        value->m_array.push_back(*element):
+        delete element;
+
+        if(parser->curr_token.value == ']') {
+            break;
+        } else if(parser->curr_token.value != ',') {
+            delete value;
+
+            unexpected_token(parser, "','", "Attempting to parse elements in array value");
+            mask_next_error = true;
+            return nullptr;
+        }
+        eat_token(parser);
+    }
+    eat_token(parser);
+
+    return value;
+}
+
+static Value *parse_struct_value(Parser *parser, const Struct *struct_)
+{
+    if(parser->curr_token.type != '{') {
+        unexpected_token(parser, "'{'", "Attempting to parse value for struct");
+        mask_next_error = true;
+        return nullptr;
+    }
+
+    // @TODO(Kevin): Maybe assert this `assert(array->subtype() == Subtype_Array)`
+    // @TODO(Kevin): Check array bounds
+
+    Value *value = new Value(struct_);
+
+    size_t num_fields = struct_->num_fields();
+    for(unsigned int n = 0 ; n < num_fields; ++n) {
+        if(parser->curr_token.value == '}') {
+            delete value;
+
+            add_error(parser, parser->curr_token.line, "Too few values for struct");
+            mask_next_error = true;
+            return nullptr;
+        }
+
+        const Field *field = struct_->nth_field(n);
+
+
+        Value *element = parser->parse_value_expr(field->element_type());
+        if(element == nullptr) {
+            delete value;
+            return nullptr;
+        }
+
+        value->m_array.push_back(*element):
+        delete element;
+
+        if(parser->curr_token.value == '}') {
+            break;
+        } else if(parser->curr_token.value != ',') {
+            delete value;
+
+            unexpected_token(parser, "','", "Attempting to parse fields in struct value");
+            mask_next_error = true;
+            return nullptr;
+        }
+        eat_token(parser);
+    }
+    eat_token(parser);
+
+    return value;
+}
+
+static Value *parse_method_value(Parser *parser, const Method *method);
 
 static void add_warning(Parser *parser, const LineInfo& where, const char *what)
 {
@@ -1764,27 +2024,6 @@ static void unexpected_token(Parser *parser, const char *expected, const char *i
     add_error(parser, parser->curr_token.line, error.str().c_str(), info);
 }
 
-static void eat_token(Parser *parser)
-{
-    if(parser->curr_token.type == Token_Eof) {
-        add_error(parser, parser->curr_token.line, "Internal parser error: Tried to eat EOF");
-    } else {
-        parser->prev_token.destroy();
-        parser->prev_token = parser->curr_token;
-        parser->curr_token = parser->next_token;
-        parser->next_token = parser->lexer->scan_token();
-    }
-}
-
-static void eat_unary(Parser *parser)
-{
-    if(parser->curr_token.type == (TokenType)'-' ||
-       parser->curr_token.type == (TokenType)'+')
-    {
-        eat_token(parser);
-    }
-}
-
 static void eat_until_end_of_statement_or_line(Parser *parser, const LineInfo& start)
 {
     while(true) {
@@ -1794,7 +2033,7 @@ static void eat_until_end_of_statement_or_line(Parser *parser, const LineInfo& s
 
         eat_token(parser);
 
-        if(parser->curr_token.type == (TokenType)';') { break; }
+        if(parser->curr_token.type == ';') { break; }
     }
 }
 
@@ -1807,7 +2046,7 @@ static void eat_until_end_of_block_or_topdecl(Parser *parser)
 
         eat_token(parser);
 
-        if(parser->curr_token.type == (TokenType)'}') { break; }
+        if(parser->curr_token.type == '}') { break; }
     }
 }
 

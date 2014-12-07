@@ -3,14 +3,19 @@
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
-namespace bamboo
-{
+namespace bamboo {
 
 
 struct LineInfo
 {
     int num = 0, col = 0;
     const char *text_pos = nullptr;
+};
+
+enum UnaryType {
+    Unary_None = 0,
+    Unary_Plus,
+    Unary_Minus,
 };
 
 enum TokenType
@@ -145,6 +150,13 @@ struct Token
             || type == (TokenType)')'
             || type == (TokenType)'['
             || type == (TokenType)']';
+    }
+
+    bool is_stray()
+    {
+        return 0 <= type && type <= 255
+            && !is_operator()
+            && !is_delimiter();
     }
 };
 
