@@ -327,7 +327,7 @@ if(BUILD_PYTHON)
   # Get the python install directory
   execute_process(
     COMMAND ${PYTHON_EXECUTABLE}
-      -c "from distutils.sysconfig import get_python_lib; print get_python_lib(True)"
+      -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(True))"
       OUTPUT_VARIABLE PYTHON_ARCH_DIR)
   STRING(REGEX REPLACE "(\r?\n)+$" "" PYTHON_ARCH_DIR "${PYTHON_ARCH_DIR}")
   set(PYTHON_INSTALL_DIR "${PYTHON_ARCH_DIR}" CACHE STRING
