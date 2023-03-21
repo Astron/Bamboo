@@ -5,9 +5,9 @@ A library and tools for object-oriented network protocols. [Work in progress]
 
 ## Build Instructions for GNU Linux/Make (Python bindings)
 
-- Compile the Bamboo C++ source and build the Bamboo shared library using CMake.
+- Compile the Bamboo C++ source and tell CMake to build the Bamboo shared library.
 ```bash
-$ cmake . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
+$ cmake . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1 && make
 ```
 
 - A `libbamboo.so` shared object file should have been generated in the current directory.
