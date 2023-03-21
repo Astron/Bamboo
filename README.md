@@ -16,9 +16,11 @@ $ cmake . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=1
 $ sudo cp libbamboo.so /lib
 ```
 
+- Install the `PyBindGen` pip module to the python environment of your choice. (required to run setup.py)
 - Build the Bamboo python module using the `setup.py` script in the `bindings/python` directory.
 ```bash
 $ cd bindings/python
+$ python2 -m pip install pybindgen
 $ python2 setup.py build
 ```
 
