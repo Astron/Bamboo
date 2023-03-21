@@ -9,7 +9,7 @@ libraryDirs = [buildDir]
 
 module = Extension('bamboo',
     include_dirs = includeDirs,
-    sources = ['pythonBindings.cpp'],
+    sources = ['prebuilt/pythonBindings.cpp'],
     libraries = ['bamboo'],
     library_dirs = libraryDirs)
 module.extra_compile_args = ['--std=c++11']

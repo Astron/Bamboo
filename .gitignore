@@ -1,2 +1,13 @@
+## CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+## GNU Linux/Make
+Makefile
+*.a
+*.so
+## Local IDE
+.idea/
+## Misc artifacts
 build/
 *.pyc
